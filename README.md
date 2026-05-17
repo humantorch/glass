@@ -5,14 +5,16 @@
 [![Obsidian](https://img.shields.io/badge/Obsidian-1.6%2B-7c3aed)](https://obsidian.md)
 [![Desktop only](https://img.shields.io/badge/platform-desktop-lightgrey)](https://obsidian.md/download)
 
-An Obsidian plugin that embeds [Claude Code](https://claude.ai/code) directly inside your vault: interactive terminal, quick-ask modal, and a built-in vault MCP server, all without leaving Obsidian.
+Blackglass puts [Claude Code](https://claude.ai/code) inside Obsidian — not a reimplementation, not a wrapper, but the actual CLI running in a real terminal alongside your notes. Every slash command, every MCP tool, every session you'd have in a standalone terminal is available here. If you already use Claude Code, there's nothing new to learn.
+
+The vault MCP server is what makes it vault-native: a built-in server gives Claude structured, authenticated access to your notes — reading, searching, and writing — without any configuration on your part.
 
 ![Blackglass — Claude Code inside Obsidian](assets/screenshot.png)
 
 ## Features
 
-- **Interactive terminal** — full Claude Code session in an Obsidian sidebar panel (xterm.js)
-- **Vault MCP server** — built-in MCP server gives Claude structured read/write access to your vault (zero configuration)
+- **Real Claude Code terminal** — not a chat UI or a wrapper; the actual Claude Code CLI running in a full xterm.js terminal in your sidebar. All slash commands, all MCP tools, full session continuity.
+- **Built-in vault MCP server** — gives Claude structured read/write access to your notes the moment the plugin loads; no configuration required
 - **Authenticated MCP server** — auto-generated Bearer token written to `.mcp.json` on every launch; any other local process is denied access
 - **Read-only vault mode** — optional setting to hide write tools from Claude entirely, limiting it to read and search only
 - **Quick ask modal** — one-shot queries using Claude Code's `--print` mode; no terminal required; renders responses as Markdown
