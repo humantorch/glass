@@ -3,7 +3,7 @@
   "name": "Blackglass",
   "version": "1.0.0",
   "minAppVersion": "1.6.0",
-  "description": "Embed Claude Code inside Obsidian: interactive terminal, quick-ask modal, and a built-in vault MCP server.",
+  "description": "Run Claude Code inside Obsidian with an interactive terminal, quick-ask modal, and a built-in MCP server for structured vault access.",
   "author": "Scott Kosman",
   "authorUrl": "https://github.com/humantorch",
   "isDesktopOnly": true
