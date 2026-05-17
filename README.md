@@ -154,6 +154,17 @@ Bumps the version in `manifest.json` and `package.json`, builds, commits, tags, 
 npm run dev   # Watch mode — recompiles on every save
 ```
 
+### Testing
+
+```bash
+npm test          # Run tests once
+npm run test:watch  # Re-run on file changes
+```
+
+Integration tests cover the vault MCP server: auth, all seven tools, read-only mode, port fallback, and HTTP edge cases. Tests spin up a real HTTP server against a mock vault — no Obsidian instance required.
+
+The PTY terminal, xterm.js rendering, and Obsidian plugin lifecycle are not covered by automated tests; verify those manually in the test vault.
+
 Install the [hot-reload](https://github.com/pjeby/hot-reload) community plugin in a dedicated test vault, symlink this directory into its plugins folder, and the plugin will reload automatically as you edit.
 
 ```bash
