@@ -214,10 +214,15 @@ export class ProcessManager {
 
 			proc.on("error", (err: Error) => {
 				clearTimeout(timer);
+				const isEnoent = (err as NodeJS.ErrnoException).code === "ENOENT";
+				const isWindows = process.platform === "win32";
+				const hint = isEnoent && isWindows
+					? `Set the full path in Settings → Blackglass → "Claude binary path" (e.g. C:\\Users\\<you>\\.local\\bin\\claude.exe).`
+					: `Is '${options.claudePath}' on your PATH?`;
 				resolve({
 					success: false,
 					text: "",
-					error: `Failed to start Claude: ${err.message}. Is '${options.claudePath}' on your PATH?`,
+					error: `Failed to start Claude: ${err.message}. ${hint}`,
 				});
 			});
 		});
