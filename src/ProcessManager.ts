@@ -10,24 +10,6 @@ import { PtySessionOptions, PrintModeOptions, PrintModeResult } from "./types";
  * Falls back gracefully if execSync is unavailable in the renderer.
  */
 function buildEnv(): Record<string, string> {
-	if (process.platform === "win32") {
-		const env: Record<string, string> = { ...(process.env as Record<string, string>) };
-		const userProfile = env.USERPROFILE || "C:\\Users\\Default";
-		const appData = env.APPDATA || "";
-		const localAppData = env.LOCALAPPDATA || "";
-		const pathParts = new Set<string>(
-			(env.PATH || "").split(";").filter(Boolean)
-		);
-		[
-			`${userProfile}\\.local\\bin`,
-			`${appData}\\npm`,
-			`${localAppData}\\Microsoft\\WinGet\\Packages`,
-			"C:\\Program Files\\nodejs",
-		].filter(Boolean).forEach((p) => pathParts.add(p));
-		env.PATH = Array.from(pathParts).join(";");
-		return env;
-	}
-
 	const env: Record<string, string> = {
 		...(process.env as Record<string, string>),
 	};
@@ -82,7 +64,9 @@ export class ProcessManager {
 
 	startPtySession(options: PtySessionOptions): ChildProcess {
 		if (process.platform === "win32") {
-			return this.startWindowsSession(options);
+			throw new Error(
+				"Interactive terminal is not yet supported on Windows. Use the Quick Ask modal instead."
+			);
 		}
 
 		const python = this.resolvePython();
@@ -105,27 +89,8 @@ export class ProcessManager {
 		return proc;
 	}
 
-	private startWindowsSession(options: PtySessionOptions): ChildProcess {
-		const args: string[] = [];
-		if (options.resumeLastSession) args.push("--continue");
-		if (options.skipPermissions) args.push("--dangerously-skip-permissions");
 
-		const cols = options.cols || 80;
-		const rows = options.rows || 24;
-
-		// conhost.exe creates a ConPTY session so Claude Code sees a real terminal rather
-		// than a pipe (which causes it to switch to --print mode). Use the absolute path
-		// since conhost.exe is not on Electron's PATH but is always at System32.
-		// Note: ConPTY defaults to 80x24 — panel resize and initial sizing are not
-		// supported without Win32 API access (known Windows limitation).
-		return spawn("C:\\Windows\\System32\\conhost.exe", ["--headless", "--", options.claudePath, ...args], {
-			cwd: options.workingDirectory || this.resolvedEnv["USERPROFILE"] || "C:\\",
-			env: { ...this.resolvedEnv, TERM: "xterm-256color", COLUMNS: String(cols), LINES: String(rows) },
-			stdio: ["pipe", "pipe", "pipe"],
-		});
-	}
-
-	resizePty(proc: ChildProcess, cols: number, rows: number): void {
+resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		try {
 			// FD #3 is the resize control channel — Python reads "COLSxROWS\n" and
 			// calls ioctl(TIOCSWINSZ) on the PTY master.

@@ -164,9 +164,8 @@ export class ClaudeTerminalView extends ItemView {
 			this.terminal.writeln(
 				`\r\n\x1b[31mFailed to start Claude Code: ${(err as Error).message}\x1b[0m`
 			);
-			const pythonHint = process.platform !== "win32" ? " and that Python 3 is installed" : "";
 			this.terminal.writeln(
-				`\r\n\x1b[33mCheck that '${settings.claudeBinaryPath}' is on your PATH${pythonHint}.\x1b[0m`
+				`\r\n\x1b[33mCheck that '${settings.claudeBinaryPath}' is on your PATH and that Python 3 is installed.\x1b[0m`
 			);
 			return;
 		}
