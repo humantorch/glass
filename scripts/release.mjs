@@ -9,14 +9,13 @@
  *   2. Builds (tsc + esbuild)
  *   3. Commits the version bump
  *   4. Generates release notes using claude --print
- *   5. Creates blackglass-X.X.X.zip
- *   6. Creates and pushes a vX.X.X git tag
- *   7. Creates a GitHub release with the zip and release notes attached
- *   8. Cleans up local temp files
+ *   5. Creates and pushes a X.X.X git tag
+ *   6. Creates a GitHub release with main.js, manifest.json, styles.css attached
+ *   7. Cleans up local temp files
  */
 
 import { execSync, spawnSync } from "child_process";
-import { readFileSync, writeFileSync, unlinkSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, unlinkSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { tmpdir } from "os";
@@ -47,7 +46,6 @@ const versions = JSON.parse(readFileSync(versionsPath, "utf8"));
 const oldVersion = manifest.version;
 const version = bumpVersion(oldVersion, bumpType);
 const tag = version; // Obsidian requires tags without a 'v' prefix
-const zip = `blackglass-${version}.zip`;
 const notesFile = resolve(tmpdir(), `blackglass-release-notes-${version}.md`);
 
 console.log(`\nBumping ${bumpType}: ${oldVersion} -> ${version}\n`);
@@ -122,24 +120,19 @@ try {
 	console.warn(`Could not generate release notes (${err.message}), falling back to auto-generated notes.`);
 }
 
-// Zip
-console.log("\nPackaging...");
-execSync(`zip ${zip} main.js styles.css manifest.json`, { cwd: root, stdio: "inherit" });
-
 // Tag + push
 console.log(`\nTagging ${tag}...`);
 execSync(`git tag -a ${tag} -m "${tag}"`, { cwd: root, stdio: "inherit" });
 execSync(`git push origin ${tag}`, { cwd: root, stdio: "inherit" });
 
-// GitHub release
+// GitHub release — attach individual files (Obsidian requires main.js, manifest.json, styles.css as direct assets)
 console.log("\nCreating GitHub release...");
 const url = execSync(
-	`gh release create ${tag} ${zip} --title "${tag}" ${notesArg}`,
+	`gh release create ${tag} main.js manifest.json styles.css --title "${tag}" ${notesArg}`,
 	{ cwd: root }
 ).toString().trim();
 
 // Clean up local temp files
-unlinkSync(resolve(root, zip));
 if (existsSync(notesFile)) unlinkSync(notesFile);
 
 console.log(`\nDone: ${url}\n`);
