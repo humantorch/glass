@@ -179,11 +179,9 @@ The symlink folder name should match the plugin ID (`blackglass`) so Obsidian ca
 
 ### Troubleshooting
 
-**"Interactive terminal is not yet supported on Windows"**: the terminal requires macOS or Linux for now. Use the Quick Ask modal on Windows. Full Windows terminal support is planned for a future release.
+**"Interactive terminal is not yet supported on Windows"**: the terminal requires macOS or Linux. Use the Quick Ask modal on Windows — it works on all platforms. Full Windows terminal support is planned for a future release.
 
 **"Python 3 not found"**: install Python 3 from [python.org](https://www.python.org/downloads/) or via Homebrew (`brew install python3`). Python 3 ships with macOS 12.3+; if you're on an older version this may be missing.
-
-**Windows: "Interactive terminal is not yet supported on Windows"**: the terminal requires macOS or Linux. Use the Quick Ask modal on Windows — it works on all platforms. Full Windows terminal support is planned for a future release.
 
 **"Session ended with exit code 1" immediately**: Claude is either not on PATH or not found. Obsidian's Electron process does not inherit your full shell PATH. The plugin attempts to supplement PATH with common install locations (`~/.local/bin`, `/opt/homebrew/bin`, `/usr/local/bin`, etc.), but if Claude is installed elsewhere the most reliable fix is to set the full path explicitly in Settings → Blackglass → "Claude binary path" (use `which claude` in your terminal to find it).
 
