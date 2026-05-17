@@ -145,13 +145,6 @@
 	opacity: 0.5;
 }
 
-.xterm-underline-1 { text-decoration-line: underline; text-decoration-style: solid; }
-.xterm-underline-2 { text-decoration-line: underline; text-decoration-style: double; }
-.xterm-underline-3 { text-decoration-line: underline; text-decoration-style: wavy; }
-.xterm-underline-4 { text-decoration-line: underline; text-decoration-style: dotted; }
-.xterm-underline-5 { text-decoration-line: underline; text-decoration-style: dashed; }
-.xterm-strikethrough { text-decoration-line: line-through; }
-
 /* ============================================================
    Quick Modal
    ============================================================ */
