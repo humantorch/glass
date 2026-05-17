@@ -9,7 +9,7 @@ An Obsidian plugin that embeds [Claude Code](https://claude.ai/code) directly in
 
 ## Features
 
-- **Interactive terminal** — full Claude Code session in an Obsidian sidebar panel (xterm.js + node-pty)
+- **Interactive terminal** — full Claude Code session in an Obsidian sidebar panel (xterm.js)
 - **Vault MCP server** — built-in MCP server gives Claude structured read/write access to your vault (zero configuration)
 - **Authenticated MCP server** — auto-generated Bearer token written to `.mcp.json` on every launch; any other local process is denied access
 - **Read-only vault mode** — optional setting to hide write tools from Claude entirely, limiting it to read and search only
@@ -24,6 +24,9 @@ An Obsidian plugin that embeds [Claude Code](https://claude.ai/code) directly in
 
 - Obsidian desktop app (1.6.0+)
 - [Claude Code CLI](https://claude.ai/code) installed and on your PATH (`claude --version` should work in your terminal)
+- Python 3 — used by the terminal bridge; ships with macOS, available via your package manager on Linux
+
+**Platform support:** The interactive terminal requires macOS or Linux. The Quick Ask modal works on all platforms including Windows.
 
 ## Installation
 
@@ -116,6 +119,7 @@ Blackglass gives Claude Code full shell access in the context of your vault's wo
 ### Prerequisites
 
 - Node.js 18+
+- Python 3
 - Claude Code CLI on your PATH
 
 ### Steps
@@ -124,8 +128,7 @@ Blackglass gives Claude Code full shell access in the context of your vault's wo
 git clone git@github.com:humantorch/blackglass.git
 cd blackglass
 npm install
-npm run rebuild-native   # Compiles node-pty for Obsidian's Electron version
-npm run build            # Produces main.js
+npm run build   # Produces main.js
 ```
 
 Then copy `main.js`, `styles.css`, and `manifest.json` into your vault's plugin directory.
@@ -159,11 +162,9 @@ The symlink folder name should match the plugin ID (`blackglass`) so Obsidian ca
 
 ### Troubleshooting
 
-**"Cannot find module 'node-pty'"** — run `npm run rebuild-native`. node-pty is a native module that must be compiled against Obsidian's specific Electron version. If the rebuild fails, open Obsidian's DevTools (Cmd+Opt+I), run `process.versions.electron` in the console, and pass that version explicitly:
+**"Interactive terminal is not yet supported on Windows"** — the terminal requires macOS or Linux. Use the Quick Ask modal on Windows.
 
-```bash
-npx @electron/rebuild -f -w node-pty --version <electron-version>
-```
+**"Python 3 not found"** — install Python 3 from [python.org](https://www.python.org/downloads/) or via Homebrew (`brew install python3`). Python 3 ships with macOS 12.3+; if you're on an older version this may be missing.
 
 **"Session ended with exit code 1" immediately** — Claude is either not on PATH or not found. Obsidian's Electron process does not inherit your full shell PATH. The plugin attempts to supplement PATH with common install locations (`~/.local/bin`, `/opt/homebrew/bin`, `/usr/local/bin`, etc.), but if Claude is installed elsewhere the most reliable fix is to set the full path explicitly in Settings → Blackglass → "Claude binary path" (use `which claude` in your terminal to find it).
 
@@ -180,7 +181,7 @@ src/
 ├── SettingsTab.ts         # Obsidian settings UI
 ├── ContextBuilder.ts      # Vault context extraction (file content, selection, paths)
 ├── ProcessManager.ts      # Claude subprocess management (PTY + print mode)
-├── ClaudeTerminalView.ts  # xterm.js + node-pty interactive terminal view
+├── ClaudeTerminalView.ts  # xterm.js interactive terminal view
 ├── ClaudeQuickModal.ts    # One-shot query modal using --print mode
 └── VaultMcpServer.ts      # Built-in MCP server exposing vault tools to Claude
 ```
