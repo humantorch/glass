@@ -110,10 +110,10 @@ export class ProcessManager {
 		if (options.resumeLastSession) args.push("--continue");
 		if (options.skipPermissions) args.push("--dangerously-skip-permissions");
 
-		// Spawn claude.exe directly with stdio pipes. No PTY wrapper is needed here —
-		// Claude Code detects the pipe environment and adjusts its output accordingly.
-		// Resize is a no-op on Windows (no FD3 channel); resizePty() handles this gracefully.
-		return spawn(options.claudePath, args, {
+		// conhost.exe creates a ConPTY session so Claude Code sees a real terminal rather
+		// than a pipe (which causes it to switch to --print mode). Use the absolute path
+		// since conhost.exe is not on Electron's PATH but is always at System32.
+		return spawn("C:\\Windows\\System32\\conhost.exe", ["--headless", "--", options.claudePath, ...args], {
 			cwd: options.workingDirectory || this.resolvedEnv["USERPROFILE"] || "C:\\",
 			env: { ...this.resolvedEnv, TERM: "xterm-256color" },
 			stdio: ["pipe", "pipe", "pipe"],
