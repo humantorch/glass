@@ -111,7 +111,11 @@ try {
 	});
 
 	if (result.status === 0 && result.stdout.trim()) {
-		writeFileSync(notesFile, result.stdout.trim());
+		// Claude sometimes wraps --print output in ```markdown ... ``` fences.
+		// Strip them so the GitHub release notes render as plain markdown.
+		let notes = result.stdout.trim();
+		notes = notes.replace(/^```[a-z]*\n/, "").replace(/\n```$/, "").trim();
+		writeFileSync(notesFile, notes);
 		notesArg = `--notes-file ${notesFile}`;
 		console.log("Release notes generated.");
 	} else {

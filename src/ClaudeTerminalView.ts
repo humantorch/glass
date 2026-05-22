@@ -104,7 +104,9 @@ export class ClaudeTerminalView extends ItemView {
 
 		// Initialize xterm
 		this.fitAddon = new FitAddon();
-		const webLinksAddon = new WebLinksAddon();
+		// Use shell.openExternal so Electron doesn't block the link as an unclearable opener.
+		const { shell } = require("electron");
+		const webLinksAddon = new WebLinksAddon((_event, uri) => shell.openExternal(uri));
 
 		this.terminal = new Terminal({
 			fontFamily: this.plugin.settings.fontFamily,
