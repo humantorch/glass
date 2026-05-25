@@ -121,6 +121,7 @@ export class ClaudeQuickModal extends Modal {
 		this.resultEl.style.display = "block";
 		this.resultEl.empty();
 		const spinner = this.resultEl.createDiv({ cls: "claude-quick-modal-loading" });
+		spinner.createEl("span", { cls: "claude-quick-modal-spinner" });
 		spinner.createEl("span", { text: "Claude is thinking..." });
 
 		const { settings } = this.plugin;
