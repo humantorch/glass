@@ -6,54 +6,42 @@ import type { ChildProcess } from "child_process";
 import type ClaudeCodePlugin from "./main";
 import { CLAUDE_ICON, CLAUDE_TERMINAL_VIEW_TYPE } from "./types";
 
-/** Returns a reasonable xterm theme based on Obsidian's current color scheme */
+/** Reads an Obsidian CSS variable from the current theme, falling back to a default. */
+function cssVar(name: string, fallback: string): string {
+	const value = getComputedStyle(document.body).getPropertyValue(name).trim();
+	return value || fallback;
+}
+
+/**
+ * Builds an xterm theme from the active Obsidian theme's CSS variables.
+ * Background, foreground, and ANSI colors are derived from the theme so
+ * third-party themes (e.g. Typewriter, Catppuccin) feel native rather than
+ * clashing with hardcoded VS Code-style colors.
+ * Hardcoded values are fallbacks for themes that don't define a given variable.
+ */
 function getXtermTheme(): object {
 	const isDark = document.body.classList.contains("theme-dark");
-	if (isDark) {
-		return {
-			background: "#1e1e1e",
-			foreground: "#d4d4d4",
-			cursor: "#d4d4d4",
-			selectionBackground: "#264f78",
-			black: "#1e1e1e",
-			red: "#f44747",
-			green: "#4ec9b0",
-			yellow: "#dcdcaa",
-			blue: "#569cd6",
-			magenta: "#c678dd",
-			cyan: "#4ec9b0",
-			white: "#d4d4d4",
-			brightBlack: "#808080",
-			brightRed: "#f44747",
-			brightGreen: "#4ec9b0",
-			brightYellow: "#dcdcaa",
-			brightBlue: "#569cd6",
-			brightMagenta: "#c678dd",
-			brightCyan: "#4ec9b0",
-			brightWhite: "#ffffff",
-		};
-	}
 	return {
-		background: "#ffffff",
-		foreground: "#383a42",
-		cursor: "#383a42",
-		selectionBackground: "#c8def0",
-		black: "#383a42",
-		red: "#e45649",
-		green: "#50a14f",
-		yellow: "#c18401",
-		blue: "#0184bc",
-		magenta: "#a626a4",
-		cyan: "#0997b3",
-		white: "#fafafa",
-		brightBlack: "#4f525e",
-		brightRed: "#e45649",
-		brightGreen: "#50a14f",
-		brightYellow: "#c18401",
-		brightBlue: "#4078f2",
-		brightMagenta: "#a626a4",
-		brightCyan: "#0997b3",
-		brightWhite: "#ffffff",
+		background:          cssVar("--background-primary",           isDark ? "#1e1e1e" : "#ffffff"),
+		foreground:          cssVar("--text-normal",                  isDark ? "#d4d4d4" : "#383a42"),
+		cursor:              cssVar("--text-normal",                  isDark ? "#d4d4d4" : "#383a42"),
+		selectionBackground: cssVar("--text-selection",               isDark ? "#264f78" : "#c8def0"),
+		black:               cssVar("--color-base-30",                isDark ? "#3a3a3a" : "#383a42"),
+		red:                 cssVar("--color-red",                    isDark ? "#f44747" : "#e45649"),
+		green:               cssVar("--color-green",                  isDark ? "#4ec9b0" : "#50a14f"),
+		yellow:              cssVar("--color-yellow",                 isDark ? "#dcdcaa" : "#c18401"),
+		blue:                cssVar("--color-blue",                   isDark ? "#569cd6" : "#0184bc"),
+		magenta:             cssVar("--color-purple",                 isDark ? "#c678dd" : "#a626a4"),
+		cyan:                cssVar("--color-cyan",                   isDark ? "#4ec9b0" : "#0997b3"),
+		white:               cssVar("--color-base-70",                isDark ? "#d4d4d4" : "#fafafa"),
+		brightBlack:         cssVar("--color-base-50",                isDark ? "#808080" : "#4f525e"),
+		brightRed:           cssVar("--color-red",                    isDark ? "#f44747" : "#e45649"),
+		brightGreen:         cssVar("--color-green",                  isDark ? "#4ec9b0" : "#50a14f"),
+		brightYellow:        cssVar("--color-yellow",                 isDark ? "#dcdcaa" : "#c18401"),
+		brightBlue:          cssVar("--color-blue",                   isDark ? "#569cd6" : "#4078f2"),
+		brightMagenta:       cssVar("--color-purple",                 isDark ? "#c678dd" : "#a626a4"),
+		brightCyan:          cssVar("--color-cyan",                   isDark ? "#4ec9b0" : "#0997b3"),
+		brightWhite:         cssVar("--color-base-100",               isDark ? "#ffffff" : "#ffffff"),
 	};
 }
 
@@ -63,6 +51,7 @@ export class ClaudeTerminalView extends ItemView {
 	private fitAddon: FitAddon | null = null;
 	private pty: ChildProcess | null = null;
 	private resizeObserver: ResizeObserver | null = null;
+	private themeObserver: MutationObserver | null = null;
 	private terminalInputDisposable: { dispose(): void } | null = null;
 	private statusDot: HTMLElement | null = null;
 
@@ -150,6 +139,11 @@ export class ClaudeTerminalView extends ItemView {
 			}
 		});
 		this.resizeObserver.observe(xtermWrapper);
+
+		this.themeObserver = new MutationObserver(() => {
+			if (this.terminal) this.terminal.options.theme = getXtermTheme();
+		});
+		this.themeObserver.observe(document.body, { attributeFilter: ["class"] });
 	}
 
 	private setSessionStatus(active: boolean): void {
@@ -286,6 +280,8 @@ export class ClaudeTerminalView extends ItemView {
 	async onClose(): Promise<void> {
 		this.resizeObserver?.disconnect();
 		this.resizeObserver = null;
+		this.themeObserver?.disconnect();
+		this.themeObserver = null;
 
 		if (this.pty) {
 			this.plugin.processManager.killPty(this.pty);
