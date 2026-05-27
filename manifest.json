@@ -6,5 +6,6 @@
   "description": "Run Claude Code inside your vault with an interactive terminal, quick-ask modal, and a built-in MCP server for structured vault access.",
   "author": "Scott Kosman",
   "authorUrl": "https://github.com/humantorch",
-  "isDesktopOnly": true
+  "isDesktopOnly": true,
+  "fundingUrl": "https://buymeacoffee.com/scottkosman"
 }
