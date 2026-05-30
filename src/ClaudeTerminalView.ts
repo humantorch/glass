@@ -178,12 +178,22 @@ export class ClaudeTerminalView extends ItemView {
 				rows: this.terminal.rows,
 			});
 		} catch (err) {
-			this.terminal.writeln(
-				`\r\n\x1b[31mFailed to start Claude Code: ${(err as Error).message}\x1b[0m`
-			);
-			this.terminal.writeln(
-				`\r\n\x1b[33mCheck that '${settings.claudeBinaryPath}' is on your PATH and that Python 3 is installed.\x1b[0m`
-			);
+			const msg = (err as Error).message;
+			this.terminal.writeln(`\r\n\x1b[31mFailed to start Claude Code: ${msg}\x1b[0m`);
+			if (process.platform === "win32" && msg.includes("Python")) {
+				this.terminal.writeln(`\r\n\x1b[33mSetup steps:\x1b[0m`);
+				this.terminal.writeln(`\r\n\x1b[33m  1. Install Python 3: https://www.python.org/downloads/\x1b[0m`);
+				this.terminal.writeln(`\r\n\x1b[33m  2. Run in PowerShell: pip install pywinpty\x1b[0m`);
+				this.terminal.writeln(`\r\n\x1b[33m  3. Reload Obsidian\x1b[0m`);
+			} else if (process.platform === "win32") {
+				this.terminal.writeln(
+					`\r\n\x1b[33mCheck that '${settings.claudeBinaryPath}' is on your PATH. If pywinpty is missing: pip install pywinpty\x1b[0m`
+				);
+			} else {
+				this.terminal.writeln(
+					`\r\n\x1b[33mCheck that '${settings.claudeBinaryPath}' is on your PATH and that Python 3 is installed.\x1b[0m`
+				);
+			}
 			return;
 		}
 
@@ -224,9 +234,11 @@ export class ClaudeTerminalView extends ItemView {
 			if (this.pty !== thisPty) return;
 			this.pty = null;
 			this.setSessionStatus(false);
-			const pythonHint = process.platform !== "win32" ? " and that Python 3 is installed" : "";
+			const setupHint = process.platform === "win32"
+				? " Python 3 and pywinpty are required (pip install pywinpty)."
+				: " Check that Python 3 is installed.";
 			this.terminal?.writeln(`\r\n\x1b[31mFailed to start Claude Code: ${err.message}\x1b[0m`);
-			this.terminal?.writeln(`\r\n\x1b[33mCheck that '${settings.claudeBinaryPath}' is on your PATH${pythonHint}.\x1b[0m`);
+			this.terminal?.writeln(`\r\n\x1b[33mCheck that '${settings.claudeBinaryPath}' is on your PATH.${setupHint}\x1b[0m`);
 		});
 
 		// PTY exit

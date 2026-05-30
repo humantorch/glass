@@ -3,7 +3,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/humantorch/blackglass)](https://github.com/humantorch/blackglass/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Obsidian](https://img.shields.io/badge/Obsidian-1.6%2B-7c3aed)](https://obsidian.md)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey)](https://github.com/humantorch/blackglass#requirements)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey)](https://github.com/humantorch/blackglass#requirements)
 [![Python 3](https://img.shields.io/badge/python-3.6%2B-blue)](https://www.python.org/downloads/)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕-yellow)](https://buymeacoffee.com/scottkosman)
 
@@ -31,11 +31,17 @@ The vault MCP server is what makes it vault-native: a built-in server gives Clau
 
 - Obsidian desktop app (1.6.0+)
 - [Claude Code CLI](https://claude.ai/code) installed and on your PATH (`claude --version` should work in your terminal)
-- Python 3 (used by the terminal bridge; ships with macOS, available via your package manager on Linux)
+- Python 3 (used by the terminal bridge; ships with macOS, available via your package manager on Linux; install from [python.org](https://www.python.org/downloads/) on Windows)
 
-**Platform support:** The interactive terminal requires macOS or Linux. The Quick Ask modal works on all platforms including Windows. Full Windows terminal support requires native ConPTY integration and is planned for a future release.
+**Platform support:** macOS and Linux work out of the box. Windows requires Python 3 and one extra step:
 
-**Windows and Agent SDK credits:** The Quick Ask modal runs Claude Code in non-interactive (`-p`) mode. As of June 15, 2026, Anthropic bills this separately from interactive usage — Pro plans include $20/month of Agent SDK credits ([details](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan)). On Windows, where the terminal is not yet available, all Blackglass usage goes through Quick Ask and draws from this pool.
+```
+pip install pywinpty
+```
+
+`pywinpty` is a Python package that provides Windows PTY support, including terminal resize. The Quick Ask modal works on all platforms without it.
+
+**Agent SDK credits:** The Quick Ask modal runs Claude Code in non-interactive (`-p`) mode. As of June 15, 2026, Anthropic bills this separately from interactive usage — Pro plans include $20/month of Agent SDK credits ([details](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan)). The interactive terminal (available on all platforms) draws from your regular Claude subscription, not this pool.
 
 ## Installation
 
@@ -185,7 +191,7 @@ The symlink folder name should match the plugin ID (`blackglass`) so Obsidian ca
 
 ### Troubleshooting
 
-**"Interactive terminal is not yet supported on Windows"**: the terminal requires macOS or Linux. Use the Quick Ask modal on Windows — it works on all platforms. Full Windows terminal support is planned for a future release. Note that Quick Ask on Windows draws from Anthropic's Agent SDK credit pool; see the note in Requirements above.
+**"pywinpty is not installed"**: Windows terminal support requires `pywinpty`. Run `pip install pywinpty` in a terminal, then reload the plugin. If you have multiple Python installs, make sure you're installing into the same Python that Blackglass finds on your PATH (`where python` will show it).
 
 **"Python 3 not found"**: install Python 3 from [python.org](https://www.python.org/downloads/) or via Homebrew (`brew install python3`). Python 3 ships with macOS 12.3+; if you're on an older version this may be missing.
 
