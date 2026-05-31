@@ -11,7 +11,7 @@ Blackglass puts [Claude Code](https://claude.ai/code) inside Obsidian with a bui
 
 Every slash command, every MCP tool, every session you'd have in a standalone terminal. If you already use Claude Code, there's nothing new to learn.
 
-![Blackglass screenshot](assets/blackglass.png)
+![Blackglass screenshot](assets/blackglass-05.31.png)
 
 ## Features
 
