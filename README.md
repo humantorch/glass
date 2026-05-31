@@ -7,9 +7,9 @@
 [![Python 3](https://img.shields.io/badge/python-3.6%2B-blue)](https://www.python.org/downloads/)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕-yellow)](https://buymeacoffee.com/scottkosman)
 
-Blackglass puts [Claude Code](https://claude.ai/code) inside Obsidian: not a reimplementation, not a wrapper, but the actual CLI running in a real terminal alongside your notes. Every slash command, every MCP tool, every session you'd have in a standalone terminal is available here. If you already use Claude Code, there's nothing new to learn.
+Blackglass puts [Claude Code](https://claude.ai/code) inside Obsidian with a built-in MCP server that gives Claude direct access to your vault — reading, searching, and writing notes without any configuration on your part. Not a chat UI, not a reimplementation: the actual Claude Code CLI running in a real terminal alongside your notes.
 
-The vault MCP server is what makes it vault-native: a built-in server gives Claude structured, authenticated access to your notes (reading, searching, and writing) without any configuration on your part.
+Every slash command, every MCP tool, every session you'd have in a standalone terminal. If you already use Claude Code, there's nothing new to learn.
 
 ![Blackglass screenshot](assets/blackglass.png)
 
