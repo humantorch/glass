@@ -1,5 +1,6 @@
 import { App, Modal, MarkdownRenderer, Notice, Component } from "obsidian";
 import type ClaudeCodePlugin from "./main";
+import { QUICK_ASK_MODELS } from "./types";
 
 export class ClaudeQuickModal extends Modal {
 	private plugin: ClaudeCodePlugin;
@@ -80,13 +81,7 @@ export class ClaudeQuickModal extends Modal {
 		this.modelSelect = modelWrapper.createEl("select", {
 			cls: "claude-quick-modal-model-select",
 		});
-		const models: [string, string][] = [
-			["", "Default"],
-			["claude-haiku-4-5-20251001", "Haiku 4.5"],
-			["claude-sonnet-4-6", "Sonnet 4.6"],
-			["claude-opus-4-7", "Opus 4.7"],
-		];
-		for (const [value, label] of models) {
+		for (const [value, label] of QUICK_ASK_MODELS) {
 			const opt = this.modelSelect.createEl("option", { text: label });
 			opt.value = value;
 		}

@@ -33,6 +33,13 @@ export const DEFAULT_SETTINGS: ClaudeCodeSettings = {
 export const CLAUDE_TERMINAL_VIEW_TYPE = "claude-code-terminal";
 export const CLAUDE_ICON = "bot";
 
+export const QUICK_ASK_MODELS: [string, string][] = [
+	["", "Default"],
+	["claude-haiku-4-5-20251001", "Haiku 4.5"],
+	["claude-sonnet-4-6", "Sonnet 4.6"],
+	["claude-opus-4-8", "Opus 4.8"],
+];
+
 export interface PtySessionOptions {
 	claudePath: string;
 	workingDirectory: string;

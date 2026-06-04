@@ -1,5 +1,6 @@
 import { App, DropdownComponent, Notice, PluginSettingTab, Setting } from "obsidian";
 import type ClaudeCodePlugin from "./main";
+import { QUICK_ASK_MODELS } from "./types";
 
 export class SettingsTab extends PluginSettingTab {
 	plugin: ClaudeCodePlugin;
@@ -49,19 +50,17 @@ export class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Quick ask model")
 			.setDesc("Claude model to use for the quick ask modal.")
-			.addDropdown((dropdown) =>
+			.addDropdown((dropdown) => {
+				for (const [value, label] of QUICK_ASK_MODELS) {
+					dropdown.addOption(value, label);
+				}
 				dropdown
-					.addOption("", "Default")
-					.addOption("claude-haiku-4-5-20251001", "Haiku 4.5")
-					.addOption("claude-sonnet-4-6", "Sonnet 4.6")
-					.addOption("claude-opus-4-7", "Opus 4.7")
-					.addOption("claude-opus-4-8", "Opus 4.8")
 					.setValue(this.plugin.settings.quickAskModel)
 					.onChange(async (value) => {
 						this.plugin.settings.quickAskModel = value;
 						await this.plugin.saveSettings();
-					})
-			);
+					});
+			});
 
 		new Setting(containerEl)
 			.setName("Terminal font size")
