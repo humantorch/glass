@@ -257,6 +257,84 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 	}
 
 	/**
+	 * Runs Claude in streaming print mode, emitting text deltas via onToken as they arrive.
+	 * Calls onComplete with the full final text, or onError on failure.
+	 * Returns a kill function to abort the request.
+	 */
+	runPrintModeStreamingWithContext(
+		context: string,
+		prompt: string,
+		options: PrintModeOptions,
+		onToken: (delta: string) => void,
+		onComplete: (fullText: string) => void,
+		onError: (message: string) => void
+	): () => void {
+		const args = ["--print", "--output-format", "text"];
+		if (options.model) args.push("--model", options.model);
+
+		const proc = spawn(options.claudePath, args, {
+			cwd: options.workingDirectory || undefined,
+			env: { ...this.resolvedEnv },
+			stdio: ["pipe", "pipe", "pipe"],
+		});
+
+		const fullMessage = context ? `${context}\n\n${prompt}` : prompt;
+		proc.stdin.write(fullMessage);
+		proc.stdin.end();
+
+		let fullText = "";
+		let killed = false;
+		let completed = false;
+
+		const timeoutMs = options.timeoutMs ?? 120000;
+		const timer = setTimeout(() => {
+			if (killed || completed) return;
+			killed = true;
+			proc.kill();
+			onError(`Request timed out after ${timeoutMs / 1000}s`);
+		}, timeoutMs);
+
+		proc.stdout.on("data", (chunk: Buffer) => {
+			if (killed) return;
+			const delta = chunk.toString();
+			fullText += delta;
+			onToken(delta);
+		});
+
+		let stderr = "";
+		proc.stderr.on("data", (d: Buffer) => { stderr += d.toString(); });
+
+		proc.on("close", (code: number | null) => {
+			clearTimeout(timer);
+			if (killed || completed) return;
+			completed = true;
+			if (code === 0) {
+				onComplete(fullText);
+			} else {
+				onError(stderr.trim() || `Claude exited with code ${code}`);
+			}
+		});
+
+		proc.on("error", (err: Error) => {
+			clearTimeout(timer);
+			if (killed || completed) return;
+			completed = true;
+			const isEnoent = (err as NodeJS.ErrnoException).code === "ENOENT";
+			const isWindows = process.platform === "win32";
+			const hint = isEnoent && isWindows
+				? `Set the full path in Settings → Blackglass → "Claude binary path".`
+				: `Is '${options.claudePath}' on your PATH?`;
+			onError(`Failed to start Claude: ${err.message}. ${hint}`);
+		});
+
+		return () => {
+			killed = true;
+			clearTimeout(timer);
+			try { proc.kill(); } catch { /* already dead */ }
+		};
+	}
+
+	/**
 	 * Runs Claude in non-interactive print mode, piping optional context + prompt via stdin.
 	 * Uses --output-format json for reliable response parsing.
 	 */

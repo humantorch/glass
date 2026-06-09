@@ -9,9 +9,16 @@ export class ClaudeQuickModal extends Modal {
 	private modelSelect: HTMLSelectElement | null = null;
 	private resultEl: HTMLElement | null = null;
 	private submitBtn: HTMLButtonElement | null = null;
+	private stopBtn: HTMLButtonElement | null = null;
 	private copyBtn: HTMLButtonElement | null = null;
 	private lastResponse = "";
 	private aborted = false;
+	private killStream: (() => void) | null = null;
+	private streamEl: HTMLElement | null = null;
+	private streamText = "";
+	private charQueue: string[] = [];
+	private animationId: number | null = null;
+	private pendingCompleteText: string | null = null;
 	private markdownComponent: Component;
 
 	constructor(app: App, plugin: ClaudeCodePlugin, prefill = "") {
@@ -72,6 +79,28 @@ export class ClaudeQuickModal extends Modal {
 		});
 		this.submitBtn.addEventListener("click", () => this.submit());
 
+		this.stopBtn = actionBar.createEl("button", {
+			text: "Stop",
+			cls: "claude-quick-modal-stop-btn",
+		});
+		this.stopBtn.style.display = "none";
+		this.stopBtn.addEventListener("click", () => {
+			this.killStream?.();
+			this.killStream = null;
+			this.pendingCompleteText = null;
+			// Flush queued chars into streamText before rendering
+			if (this.charQueue.length > 0) {
+				this.streamText += this.charQueue.join("");
+				this.charQueue = [];
+			}
+			if (this.streamText) {
+				void this.finalizeResponse(this.streamText);
+			} else {
+				this.finishStreaming();
+				if (this.resultEl) this.resultEl.style.display = "none";
+			}
+		});
+
 		// Model selector — defaults to the setting, overridable per-query
 		const modelWrapper = actionBar.createDiv({ cls: "claude-quick-modal-model-wrapper" });
 		modelWrapper.createEl("label", {
@@ -99,7 +128,7 @@ export class ClaudeQuickModal extends Modal {
 		this.resultEl.style.display = "none";
 	}
 
-	private async submit(): Promise<void> {
+	private submit(): void {
 		if (!this.promptTextarea || !this.resultEl || !this.submitBtn) return;
 
 		const prompt = this.promptTextarea.value.trim();
@@ -108,66 +137,104 @@ export class ClaudeQuickModal extends Modal {
 			return;
 		}
 
+		// Kill any in-progress stream before starting a new one
+		this.killStream?.();
+		this.killStream = null;
 		this.aborted = false;
-		this.submitBtn.disabled = true;
-		this.submitBtn.textContent = "Asking Claude...";
+		this.streamText = "";
 
-		// Show loading state
+		this.submitBtn.disabled = true;
+		this.submitBtn.textContent = "Asking...";
+		if (this.stopBtn) this.stopBtn.style.display = "inline-block";
+		if (this.copyBtn) this.copyBtn.style.display = "none";
+
+		// Show streaming area
 		this.resultEl.style.display = "block";
 		this.resultEl.empty();
-		const spinner = this.resultEl.createDiv({ cls: "claude-quick-modal-loading" });
-		spinner.createEl("span", { cls: "claude-quick-modal-spinner" });
-		spinner.createEl("span", { text: "Claude is thinking..." });
+		this.streamEl = this.resultEl.createDiv({ cls: "claude-quick-modal-stream claude-quick-modal-stream--active" });
 
 		const { settings } = this.plugin;
-		const workingDir =
-			settings.workingDirectory ||
-			this.plugin.contextBuilder.getVaultRoot() ||
-			"";
-
+		const workingDir = settings.workingDirectory || this.plugin.contextBuilder.getVaultRoot() || "";
 		const model = this.modelSelect?.value || undefined;
 
-		const result = await this.plugin.processManager.runPrintModeWithContext(
+		this.killStream = this.plugin.processManager.runPrintModeStreamingWithContext(
 			this.prefill,
 			prompt,
-			{
-				claudePath: settings.claudeBinaryPath,
-				workingDirectory: workingDir,
-				model,
+			{ claudePath: settings.claudeBinaryPath, workingDirectory: workingDir, model },
+			(delta: string) => {
+				if (this.aborted) return;
+				for (const ch of delta) this.charQueue.push(ch);
+				if (this.animationId === null) this.startStreamAnimation();
+			},
+			(fullText: string) => {
+				if (this.aborted) return;
+				this.killStream = null;
+				if (this.charQueue.length === 0 && this.animationId === null) {
+					void this.finalizeResponse(fullText);
+				} else {
+					this.pendingCompleteText = fullText;
+				}
+			},
+			(error: string) => {
+				if (this.aborted) return;
+				this.killStream = null;
+				this.finishStreaming();
+				if (this.resultEl) {
+					this.resultEl.empty();
+					this.resultEl.createEl("p", { text: `Error: ${error}`, cls: "claude-quick-modal-error" });
+				}
 			}
 		);
+	}
 
-		if (this.aborted) return;
+	private startStreamAnimation(): void {
+		const step = () => {
+			if (this.charQueue.length === 0) {
+				this.animationId = null;
+				if (this.pendingCompleteText !== null) {
+					const text = this.pendingCompleteText;
+					this.pendingCompleteText = null;
+					void this.finalizeResponse(text);
+				}
+				return;
+			}
+			// Slow when queue is small (visible streaming), fast when backlogged
+			const n = this.charQueue.length > 1000 ? 50 : this.charQueue.length > 300 ? 15 : 5;
+			this.streamText += this.charQueue.splice(0, n).join("");
+			if (this.streamEl) {
+				this.streamEl.textContent = this.streamText;
+			}
+			this.animationId = requestAnimationFrame(step);
+		};
+		this.animationId = requestAnimationFrame(step);
+	}
 
-		this.submitBtn.disabled = false;
-		this.submitBtn.textContent = "Ask Claude";
+	private finishStreaming(): void {
+		if (this.animationId !== null) {
+			cancelAnimationFrame(this.animationId);
+			this.animationId = null;
+		}
+		this.charQueue = [];
+		this.pendingCompleteText = null;
+		if (this.submitBtn) {
+			this.submitBtn.disabled = false;
+			this.submitBtn.textContent = "Ask Claude";
+		}
+		if (this.stopBtn) this.stopBtn.style.display = "none";
+		this.streamEl = null;
+	}
 
+	private async finalizeResponse(text: string): Promise<void> {
+		this.lastResponse = text;
+		this.finishStreaming();
+
+		if (!this.resultEl) return;
 		this.resultEl.empty();
-
-		if (!result.success) {
-			this.resultEl.createEl("p", {
-				text: `Error: ${result.error}`,
-				cls: "claude-quick-modal-error",
-			});
-			return;
-		}
-
-		this.lastResponse = result.text;
-
-		// Render response as markdown
 		const responseEl = this.resultEl.createDiv({ cls: "claude-quick-modal-response" });
-		await MarkdownRenderer.render(
-			this.app,
-			result.text,
-			responseEl,
-			"",
-			this.markdownComponent
-		);
+		await MarkdownRenderer.render(this.app, text, responseEl, "", this.markdownComponent);
+		this.resultEl.scrollTo({ top: 0 });
 
-		// Show copy button
-		if (this.copyBtn) {
-			this.copyBtn.style.display = "inline-block";
-		}
+		if (this.copyBtn) this.copyBtn.style.display = "inline-block";
 	}
 
 	private async copyToClipboard(): Promise<void> {
@@ -182,6 +249,13 @@ export class ClaudeQuickModal extends Modal {
 
 	onClose(): void {
 		this.aborted = true;
+		this.killStream?.();
+		this.killStream = null;
+		if (this.animationId !== null) {
+			cancelAnimationFrame(this.animationId);
+			this.animationId = null;
+		}
+		this.charQueue = [];
 		this.markdownComponent.unload();
 		const { contentEl } = this;
 		contentEl.empty();

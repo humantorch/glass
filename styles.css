@@ -372,6 +372,36 @@
 	animation: claude-spin 0.8s linear infinite;
 }
 
+.claude-quick-modal-stream {
+	font-size: var(--font-ui-medium);
+	white-space: pre-wrap;
+	word-break: break-word;
+	color: var(--text-normal);
+	margin: 0;
+	min-height: 1.5em;
+}
+
+.claude-quick-modal-stream--active::after {
+	content: "▊";
+	color: var(--interactive-accent);
+	animation: claude-blink 1s step-end infinite;
+}
+
+.claude-quick-modal-stop-btn {
+	background: var(--interactive-normal);
+	color: var(--text-muted);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	padding: 4px 12px;
+	cursor: pointer;
+}
+
+.claude-quick-modal-stop-btn:hover {
+	background: var(--color-red);
+	color: var(--text-on-accent);
+	border-color: var(--color-red);
+}
+
 /* ============================================================
    Spinner animation
    ============================================================ */
@@ -379,4 +409,8 @@
 @keyframes claude-spin {
 	from { transform: rotate(0deg); }
 	to { transform: rotate(360deg); }
+}
+
+@keyframes claude-blink {
+	50% { opacity: 0; }
 }
