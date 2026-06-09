@@ -15,7 +15,7 @@ export class SettingsTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		new Setting(containerEl).setName("Claude Code Settings").setHeading();
+		new Setting(containerEl).setName("Claude Code").setHeading();
 
 		new Setting(containerEl)
 			.setName("Claude binary path")
