@@ -2,7 +2,7 @@
 
 [![GitHub release](https://img.shields.io/github/v/release/humantorch/blackglass)](https://github.com/humantorch/blackglass/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Obsidian](https://img.shields.io/badge/Obsidian-1.6%2B-7c3aed)](https://obsidian.md)
+[![Obsidian](https://img.shields.io/badge/Obsidian-1.7.7%2B-7c3aed)](https://obsidian.md)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey)](https://github.com/humantorch/blackglass#requirements)
 [![Python 3](https://img.shields.io/badge/python-3.6%2B-blue)](https://www.python.org/downloads/)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕-yellow)](https://buymeacoffee.com/scottkosman)
@@ -29,7 +29,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 
 ## Requirements
 
-- Obsidian desktop app (1.6.0+)
+- Obsidian desktop app (1.7.7+)
 - [Claude Code CLI](https://claude.ai/code) installed and on your PATH (`claude --version` should work in your terminal)
 - Python 3 (used by the terminal bridge; ships with macOS, available via your package manager on Linux; install from [python.org](https://www.python.org/downloads/) on Windows)
 
@@ -159,7 +159,7 @@ npm run release:minor   # 0.2.0 → 0.3.0
 npm run release:major   # 0.2.0 → 1.0.0
 ```
 
-Bumps the version in `manifest.json` and `package.json`, builds, commits, tags, and publishes a GitHub release with the zip attached. Requires the `gh` CLI to be authenticated.
+Bumps the version in `manifest.json` and `package.json`, builds, commits, tags, and creates a GitHub release with `manifest.json` attached. A GitHub Actions workflow then builds the release assets, attests build provenance, and uploads `main.js` and `styles.css`. Requires the `gh` CLI to be authenticated.
 
 ### Development loop
 
@@ -170,7 +170,8 @@ npm run dev   # Watch mode — recompiles on every save
 ### Testing
 
 ```bash
-npm test          # Run tests once
+npm run lint        # Run Obsidian plugin linter (zero errors = ready to submit)
+npm test            # Run tests once
 npm run test:watch  # Re-run on file changes
 ```
 
