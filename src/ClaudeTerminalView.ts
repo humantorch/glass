@@ -1,6 +1,6 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import { App, FuzzySuggestModal, ItemView, Notice, TFile, WorkspaceLeaf, setIcon } from "obsidian";
 import { Terminal } from "@xterm/xterm";
-import type { FontWeight } from "@xterm/xterm";
+import type { FontWeight, ILink } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { shell } from "electron";
@@ -45,6 +45,29 @@ function getXtermTheme(): object {
 		brightCyan:          cssVar("--color-cyan",                   isDark ? "#4ec9b0" : "#0997b3"),
 		brightWhite:         cssVar("--color-base-100",               isDark ? "#ffffff" : "#ffffff"),
 	};
+}
+
+class FilePickerModal extends FuzzySuggestModal<TFile> {
+	private callback: (file: TFile) => void;
+
+	constructor(app: App, callback: (file: TFile) => void) {
+		super(app);
+		this.callback = callback;
+		this.setPlaceholder("Type to search notes...");
+	}
+
+	getItems(): TFile[] {
+		return this.app.vault.getMarkdownFiles()
+			.sort((a, b) => a.path.localeCompare(b.path));
+	}
+
+	getItemText(file: TFile): string {
+		return file.path;
+	}
+
+	onChooseItem(file: TFile): void {
+		this.callback(file);
+	}
 }
 
 export class ClaudeTerminalView extends ItemView {
@@ -109,6 +132,30 @@ export class ClaudeTerminalView extends ItemView {
 			this.terminal?.clear();
 		});
 
+		const atBtn = toolbar.createEl("button", {
+			text: "@",
+			cls: "claude-code-toolbar-btn",
+		});
+		atBtn.title = "Insert a note reference into the terminal (@filename)";
+		atBtn.addEventListener("click", (e) => {
+			(e.currentTarget as HTMLButtonElement).blur();
+			this.insertNoteReference();
+		});
+
+		const settingsBtn = toolbar.createEl("button", {
+			cls: "claude-code-toolbar-btn claude-code-toolbar-btn--icon",
+		});
+		setIcon(settingsBtn, "settings");
+		settingsBtn.title = "Open Blackglass settings";
+		settingsBtn.addEventListener("click", (e) => {
+			(e.currentTarget as HTMLButtonElement).blur();
+			const app = this.plugin.app as unknown as {
+				setting: { open(): void; openTabById(id: string): void };
+			};
+			app.setting.open();
+			app.setting.openTabById("blackglass");
+		});
+
 		const sessionIndicator = toolbar.createDiv({ cls: "claude-code-indicator" });
 		this.statusDot = sessionIndicator.createDiv({ cls: "claude-code-status-dot" });
 		sessionIndicator.createSpan({ cls: "claude-code-indicator-label", text: "session" });
@@ -151,6 +198,34 @@ export class ClaudeTerminalView extends ItemView {
 		this.terminal.loadAddon(this.fitAddon);
 		this.terminal.loadAddon(webLinksAddon);
 		this.terminal.open(xtermWrapper);
+
+		// Detect vault-relative .md paths in terminal output and open them in Obsidian on click.
+		// Only paths that resolve to an actual vault file get the link treatment.
+		const vaultPathPattern = /\b([\w][\w./ -]*\.md)\b/g;
+		this.terminal.registerLinkProvider({
+			provideLinks: (y: number, callback: (links: ILink[] | undefined) => void) => {
+				const line = this.terminal?.buffer.active.getLine(y - 1);
+				if (!line) { callback(undefined); return; }
+				const text = line.translateToString(true);
+				const links: ILink[] = [];
+				vaultPathPattern.lastIndex = 0;
+				let match: RegExpExecArray | null;
+				while ((match = vaultPathPattern.exec(text)) !== null) {
+					const filePath = match[1];
+					if (!(this.plugin.app.vault.getAbstractFileByPath(filePath) instanceof TFile)) continue;
+					const startX = match.index + 1;
+					const endX = match.index + match[0].length;
+					links.push({
+						range: { start: { x: startX, y }, end: { x: endX, y } },
+						text: filePath,
+						activate: (_event: MouseEvent, linkText: string) => {
+							void this.plugin.app.workspace.openLinkText(linkText, "", false);
+						},
+					});
+				}
+				callback(links.length > 0 ? links : undefined);
+			},
+		});
 
 		// Fit after DOM is rendered
 		window.setTimeout(() => {
@@ -332,6 +407,16 @@ export class ClaudeTerminalView extends ItemView {
 			app.setting.open();
 			app.setting.openTabById("community-plugins");
 		};
+	}
+
+	insertNoteReference(): void {
+		new FilePickerModal(this.plugin.app, (file) => {
+			if (this.pty) {
+				this.plugin.processManager.writePty(this.pty, `@${file.path}`);
+			} else {
+				new Notice("No active Claude Code session.");
+			}
+		}).open();
 	}
 
 	updateMcpStatus(): void {

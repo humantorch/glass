@@ -40,6 +40,18 @@
 	color: var(--text-normal);
 }
 
+.claude-code-toolbar-btn--icon {
+	padding: 2px 5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.claude-code-toolbar-btn--icon svg {
+	width: 13px;
+	height: 13px;
+}
+
 /* ---- Wordmark ---- */
 
 .claude-code-wordmark {

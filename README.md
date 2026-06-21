@@ -60,8 +60,9 @@ All commands are available via the command palette (Cmd+P):
 | Ask Claude about this note | Prefills the modal with the current note's content |
 | Ask Claude about selection | Prefills the modal with the selected text |
 | Start new Claude Code session | Kills the current session and starts a clean fresh one |
+| Insert note reference into terminal | Opens a note picker and inserts `@<path>` into the terminal; assign a hotkey in Settings → Hotkeys |
 
-A ribbon icon (bot) also opens the terminal panel directly. The terminal toolbar has a **New session** button that starts a completely fresh session, a **Clear** button that wipes the terminal output without ending the session, and a status dot (green = active, grey = ended).
+A ribbon icon (bot) also opens the terminal panel directly. The terminal toolbar has a **New session** button that starts a completely fresh session, a **Clear** button that wipes the terminal output without ending the session, an **@** button that opens a fuzzy note picker and writes the selected path as a `@filename` reference into the terminal (Claude Code reads the file directly — no content dump), a **settings** button (⚙) that opens Blackglass settings, and status dots for the session and MCP server (green = active, grey = inactive).
 
 Right-clicking any `.md` file in the file explorer shows an **Ask Claude about this** option, which opens the quick ask modal prefilled with that note's content.
 
@@ -112,6 +113,20 @@ Claude Code gains the following vault tools:
 To disable the MCP server, toggle it off in Settings - Blackglass - "Enable vault MCP server". To use a different port, change the "MCP server port" setting (valid range: 1024-65535). To prevent Claude from writing to your vault, enable "Read-only vault access"; this hides `create_note` and `update_note` from Claude entirely.
 
 **Note:** `.mcp.json` in the vault root is managed by Blackglass. If you already have a `.mcp.json` with other servers, Blackglass will merge its `mcpServers.obsidian` entry rather than overwriting the whole file.
+
+## Remote access
+
+Claude Code's built-in `/remote-control` command lets you access your running Blackglass session from any device where you're signed into Claude — a phone, tablet, or another computer — with no extra install required.
+
+While Blackglass is open on your desktop:
+
+1. Type `/remote-control` in the terminal
+2. Claude Code displays a URL for the remote session
+3. Open that URL on any device (any browser, no install)
+
+The vault MCP server keeps running on your desktop, so Claude can still read, search, and write notes from the remote session. You can ask questions about your vault, kick off long tasks, and get results — all from your phone.
+
+**Limitation:** this requires Obsidian to remain open on your desktop machine. Closing the app or putting it to sleep shuts down the MCP server, and vault access from the remote session is lost.
 
 ## Network usage
 

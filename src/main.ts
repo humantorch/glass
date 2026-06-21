@@ -96,6 +96,19 @@ export default class ClaudeCodePlugin extends Plugin {
 		});
 
 		this.addCommand({
+			id: "insert-note-reference",
+			name: "Insert note reference into terminal",
+			callback: () => {
+				const view = this.getClaudeView();
+				if (view) {
+					view.insertNoteReference();
+				} else {
+					new Notice("Open the Claude Code terminal first.");
+				}
+			},
+		});
+
+		this.addCommand({
 			id: "new-session",
 			name: "Start new Claude Code session",
 			callback: () => {
