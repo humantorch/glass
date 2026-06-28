@@ -211,7 +211,7 @@ export default class ClaudeCodePlugin extends Plugin {
 				this.availableVersion = latest;
 				this.getClaudeView()?.showUpdateAvailable(latest);
 				new Notice(
-					`Blackglass ${latest} is available. Click the version in the toolbar to update.`,
+					`Glass ${latest} is available. Click the version in the toolbar to update.`,
 					10000
 				);
 			}
@@ -255,7 +255,7 @@ export default class ClaudeCodePlugin extends Plugin {
 			const token = this.vaultMcpServer.getToken();
 			this.registerMcpInProjectSettings(vaultRoot, port, token);
 		} catch (err) {
-			console.error("Blackglass: failed to start vault MCP server:", err);
+			console.error("Glass: failed to start vault MCP server:", err);
 			this.vaultMcpServer = null;
 		}
 		this.getClaudeView()?.updateMcpStatus();
@@ -298,7 +298,7 @@ export default class ClaudeCodePlugin extends Plugin {
 		try {
 			fs.writeFileSync(mcpPath, JSON.stringify(config, null, 2));
 		} catch (err) {
-			console.error("Blackglass: failed to write .mcp.json:", err);
+			console.error("Glass: failed to write .mcp.json:", err);
 		}
 	}
 

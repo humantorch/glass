@@ -109,8 +109,8 @@ export class ClaudeTerminalView extends ItemView {
 		const toolbar = container.createDiv({ cls: "claude-code-toolbar" });
 
 		const wordmark = toolbar.createDiv({ cls: "claude-code-wordmark" });
-		wordmark.createSpan({ text: "Black" });
-		wordmark.createSpan({ cls: "claude-code-wordmark-accent", text: "glass" });
+		wordmark.createSpan({ text: "GLASS" });
+		wordmark.createSpan({ cls: "claude-code-wordmark-byline", text: "by Blackglass" });
 
 		const newSessionBtn = toolbar.createEl("button", {
 			text: "New session",
@@ -146,7 +146,7 @@ export class ClaudeTerminalView extends ItemView {
 			cls: "claude-code-toolbar-btn claude-code-toolbar-btn--icon",
 		});
 		setIcon(settingsBtn, "settings");
-		settingsBtn.title = "Open Blackglass settings";
+		settingsBtn.title = "Open Glass settings";
 		settingsBtn.addEventListener("click", (e) => {
 			(e.currentTarget as HTMLButtonElement).blur();
 			const app = this.plugin.app as unknown as {
@@ -426,7 +426,7 @@ export class ClaudeTerminalView extends ItemView {
 		if (!this.versionLabel) return;
 		this.versionLabel.setText(`v${version} ↑`);
 		this.versionLabel.addClass("claude-code-version--update");
-		this.versionLabel.title = `Blackglass ${version} is available — click to update`;
+		this.versionLabel.title = `Glass ${version} is available — click to update`;
 		this.versionLabel.onclick = () => {
 			const app = this.plugin.app as unknown as {
 				setting: { open(): void; openTabById(id: string): void };

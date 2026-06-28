@@ -1,4 +1,4 @@
-# Blackglass
+# Glass
 
 [![GitHub release](https://img.shields.io/github/v/release/humantorch/blackglass)](https://github.com/humantorch/blackglass/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -7,11 +7,13 @@
 [![Python 3](https://img.shields.io/badge/python-3.6%2B-blue)](https://www.python.org/downloads/)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕-yellow)](https://buymeacoffee.com/scottkosman)
 
-Blackglass puts [Claude Code](https://claude.ai/code) inside Obsidian with a built-in MCP server that gives Claude direct access to your vault — reading, searching, and writing notes without any configuration on your part. Not a chat UI, not a reimplementation: the actual Claude Code CLI running in a real terminal alongside your notes.
+Glass puts [Claude Code](https://claude.ai/code) inside Obsidian with a built-in MCP server that gives Claude direct access to your vault — reading, searching, and writing notes without any configuration on your part. Not a chat UI, not a reimplementation: the actual Claude Code CLI running in a real terminal alongside your notes.
 
 Every slash command, every MCP tool, every session you'd have in a standalone terminal. If you already use Claude Code, there's nothing new to learn.
 
 ![Blackglass screenshot](assets/blackglass-05.31.png)
+
+**Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
 <!-- WHATS-NEW-START -->
 ## What's new in 1.7.2
@@ -52,7 +54,7 @@ pip install pywinpty
 
 ## Installation
 
-Search for **Blackglass** in Settings → Community Plugins → Browse, then install and enable it.
+Search for **Glass** in Settings → Community Plugins → Browse, then install and enable it.
 
 **Manual install:** Download `main.js`, `styles.css`, and `manifest.json` from the [latest release](https://github.com/humantorch/blackglass/releases/latest) and copy them into `<your-vault>/.obsidian/plugins/blackglass/`.
 
@@ -69,13 +71,13 @@ All commands are available via the command palette (Cmd+P):
 | Start new Claude Code session | Kills the current session and starts a clean fresh one |
 | Insert note reference into terminal | Opens a note picker and inserts `@<path>` into the terminal; assign a hotkey in Settings → Hotkeys |
 
-A ribbon icon (bot) also opens the terminal panel directly. The terminal toolbar has a **New session** button that starts a completely fresh session, a **Clear** button that wipes the terminal output without ending the session, an **@** button that opens a fuzzy note picker and writes the selected path as a `@filename` reference into the terminal (Claude Code reads the file directly — no content dump), a **settings** button (⚙) that opens Blackglass settings, and status dots for the session and MCP server (green = active, grey = inactive).
+A ribbon icon (bot) also opens the terminal panel directly. The terminal toolbar has a **New session** button that starts a completely fresh session, a **Clear** button that wipes the terminal output without ending the session, an **@** button that opens a fuzzy note picker and writes the selected path as a `@filename` reference into the terminal (Claude Code reads the file directly — no content dump), a **settings** button (⚙) that opens Glass settings, and status dots for the session and MCP server (green = active, grey = inactive).
 
 Right-clicking any `.md` file in the file explorer shows an **Ask Claude about this** option, which opens the quick ask modal prefilled with that note's content.
 
 ## Settings
 
-Settings → Blackglass:
+Settings → Glass:
 
 | Setting | Default | Description |
 |---|---|---|
@@ -95,7 +97,7 @@ Settings → Blackglass:
 
 ## Vault MCP server
 
-Blackglass includes a built-in MCP server that gives the embedded Claude Code session structured access to your vault. When enabled (on by default), the plugin:
+Glass includes a built-in MCP server that gives the embedded Claude Code session structured access to your vault. When enabled (on by default), the plugin:
 
 1. Starts a local HTTP server on `localhost:27123` (or the next available port)
 2. Generates a random Bearer token and writes it alongside the server address into `.mcp.json` so Claude Code authenticates automatically
@@ -117,15 +119,15 @@ Claude Code gains the following vault tools:
 
 `search_note_content` accepts an optional `directory` argument to limit the search to a subtree, and an optional `max_results` argument (default 10, max 50). Each result includes up to 3 matching lines with surrounding context so Claude can decide which notes to read in full.
 
-To disable the MCP server, toggle it off in Settings - Blackglass - "Enable vault MCP server". To use a different port, change the "MCP server port" setting (valid range: 1024-65535). To prevent Claude from writing to your vault, enable "Read-only vault access"; this hides `create_note` and `update_note` from Claude entirely.
+To disable the MCP server, toggle it off in Settings - Glass - "Enable vault MCP server". To use a different port, change the "MCP server port" setting (valid range: 1024-65535). To prevent Claude from writing to your vault, enable "Read-only vault access"; this hides `create_note` and `update_note` from Claude entirely.
 
-**Note:** `.mcp.json` in the vault root is managed by Blackglass. If you already have a `.mcp.json` with other servers, Blackglass will merge its `mcpServers.obsidian` entry rather than overwriting the whole file.
+**Note:** `.mcp.json` in the vault root is managed by Glass. If you already have a `.mcp.json` with other servers, Glass will merge its `mcpServers.obsidian` entry rather than overwriting the whole file.
 
 ## Remote access
 
-Claude Code's built-in `/remote-control` command lets you access your running Blackglass session from any device where you're signed into Claude — a phone, tablet, or another computer — with no extra install required.
+Claude Code's built-in `/remote-control` command lets you access your running Glass session from any device where you're signed into Claude — a phone, tablet, or another computer — with no extra install required.
 
-While Blackglass is open on your desktop:
+While Glass is open on your desktop:
 
 1. Type `/remote-control` in the terminal
 2. Claude Code displays a URL for the remote session
@@ -137,15 +139,15 @@ The vault MCP server keeps running on your desktop, so Claude can still read, se
 
 ## Network usage
 
-Blackglass itself communicates only over localhost: the vault MCP server binds to `127.0.0.1` and is never exposed to the network.
+Glass itself communicates only over localhost: the vault MCP server binds to `127.0.0.1` and is never exposed to the network.
 
-The Claude Code CLI that Blackglass runs is a separate process that sends your prompts and conversation history to [Anthropic's API](https://www.anthropic.com) over HTTPS. This is the same network activity that occurs when you use Claude Code in a terminal. Blackglass does not transmit any data to Anthropic directly; all API communication is handled by the Claude Code CLI using your own account and API credentials.
+The Claude Code CLI that Glass runs is a separate process that sends your prompts and conversation history to [Anthropic's API](https://www.anthropic.com) over HTTPS. This is the same network activity that occurs when you use Claude Code in a terminal. Glass does not transmit any data to Anthropic directly; all API communication is handled by the Claude Code CLI using your own account and API credentials.
 
 ## Security
 
-Blackglass gives Claude Code full shell access in the context of your vault's working directory. This means a note containing adversarial instructions (prompt injection) could (if read into Claude's context via `read_note`, `get_active_note`, or the quick ask commands) attempt to influence Claude's behaviour, including running shell commands.
+Glass gives Claude Code full shell access in the context of your vault's working directory. This means a note containing adversarial instructions (prompt injection) could (if read into Claude's context via `read_note`, `get_active_note`, or the quick ask commands) attempt to influence Claude's behaviour, including running shell commands.
 
-**What Blackglass does:** All note content passed to Claude is wrapped in XML-style delimiters with an explicit instruction to treat it as data rather than instructions. This defends against naive and moderately sophisticated injection attempts. It is not a complete solution; a carefully crafted note could attempt to escape the wrapper, but it meaningfully raises the bar.
+**What Glass does:** All note content passed to Claude is wrapped in XML-style delimiters with an explicit instruction to treat it as data rather than instructions. This defends against naive and moderately sophisticated injection attempts. It is not a complete solution; a carefully crafted note could attempt to escape the wrapper, but it meaningfully raises the bar.
 
 **What won't protect you:** The **Read-only vault access** setting removes the `create_note` and `update_note` MCP tools, but this is not a meaningful injection defence. A successful injection still has full shell access; it can exfiltrate data via `curl`, write files directly via the filesystem, or run any other shell command. Read-only mode is useful if you want to prevent accidental vault writes during a browsing or query session; it should not be mistaken for a security boundary.
 
@@ -214,11 +216,11 @@ The symlink folder name should match the plugin ID (`blackglass`) so Obsidian ca
 
 ### Troubleshooting
 
-**"pywinpty is not installed"**: Windows terminal support requires `pywinpty`. Run `pip install pywinpty` in a terminal, then reload the plugin. If you have multiple Python installs, make sure you're installing into the same Python that Blackglass finds on your PATH (`where python` will show it).
+**"pywinpty is not installed"**: Windows terminal support requires `pywinpty`. Run `pip install pywinpty` in a terminal, then reload the plugin. If you have multiple Python installs, make sure you're installing into the same Python that Glass finds on your PATH (`where python` will show it).
 
 **"Python 3 not found"**: install Python 3 from [python.org](https://www.python.org/downloads/) or via Homebrew (`brew install python3`). Python 3 ships with macOS 12.3+; if you're on an older version this may be missing.
 
-**"Session ended with exit code 1" immediately**: Claude is either not on PATH or not found. Obsidian's Electron process does not inherit your full shell PATH. The plugin attempts to supplement PATH with common install locations (`~/.local/bin`, `/opt/homebrew/bin`, `/usr/local/bin`, etc.), but if Claude is installed elsewhere the most reliable fix is to set the full path explicitly in Settings → Blackglass → "Claude binary path" (use `which claude` in your terminal to find it).
+**"Session ended with exit code 1" immediately**: Claude is either not on PATH or not found. Obsidian's Electron process does not inherit your full shell PATH. The plugin attempts to supplement PATH with common install locations (`~/.local/bin`, `/opt/homebrew/bin`, `/usr/local/bin`, etc.), but if Claude is installed elsewhere the most reliable fix is to set the full path explicitly in Settings → Glass → "Claude binary path" (use `which claude` in your terminal to find it).
 
 **"No previous session found, starting fresh"**: expected on first launch or in a new working directory. The plugin retries automatically without `--continue` and this message can be ignored.
 

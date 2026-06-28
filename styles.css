@@ -55,13 +55,34 @@
 /* ---- Wordmark ---- */
 
 .claude-code-wordmark {
-	font-weight: 700;
-	font-size: 0.9em;
-	letter-spacing: -0.02em;
-	color: var(--text-normal);
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-weight: 900;
+	font-size: 1em;
+	letter-spacing: 0.06em;
+	background: linear-gradient(180deg, var(--text-normal), var(--interactive-accent));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
 	margin-right: 4px;
 	user-select: none;
 	flex-shrink: 0;
+}
+
+.claude-code-wordmark svg {
+	width: 14px;
+	height: 14px;
+	flex-shrink: 0;
+}
+
+.claude-code-wordmark-byline {
+	font-size: 0.65em;
+	color: var(--text-muted);
+	font-weight: 400;
+	letter-spacing: 0;
+	margin-left: 2px;
 }
 
 .claude-code-wordmark-accent {

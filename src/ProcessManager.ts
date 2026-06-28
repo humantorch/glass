@@ -319,7 +319,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			const isEnoent = (err as NodeJS.ErrnoException).code === "ENOENT";
 			const isWindows = process.platform === "win32";
 			const hint = isEnoent && isWindows
-				? `Set the full path in Settings → Blackglass → "Claude binary path".`
+				? `Set the full path in Settings → Glass → "Claude binary path".`
 				: `Is '${options.claudePath}' on your PATH?`;
 			onError(`Failed to start Claude: ${err.message}. ${hint}`);
 		});
@@ -411,7 +411,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 				const isEnoent = (err as NodeJS.ErrnoException).code === "ENOENT";
 				const isWindows = process.platform === "win32";
 				const hint = isEnoent && isWindows
-					? `Set the full path in Settings → Blackglass → "Claude binary path" (e.g. C:\\Users\\<you>\\.local\\bin\\claude.exe).`
+					? `Set the full path in Settings → Glass → "Claude binary path" (e.g. C:\\Users\\<you>\\.local\\bin\\claude.exe).`
 					: `Is '${options.claudePath}' on your PATH?`;
 				resolve({
 					success: false,
