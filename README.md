@@ -16,11 +16,11 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 **Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
 <!-- WHATS-NEW-START -->
-## What's new in 1.8.3
+## What's new in 1.8.4
 
-- **Terminal Process Stability** — process I/O (stdin/stdout/stderr) is now more robustly null-checked, reducing the chance of crashes if a Claude Code process's streams behave unexpectedly.
-- **More Reliable Error Reporting** — errors are now properly checked as `Error` instances before their properties are read, so error messages surfaced in the terminal and MCP server are more accurate.
-- **Hardened Vault MCP Server** — JSON responses in the MCP server are now explicitly typed, reducing the risk of malformed data being returned to Claude Code.
+- **Type-safety hardening** — Internal type-checking improvements across the process manager, MCP server, and main plugin file reduce the risk of runtime errors when spawning terminals or handling `.mcp.json`.
+- **Environment variable handling** — More robust handling of `process.env` and child process streams (stdout/stderr) on both macOS and Windows, improving reliability of terminal sessions.
+- **Documentation cleanup** — Removed internal-only commentary from the README so the public docs stay focused on user-facing information.
 <!-- WHATS-NEW-END -->
 
 ## Features
