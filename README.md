@@ -16,10 +16,9 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 **Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
 <!-- WHATS-NEW-START -->
-## What's new in 1.8.6
+## What's new in 1.8.8
 
-- **Cleaner ESLint suppressions** — disable comments now document their reason, reducing confusing blanket linting overrides in the codebase.
-- **Improved release notes** — the README now shows accurate, user-facing changelog entries instead of internal development notes.
+- **Stability release** — reverted to the proven 1.8.2 codebase (macOS option key input fix) after remediation attempts introduced checker incompatibilities. No new features, but a reliable, working version.
 <!-- WHATS-NEW-END -->
 
 ## Features
