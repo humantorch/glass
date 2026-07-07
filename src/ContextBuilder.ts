@@ -1,4 +1,5 @@
-import { App, Editor, FileSystemAdapter } from "obsidian";
+import type { App, Editor} from "obsidian";
+import { FileSystemAdapter } from "obsidian";
 
 export class ContextBuilder {
 	private app: App;

@@ -1,4 +1,5 @@
-import { App, DropdownComponent, Notice, PluginSettingTab, Setting } from "obsidian";
+import type { App, DropdownComponent} from "obsidian";
+import { Notice, PluginSettingTab, Setting } from "obsidian";
 import type ClaudeCodePlugin from "./main";
 import { QUICK_ASK_MODELS } from "./types";
 

@@ -1,4 +1,5 @@
-import { App, FuzzySuggestModal, ItemView, Notice, TFile, WorkspaceLeaf, setIcon } from "obsidian";
+import type { App, WorkspaceLeaf} from "obsidian";
+import { FuzzySuggestModal, ItemView, Notice, TFile, setIcon } from "obsidian";
 import { Terminal } from "@xterm/xterm";
 import type { FontWeight, ILink } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
@@ -6,7 +7,7 @@ import { WebLinksAddon } from "@xterm/addon-web-links";
 import { shell } from "electron";
 import type { ChildProcess } from "child_process";
 import type ClaudeCodePlugin from "./main";
-import { CLAUDE_ICON, CLAUDE_TERMINAL_VIEW_TYPE } from "./types";
+import { CLAUDE_ICON, CLAUDE_TERMINAL_VIEW_TYPE, getErrorMessage } from "./types";
 
 /** Reads an Obsidian CSS variable from the current theme, falling back to a default. */
 function cssVar(name: string, fallback: string): string {
@@ -146,7 +147,7 @@ export class ClaudeTerminalView extends ItemView {
 			cls: "claude-code-toolbar-btn claude-code-toolbar-btn--icon",
 		});
 		setIcon(settingsBtn, "settings");
-		settingsBtn.title = "Open Glass settings";
+		settingsBtn.title = "Open glass settings";
 		settingsBtn.addEventListener("click", (e) => {
 			(e.currentTarget as HTMLButtonElement).blur();
 			const app = this.plugin.app as unknown as {
@@ -331,7 +332,7 @@ export class ClaudeTerminalView extends ItemView {
 				rows: this.terminal.rows,
 			});
 		} catch (err) {
-			const msg = (err as Error).message;
+			const msg = getErrorMessage(err);
 			this.terminal.writeln(`\r\n\x1b[31mFailed to start Claude Code: ${msg}\x1b[0m`);
 			if (process.platform === "win32" && msg.includes("Python")) {
 				this.terminal.writeln(`\r\n\x1b[33mSetup steps:\x1b[0m`);

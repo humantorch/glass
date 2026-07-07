@@ -3,7 +3,8 @@ import type { ChildProcess } from "child_process";
 import * as fs from "fs";
 import pseudoterminalScript from "./pseudoterminal.py";
 import winBridgeScript from "./pty_bridge_win.py";
-import { PtySessionOptions, PrintModeOptions, PrintModeResult } from "./types";
+import type { PtySessionOptions, PrintModeOptions, PrintModeResult} from "./types";
+import { isErrnoException, isWritableStream } from "./types";
 
 /**
  * Electron inherits a minimal environment — PATH is truncated and shell-profile
@@ -152,8 +153,10 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		try {
 			// FD #3 is the resize control channel — Python reads "COLSxROWS\n" and
 			// calls ioctl(TIOCSWINSZ) on the PTY master.
-			const cmdio = proc.stdio[3] as NodeJS.WritableStream | null;
-			cmdio?.write(`${cols}x${rows}\n`);
+			const stream = proc.stdio[3];
+			if (isWritableStream(stream)) {
+				stream.write(`${cols}x${rows}\n`);
+			}
 		} catch {
 			// Process may have already exited
 		}
@@ -316,7 +319,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			window.clearTimeout(timer);
 			if (killed || completed) return;
 			completed = true;
-			const isEnoent = (err as NodeJS.ErrnoException).code === "ENOENT";
+			const isEnoent = isErrnoException(err) && err.code === "ENOENT";
 			const isWindows = process.platform === "win32";
 			const hint = isEnoent && isWindows
 				? `Set the full path in Settings → Glass → "Claude binary path".`
@@ -408,7 +411,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 
 			proc.on("error", (err: Error) => {
 				window.clearTimeout(timer);
-				const isEnoent = (err as NodeJS.ErrnoException).code === "ENOENT";
+				const isEnoent = isErrnoException(err) && err.code === "ENOENT";
 				const isWindows = process.platform === "win32";
 				const hint = isEnoent && isWindows
 					? `Set the full path in Settings → Glass → "Claude binary path" (e.g. C:\\Users\\<you>\\.local\\bin\\claude.exe).`

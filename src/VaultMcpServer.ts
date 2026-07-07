@@ -1,6 +1,8 @@
 import * as http from "http";
 import * as crypto from "crypto";
-import { App, TFile, TFolder } from "obsidian";
+import type { App} from "obsidian";
+import { TFile, TFolder } from "obsidian";
+import { isRecord, getErrorMessage } from "./types";
 
 interface JsonRpcRequest {
 	jsonrpc: "2.0";
@@ -133,6 +135,21 @@ const TOOL_DEFINITIONS = [
 ];
 
 const WRITE_TOOLS = new Set(["create_note", "update_note"]);
+
+function extractToolParams(params: unknown): Record<string, unknown> {
+	if (!isRecord(params)) return {};
+	return params;
+}
+
+function getString(obj: Record<string, unknown>, key: string, defaultValue = ""): string {
+	const value = obj[key];
+	return typeof value === 'string' ? value : defaultValue;
+}
+
+function getNumber(obj: Record<string, unknown>, key: string, defaultValue = 0): number {
+	const value = obj[key];
+	return typeof value === 'number' ? value : defaultValue;
+}
 
 /**
  * Wraps vault note content in explicit delimiters and a data-boundary instruction.
@@ -299,12 +316,9 @@ export class VaultMcpServer {
 				};
 
 			case "tools/call": {
-				const params = request.params as {
-					name?: string;
-					arguments?: Record<string, unknown>;
-				};
-				const name = params?.name ?? "";
-				const args = params?.arguments ?? {};
+				const params = extractToolParams(request.params);
+				const name = typeof params.name === 'string' ? params.name : "";
+				const args = isRecord(params.arguments) ? params.arguments : {};
 				try {
 					const text = await this.callTool(name, args);
 					return {
@@ -316,11 +330,12 @@ export class VaultMcpServer {
 						},
 					};
 				} catch (err) {
+					const errorMessage = getErrorMessage(err);
 					return {
 						jsonrpc: "2.0",
 						id,
 						result: {
-							content: [{ type: "text", text: `Error: ${(err as Error).message}` }],
+							content: [{ type: "text", text: `Error: ${errorMessage}` }],
 							isError: true,
 						},
 					};
@@ -342,22 +357,22 @@ export class VaultMcpServer {
 		}
 		switch (name) {
 			case "read_note":
-				return this.readNote(args.path as string);
+				return this.readNote(getString(args, "path"));
 			case "list_notes":
-				return this.listNotes((args.directory as string) ?? "");
+				return this.listNotes(getString(args, "directory"));
 			case "search_vault":
-				return this.searchVault(args.query as string);
+				return this.searchVault(getString(args, "query"));
 			case "get_active_note":
 				return this.getActiveNote();
 			case "create_note":
-				return this.createNote(args.path as string, args.content as string);
+				return this.createNote(getString(args, "path"), getString(args, "content"));
 			case "update_note":
-				return this.updateNote(args.path as string, args.content as string);
+				return this.updateNote(getString(args, "path"), getString(args, "content"));
 			case "search_note_content":
 				return this.searchNoteContent(
-					args.query as string,
-					(args.max_results as number | undefined) ?? 10,
-					(args.directory as string | undefined) ?? ""
+					getString(args, "query"),
+					getNumber(args, "max_results", 10),
+					getString(args, "directory")
 				);
 			default:
 				throw new Error(`Unknown tool: ${name}`);

@@ -1,8 +1,10 @@
-import { FileSystemAdapter, Menu, Notice, Plugin, RequestUrlResponse, TFile, WorkspaceLeaf, requestUrl } from "obsidian";
+import type { Menu, RequestUrlResponse, WorkspaceLeaf} from "obsidian";
+import { FileSystemAdapter, Notice, Plugin, TFile, requestUrl } from "obsidian";
 import * as fs from "fs";
 import * as path from "path";
+import type {
+	ClaudeCodeSettings} from "./types";
 import {
-	ClaudeCodeSettings,
 	CLAUDE_ICON,
 	CLAUDE_TERMINAL_VIEW_TYPE,
 	DEFAULT_SETTINGS,

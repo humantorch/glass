@@ -10,11 +10,17 @@
     "importHelpers": true,
     "isolatedModules": true,
     "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
     "allowArbitraryExtensions": true,
-    "lib": ["ES6", "DOM"],
+    "lib": ["ES2018", "DOM"],
     "paths": {
       "obsidian": ["../node_modules/obsidian/obsidian.d.ts"]
-    }
+    },
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts"]
 }
