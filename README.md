@@ -16,9 +16,10 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 **Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
 <!-- WHATS-NEW-START -->
-## What's new in 1.8.1
+## What's new in 1.8.2
 
-- **Plugin renamed to Glass** — Shorter, cleaner name. The plugin ID remains `blackglass` so your existing installation updates seamlessly.
+- **macOS option key input** — Option-key combinations (e.g. ™, €, ¢) now reach the terminal correctly instead of being swallowed by the browser's default keyboard handling.
+- **Auto-focus on terminal open** — The terminal now automatically grabs focus when a session is opened, so you can start typing immediately.
 <!-- WHATS-NEW-END -->
 
 ## Features
