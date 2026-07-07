@@ -20,7 +20,6 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 
 - **Type-safety hardening** — Internal type-checking improvements across the process manager, MCP server, and main plugin file reduce the risk of runtime errors when spawning terminals or handling `.mcp.json`.
 - **Environment variable handling** — More robust handling of `process.env` and child process streams (stdout/stderr) on both macOS and Windows, improving reliability of terminal sessions.
-- **Documentation cleanup** — Removed internal-only commentary from the README so the public docs stay focused on user-facing information.
 <!-- WHATS-NEW-END -->
 
 ## Features
