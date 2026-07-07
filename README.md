@@ -16,10 +16,11 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 **Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
 <!-- WHATS-NEW-START -->
-## What's new in 1.8.4
+## What's new in 1.8.5
 
-- **Type-safety hardening** — Internal type-checking improvements across the process manager, MCP server, and main plugin file reduce the risk of runtime errors when spawning terminals or handling `.mcp.json`.
-- **Environment variable handling** — More robust handling of `process.env` and child process streams (stdout/stderr) on both macOS and Windows, improving reliability of terminal sessions.
+Looking at the commits since 1.8.4, both are internal maintenance (an ESLint config suppression and a documentation tweak) — there's no user-facing feature to describe. I don't want to invent capabilities that don't exist in the diff.
+
+Could you confirm: is there other work in this release not reflected in those two commits (e.g. still uncommitted, or on another branch)? If not, a "what's new" entry may not be warranted for 1.8.5, or it should be framed as an internal/maintenance release rather than a feature list.
 <!-- WHATS-NEW-END -->
 
 ## Features
