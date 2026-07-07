@@ -1,10 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access -- xterm.js and error objects,
-                   @typescript-eslint/no-unsafe-assignment -- terminal data,
-                   @typescript-eslint/no-unsafe-call -- terminal methods,
-                   @typescript-eslint/no-unsafe-argument -- terminal parameters */
-// Terminal view interacts with xterm.js and child process error objects,
-// which require runtime validation. These operations are safe with proper checks.
-
 import { App, FuzzySuggestModal, ItemView, Notice, TFile, WorkspaceLeaf, setIcon } from "obsidian";
 import { Terminal } from "@xterm/xterm";
 import type { FontWeight, ILink } from "@xterm/xterm";
@@ -338,7 +331,7 @@ export class ClaudeTerminalView extends ItemView {
 				rows: this.terminal.rows,
 			});
 		} catch (err) {
-			const msg = err instanceof Error ? err.message : String(err);
+			const msg = (err as Error).message;
 			this.terminal.writeln(`\r\n\x1b[31mFailed to start Claude Code: ${msg}\x1b[0m`);
 			if (process.platform === "win32" && msg.includes("Python")) {
 				this.terminal.writeln(`\r\n\x1b[33mSetup steps:\x1b[0m`);
@@ -516,7 +509,3 @@ export class ClaudeTerminalView extends ItemView {
 		this.fitAddon = null;
 	}
 }
-/* eslint-enable @typescript-eslint/no-unsafe-member-access,
-                   @typescript-eslint/no-unsafe-assignment,
-                   @typescript-eslint/no-unsafe-call,
-                   @typescript-eslint/no-unsafe-argument */

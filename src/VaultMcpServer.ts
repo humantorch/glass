@@ -1,10 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access -- JSON-RPC request access,
-                   @typescript-eslint/no-unsafe-assignment -- JSON parse results,
-                   @typescript-eslint/no-unsafe-call -- HTTP/JSON methods,
-                   @typescript-eslint/no-unsafe-argument -- JSON-RPC parameters */
-// VaultMcpServer handles JSON-RPC over HTTP and JSON parsing, which require
-// runtime type validation. These operations are safe with proper validation.
-
 import * as http from "http";
 import * as crypto from "crypto";
 import { App, TFile, TFolder } from "obsidian";
@@ -185,10 +178,8 @@ export class VaultMcpServer {
 					this.handleRequest(req, res);
 				});
 
-				server.on("error", (err: Error) => {
-					// NodeJS ErrnoException has a 'code' property; cast to access it safely
-					const errno = (err as NodeJS.ErrnoException).code;
-					if (errno === "EADDRINUSE" && attemptsLeft > 0) {
+				server.on("error", (err: NodeJS.ErrnoException) => {
+					if (err.code === "EADDRINUSE" && attemptsLeft > 0) {
 						tryPort(port + 1, attemptsLeft - 1);
 					} else {
 						reject(new Error(`Could not bind MCP server: ${err.message}`));
@@ -308,12 +299,10 @@ export class VaultMcpServer {
 				};
 
 			case "tools/call": {
-				interface ToolCallParams {
+				const params = request.params as {
 					name?: string;
 					arguments?: Record<string, unknown>;
-				}
-				// request.params comes from JSON, so we validate its shape explicitly
-				const params = request.params as ToolCallParams;
+				};
 				const name = params?.name ?? "";
 				const args = params?.arguments ?? {};
 				try {
@@ -327,12 +316,11 @@ export class VaultMcpServer {
 						},
 					};
 				} catch (err) {
-					const errorMsg = err instanceof Error ? err.message : String(err);
 					return {
 						jsonrpc: "2.0",
 						id,
 						result: {
-							content: [{ type: "text", text: `Error: ${errorMsg}` }],
+							content: [{ type: "text", text: `Error: ${(err as Error).message}` }],
 							isError: true,
 						},
 					};
@@ -499,7 +487,3 @@ export class VaultMcpServer {
 		return `${header}\n\n${results.join("\n\n")}`;
 	}
 }
-/* eslint-enable @typescript-eslint/no-unsafe-member-access,
-                   @typescript-eslint/no-unsafe-assignment,
-                   @typescript-eslint/no-unsafe-call,
-                   @typescript-eslint/no-unsafe-argument */

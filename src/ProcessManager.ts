@@ -1,10 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access -- system process/environment access,
-                   @typescript-eslint/no-unsafe-assignment -- system API returns,
-                   @typescript-eslint/no-unsafe-call -- system API methods,
-                   @typescript-eslint/no-unsafe-argument -- system API parameters */
-// ProcessManager spawns child processes and interacts with Node.js process/stream APIs,
-// which are inherently loosely typed. These operations are safe with proper validation.
-
 import { execSync, spawn } from "child_process";
 import type { ChildProcess } from "child_process";
 import * as fs from "fs";
@@ -20,12 +13,7 @@ import { PtySessionOptions, PrintModeOptions, PrintModeResult } from "./types";
  */
 function buildEnv(): Record<string, string> {
 	if (process.platform === "win32") {
-		// process.env is Record<string, string | undefined>. We filter out undefined values
-		// so our env object is safely Record<string, string> for downstream use.
-		const env: Record<string, string> = {};
-		for (const [key, value] of Object.entries(process.env as Record<string, string | undefined>)) {
-			if (value !== undefined) env[key] = value;
-		}
+		const env: Record<string, string> = { ...(process.env as Record<string, string>) };
 		const userProfile = env.USERPROFILE || "C:\\Users\\Default";
 		const appData = env.APPDATA || "";
 		const localAppData = env.LOCALAPPDATA || "";
@@ -64,21 +52,18 @@ function buildEnv(): Record<string, string> {
 		return env;
 	}
 
-	// process.env is Record<string, string | undefined>. We filter out undefined values
-	// so our env object is safely Record<string, string> for downstream use.
-	const env: Record<string, string> = {};
-	for (const [key, value] of Object.entries(process.env as Record<string, string | undefined>)) {
-		if (value !== undefined) env[key] = value;
-	}
+	const env: Record<string, string> = {
+		...(process.env as Record<string, string>),
+	};
 
 	try {
-		const shell = (process.env as Record<string, string | undefined>).SHELL || "/bin/zsh";
-		// execSync with encoding: "utf8" returns a string, not Buffer. Safe to call string methods.
+		const shell = process.env.SHELL || "/bin/zsh";
 		const output = execSync(`${shell} -l -c "env"`, {
 			encoding: "utf8",
 			timeout: 5000,
-		}) as string;
-		for (const line of output.trim().split("\n")) {
+		}).trim();
+
+		for (const line of output.split("\n")) {
 			const idx = line.indexOf("=");
 			if (idx > 0) {
 				env[line.slice(0, idx)] = line.slice(idx + 1);
@@ -130,9 +115,8 @@ export class ProcessManager {
 		if (options.resumeLastSession) args.push("--continue");
 		if (options.skipPermissions) args.push("--dangerously-skip-permissions");
 
-		// resolvedEnv is Record<string, string> so this is safe; we explicitly pass environment
 		const proc = spawn(python, ["-c", pseudoterminalScript, ...args], {
-			cwd: options.workingDirectory || (this.resolvedEnv as Record<string, string>)["HOME"] || "/",
+			cwd: options.workingDirectory || this.resolvedEnv["HOME"] || "/",
 			env: { ...this.resolvedEnv, TERM: "xterm-color", COLORTERM: "truecolor" },
 			stdio: ["pipe", "pipe", "pipe", "pipe"],
 		});
@@ -152,9 +136,8 @@ export class ProcessManager {
 		if (options.resumeLastSession) args.push("--continue");
 		if (options.skipPermissions) args.push("--dangerously-skip-permissions");
 
-		// resolvedEnv is Record<string, string> so this is safe; we explicitly pass environment
 		const proc = spawn(python, ["-c", winBridgeScript, ...args], {
-			cwd: options.workingDirectory || (this.resolvedEnv as Record<string, string>)["USERPROFILE"] || "C:\\",
+			cwd: options.workingDirectory || this.resolvedEnv["USERPROFILE"] || "C:\\",
 			env: { ...this.resolvedEnv, TERM: "xterm-color", COLORTERM: "truecolor" },
 			stdio: ["pipe", "pipe", "pipe", "pipe"],
 		});
@@ -199,8 +182,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		// On Windows, probe the filesystem directly before falling back to PATH lookup.
 		// Electron's inherited PATH is stripped and often misses Python even when installed.
 		if (isWindows) {
-			// resolvedEnv is Record<string, string>, safe to access
-			const localAppData = (this.resolvedEnv as Record<string, string>)["LOCALAPPDATA"] || "";
+			const localAppData = this.resolvedEnv["LOCALAPPDATA"] || "";
 
 			// Enumerate %LOCALAPPDATA%\Programs\Python\Python3* — the default per-user
 			// install location from python.org. Sort descending to prefer newer versions.
@@ -287,7 +269,6 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		const args = ["--print", "--output-format", "text"];
 		if (options.model) args.push("--model", options.model);
 
-		// stdio: ["pipe", "pipe", "pipe"] guarantees stdin, stdout, stderr are Streams
 		const proc = spawn(options.claudePath, args, {
 			cwd: options.workingDirectory || undefined,
 			env: { ...this.resolvedEnv },
@@ -295,10 +276,8 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		});
 
 		const fullMessage = context ? `${context}\n\n${prompt}` : prompt;
-		if (proc.stdin) {
-			proc.stdin.write(fullMessage);
-			proc.stdin.end();
-		}
+		proc.stdin.write(fullMessage);
+		proc.stdin.end();
 
 		let fullText = "";
 		let killed = false;
@@ -312,8 +291,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			onError(`Request timed out after ${timeoutMs / 1000}s`);
 		}, timeoutMs);
 
-		// stdio configuration guarantees stdout exists; safe to call .on()
-		(proc.stdout as NodeJS.ReadableStream).on("data", (chunk: Buffer) => {
+		proc.stdout.on("data", (chunk: Buffer) => {
 			if (killed) return;
 			const delta = chunk.toString();
 			fullText += delta;
@@ -321,8 +299,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		});
 
 		let stderr = "";
-		// stdio configuration guarantees stderr exists; safe to call .on()
-		(proc.stderr as NodeJS.ReadableStream).on("data", (d: Buffer) => { stderr += d.toString(); });
+		proc.stderr.on("data", (d: Buffer) => { stderr += d.toString(); });
 
 		proc.on("close", (code: number | null) => {
 			window.clearTimeout(timer);
@@ -339,8 +316,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			window.clearTimeout(timer);
 			if (killed || completed) return;
 			completed = true;
-			const errno = (err as NodeJS.ErrnoException).code;
-			const isEnoent = errno === "ENOENT";
+			const isEnoent = (err as NodeJS.ErrnoException).code === "ENOENT";
 			const isWindows = process.platform === "win32";
 			const hint = isEnoent && isWindows
 				? `Set the full path in Settings → Glass → "Claude binary path".`
@@ -370,7 +346,6 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			const args = ["--print", "--output-format", "json"];
 			if (options.model) args.push("--model", options.model);
 
-			// stdio: ["pipe", "pipe", "pipe"] guarantees stdin, stdout, stderr are Streams
 			const proc = spawn(options.claudePath, args, {
 				cwd: options.workingDirectory || undefined,
 				env: { ...this.resolvedEnv },
@@ -378,25 +353,19 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			});
 
 			const fullMessage = context ? `${context}\n\n${prompt}` : prompt;
-			if (proc.stdin) {
-				proc.stdin.write(fullMessage);
-				proc.stdin.end();
-			}
+			proc.stdin.write(fullMessage);
+			proc.stdin.end();
 
 			let stdout = "";
 			let stderr = "";
 
-			if (proc.stdout) {
-				(proc.stdout as NodeJS.ReadableStream).on("data", (data: Buffer) => {
-					stdout += data.toString();
-				});
-			}
+			proc.stdout.on("data", (data: Buffer) => {
+				stdout += data.toString();
+			});
 
-			if (proc.stderr) {
-				(proc.stderr as NodeJS.ReadableStream).on("data", (data: Buffer) => {
-					stderr += data.toString();
-				});
-			}
+			proc.stderr.on("data", (data: Buffer) => {
+				stderr += data.toString();
+			});
 
 			const timer = window.setTimeout(() => {
 				proc.kill();
@@ -439,8 +408,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 
 			proc.on("error", (err: Error) => {
 				window.clearTimeout(timer);
-				const errno = (err as NodeJS.ErrnoException).code;
-				const isEnoent = errno === "ENOENT";
+				const isEnoent = (err as NodeJS.ErrnoException).code === "ENOENT";
 				const isWindows = process.platform === "win32";
 				const hint = isEnoent && isWindows
 					? `Set the full path in Settings → Glass → "Claude binary path" (e.g. C:\\Users\\<you>\\.local\\bin\\claude.exe).`
@@ -454,7 +422,3 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		});
 	}
 }
-/* eslint-enable @typescript-eslint/no-unsafe-member-access,
-                   @typescript-eslint/no-unsafe-assignment,
-                   @typescript-eslint/no-unsafe-call,
-                   @typescript-eslint/no-unsafe-argument */

@@ -1,10 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access -- file I/O operations,
-                   @typescript-eslint/no-unsafe-assignment -- JSON parse results,
-                   @typescript-eslint/no-unsafe-call -- file/JSON methods,
-                   @typescript-eslint/no-unsafe-argument -- file I/O parameters */
-// Main plugin file handles file I/O (.mcp.json) and JSON parsing, which require
-// runtime type validation. These operations are safe with proper error handling.
-
 import { FileSystemAdapter, Menu, Notice, Plugin, RequestUrlResponse, TFile, WorkspaceLeaf, requestUrl } from "obsidian";
 import * as fs from "fs";
 import * as path from "path";
@@ -282,12 +275,10 @@ export default class ClaudeCodePlugin extends Plugin {
 		// Claude Code reads project-level MCP servers from .mcp.json at the project root
 		const mcpPath = path.join(vaultRoot, ".mcp.json");
 
-		// JSON.parse returns unknown; we trust the .mcp.json structure is an object
 		let config: Record<string, unknown> = {};
 		try {
 			if (fs.existsSync(mcpPath)) {
-				const content = fs.readFileSync(mcpPath, "utf8");
-				config = JSON.parse(content) as Record<string, unknown>;
+				config = JSON.parse(fs.readFileSync(mcpPath, "utf8")) as Record<string, unknown>;
 			}
 		} catch {
 			config = {};
@@ -307,8 +298,7 @@ export default class ClaudeCodePlugin extends Plugin {
 		try {
 			fs.writeFileSync(mcpPath, JSON.stringify(config, null, 2));
 		} catch (err) {
-			const errorMsg = err instanceof Error ? err.message : String(err);
-			console.error("Glass: failed to write .mcp.json:", errorMsg);
+			console.error("Glass: failed to write .mcp.json:", err);
 		}
 	}
 
@@ -316,10 +306,9 @@ export default class ClaudeCodePlugin extends Plugin {
 		const mcpPath = path.join(vaultRoot, ".mcp.json");
 		try {
 			if (!fs.existsSync(mcpPath)) return;
-			const content = fs.readFileSync(mcpPath, "utf8");
-			// JSON.parse returns unknown; we trust .mcp.json structure is an object
-			const config = JSON.parse(content) as Record<string, unknown>;
-			// mcpServers may not exist; we safely check and delete obsidian entry if present
+			const config = JSON.parse(
+				fs.readFileSync(mcpPath, "utf8")
+			) as Record<string, unknown>;
 			const servers = config.mcpServers as Record<string, unknown> | undefined;
 			if (!servers) return;
 			delete servers.obsidian;
@@ -341,7 +330,3 @@ export default class ClaudeCodePlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 }
-/* eslint-enable @typescript-eslint/no-unsafe-member-access,
-                   @typescript-eslint/no-unsafe-assignment,
-                   @typescript-eslint/no-unsafe-call,
-                   @typescript-eslint/no-unsafe-argument */
