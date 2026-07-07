@@ -18,9 +18,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 <!-- WHATS-NEW-START -->
 ## What's new in 1.8.5
 
-Looking at the commits since 1.8.4, both are internal maintenance (an ESLint config suppression and a documentation tweak) — there's no user-facing feature to describe. I don't want to invent capabilities that don't exist in the diff.
-
-Could you confirm: is there other work in this release not reflected in those two commits (e.g. still uncommitted, or on another branch)? If not, a "what's new" entry may not be warranted for 1.8.5, or it should be framed as an internal/maintenance release rather than a feature list.
+- **ESLint warning suppressions** — Added file-level eslint-disable comments for system-level operations (process spawning, file I/O, JSON parsing) that require interaction with loosely-typed Node.js APIs. No functional changes.
 <!-- WHATS-NEW-END -->
 
 ## Features
