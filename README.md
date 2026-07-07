@@ -21,8 +21,6 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 - **Terminal Process Stability** — process I/O (stdin/stdout/stderr) is now more robustly null-checked, reducing the chance of crashes if a Claude Code process's streams behave unexpectedly.
 - **More Reliable Error Reporting** — errors are now properly checked as `Error` instances before their properties are read, so error messages surfaced in the terminal and MCP server are more accurate.
 - **Hardened Vault MCP Server** — JSON responses in the MCP server are now explicitly typed, reducing the risk of malformed data being returned to Claude Code.
-
-If you'd like, I can dig further back (e.g., include unreleased work-in-progress changes, or compare against 1.8.1) to build a fuller "what's new," but as it stands 1.8.3 is a type-safety/maintenance release with no behavior changes.
 <!-- WHATS-NEW-END -->
 
 ## Features
