@@ -275,6 +275,7 @@ export default class ClaudeCodePlugin extends Plugin {
 		// Claude Code reads project-level MCP servers from .mcp.json at the project root
 		const mcpPath = path.join(vaultRoot, ".mcp.json");
 
+		// JSON.parse returns unknown; we trust the .mcp.json structure is an object
 		let config: Record<string, unknown> = {};
 		try {
 			if (fs.existsSync(mcpPath)) {
@@ -309,7 +310,9 @@ export default class ClaudeCodePlugin extends Plugin {
 		try {
 			if (!fs.existsSync(mcpPath)) return;
 			const content = fs.readFileSync(mcpPath, "utf8");
+			// JSON.parse returns unknown; we trust .mcp.json structure is an object
 			const config = JSON.parse(content) as Record<string, unknown>;
+			// mcpServers may not exist; we safely check and delete obsidian entry if present
 			const servers = config.mcpServers as Record<string, unknown> | undefined;
 			if (!servers) return;
 			delete servers.obsidian;

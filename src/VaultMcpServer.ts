@@ -179,6 +179,7 @@ export class VaultMcpServer {
 				});
 
 				server.on("error", (err: Error) => {
+					// NodeJS ErrnoException has a 'code' property; cast to access it safely
 					const errno = (err as NodeJS.ErrnoException).code;
 					if (errno === "EADDRINUSE" && attemptsLeft > 0) {
 						tryPort(port + 1, attemptsLeft - 1);
@@ -304,6 +305,7 @@ export class VaultMcpServer {
 					name?: string;
 					arguments?: Record<string, unknown>;
 				}
+				// request.params comes from JSON, so we validate its shape explicitly
 				const params = request.params as ToolCallParams;
 				const name = params?.name ?? "";
 				const args = params?.arguments ?? {};

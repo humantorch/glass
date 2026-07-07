@@ -13,8 +13,10 @@ import { PtySessionOptions, PrintModeOptions, PrintModeResult } from "./types";
  */
 function buildEnv(): Record<string, string> {
 	if (process.platform === "win32") {
+		// process.env is Record<string, string | undefined>. We filter out undefined values
+		// so our env object is safely Record<string, string> for downstream use.
 		const env: Record<string, string> = {};
-		for (const [key, value] of Object.entries(process.env)) {
+		for (const [key, value] of Object.entries(process.env as Record<string, string | undefined>)) {
 			if (value !== undefined) env[key] = value;
 		}
 		const userProfile = env.USERPROFILE || "C:\\Users\\Default";
@@ -55,17 +57,20 @@ function buildEnv(): Record<string, string> {
 		return env;
 	}
 
+	// process.env is Record<string, string | undefined>. We filter out undefined values
+	// so our env object is safely Record<string, string> for downstream use.
 	const env: Record<string, string> = {};
-	for (const [key, value] of Object.entries(process.env)) {
+	for (const [key, value] of Object.entries(process.env as Record<string, string | undefined>)) {
 		if (value !== undefined) env[key] = value;
 	}
 
 	try {
-		const shell = process.env.SHELL || "/bin/zsh";
+		const shell = (process.env as Record<string, string | undefined>).SHELL || "/bin/zsh";
+		// execSync with encoding: "utf8" returns a string, not Buffer. Safe to call string methods.
 		const output = execSync(`${shell} -l -c "env"`, {
 			encoding: "utf8",
 			timeout: 5000,
-		});
+		}) as string;
 		for (const line of output.trim().split("\n")) {
 			const idx = line.indexOf("=");
 			if (idx > 0) {
@@ -118,8 +123,9 @@ export class ProcessManager {
 		if (options.resumeLastSession) args.push("--continue");
 		if (options.skipPermissions) args.push("--dangerously-skip-permissions");
 
+		// resolvedEnv is Record<string, string> so this is safe; we explicitly pass environment
 		const proc = spawn(python, ["-c", pseudoterminalScript, ...args], {
-			cwd: options.workingDirectory || this.resolvedEnv["HOME"] || "/",
+			cwd: options.workingDirectory || (this.resolvedEnv as Record<string, string>)["HOME"] || "/",
 			env: { ...this.resolvedEnv, TERM: "xterm-color", COLORTERM: "truecolor" },
 			stdio: ["pipe", "pipe", "pipe", "pipe"],
 		});
@@ -139,8 +145,9 @@ export class ProcessManager {
 		if (options.resumeLastSession) args.push("--continue");
 		if (options.skipPermissions) args.push("--dangerously-skip-permissions");
 
+		// resolvedEnv is Record<string, string> so this is safe; we explicitly pass environment
 		const proc = spawn(python, ["-c", winBridgeScript, ...args], {
-			cwd: options.workingDirectory || this.resolvedEnv["USERPROFILE"] || "C:\\",
+			cwd: options.workingDirectory || (this.resolvedEnv as Record<string, string>)["USERPROFILE"] || "C:\\",
 			env: { ...this.resolvedEnv, TERM: "xterm-color", COLORTERM: "truecolor" },
 			stdio: ["pipe", "pipe", "pipe", "pipe"],
 		});
@@ -185,7 +192,8 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		// On Windows, probe the filesystem directly before falling back to PATH lookup.
 		// Electron's inherited PATH is stripped and often misses Python even when installed.
 		if (isWindows) {
-			const localAppData = this.resolvedEnv["LOCALAPPDATA"] || "";
+			// resolvedEnv is Record<string, string>, safe to access
+			const localAppData = (this.resolvedEnv as Record<string, string>)["LOCALAPPDATA"] || "";
 
 			// Enumerate %LOCALAPPDATA%\Programs\Python\Python3* — the default per-user
 			// install location from python.org. Sort descending to prefer newer versions.
@@ -272,6 +280,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		const args = ["--print", "--output-format", "text"];
 		if (options.model) args.push("--model", options.model);
 
+		// stdio: ["pipe", "pipe", "pipe"] guarantees stdin, stdout, stderr are Streams
 		const proc = spawn(options.claudePath, args, {
 			cwd: options.workingDirectory || undefined,
 			env: { ...this.resolvedEnv },
@@ -296,7 +305,8 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			onError(`Request timed out after ${timeoutMs / 1000}s`);
 		}, timeoutMs);
 
-		proc.stdout.on("data", (chunk: Buffer) => {
+		// stdio configuration guarantees stdout exists; safe to call .on()
+		(proc.stdout as NodeJS.ReadableStream).on("data", (chunk: Buffer) => {
 			if (killed) return;
 			const delta = chunk.toString();
 			fullText += delta;
@@ -304,7 +314,8 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		});
 
 		let stderr = "";
-		proc.stderr.on("data", (d: Buffer) => { stderr += d.toString(); });
+		// stdio configuration guarantees stderr exists; safe to call .on()
+		(proc.stderr as NodeJS.ReadableStream).on("data", (d: Buffer) => { stderr += d.toString(); });
 
 		proc.on("close", (code: number | null) => {
 			window.clearTimeout(timer);
@@ -352,6 +363,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			const args = ["--print", "--output-format", "json"];
 			if (options.model) args.push("--model", options.model);
 
+			// stdio: ["pipe", "pipe", "pipe"] guarantees stdin, stdout, stderr are Streams
 			const proc = spawn(options.claudePath, args, {
 				cwd: options.workingDirectory || undefined,
 				env: { ...this.resolvedEnv },
@@ -368,13 +380,13 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			let stderr = "";
 
 			if (proc.stdout) {
-				proc.stdout.on("data", (data: Buffer) => {
+				(proc.stdout as NodeJS.ReadableStream).on("data", (data: Buffer) => {
 					stdout += data.toString();
 				});
 			}
 
 			if (proc.stderr) {
-				proc.stderr.on("data", (data: Buffer) => {
+				(proc.stderr as NodeJS.ReadableStream).on("data", (data: Buffer) => {
 					stderr += data.toString();
 				});
 			}
