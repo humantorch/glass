@@ -193,11 +193,37 @@ export class ClaudeTerminalView extends ItemView {
 			allowProposedApi: true,
 			customGlyphs: true,
 			scrollback: this.plugin.settings.scrollback,
+			macOptionIsMeta: false,
 		});
 
 		this.terminal.loadAddon(this.fitAddon);
 		this.terminal.loadAddon(webLinksAddon);
 		this.terminal.open(xtermWrapper);
+
+		// Focus the terminal after opening
+		window.setTimeout(() => {
+			const canvas = xtermWrapper.querySelector("canvas") as HTMLCanvasElement;
+			canvas?.focus();
+		}, 50);
+
+		// On macOS, option key combinations produce Unicode characters (™, €, ¢) that xterm.js's
+		// keyboard handler doesn't capture. Intercept them with a capture phase listener so we handle
+		// them before xterm.js's default keyboard logic consumes the event.
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (!this.terminal || !this.pty) return;
+
+			// Only handle when option key is pressed
+			if (!e.altKey) return;
+
+			// e.key contains the composed character when option is pressed
+			const char = e.key;
+			if (char && char.length === 1 && !e.ctrlKey && !e.metaKey) {
+				e.preventDefault();
+				this.plugin.processManager.writePty(this.pty, char);
+			}
+		};
+
+		xtermWrapper.addEventListener("keydown", handleKeyDown, true);
 
 		// Detect vault file references in terminal output and open them in Obsidian on click.
 		// Handles two formats:
