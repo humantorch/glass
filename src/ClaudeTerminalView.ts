@@ -331,7 +331,7 @@ export class ClaudeTerminalView extends ItemView {
 				rows: this.terminal.rows,
 			});
 		} catch (err) {
-			const msg = (err as Error).message;
+			const msg = err instanceof Error ? err.message : String(err);
 			this.terminal.writeln(`\r\n\x1b[31mFailed to start Claude Code: ${msg}\x1b[0m`);
 			if (process.platform === "win32" && msg.includes("Python")) {
 				this.terminal.writeln(`\r\n\x1b[33mSetup steps:\x1b[0m`);

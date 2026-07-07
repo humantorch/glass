@@ -278,7 +278,8 @@ export default class ClaudeCodePlugin extends Plugin {
 		let config: Record<string, unknown> = {};
 		try {
 			if (fs.existsSync(mcpPath)) {
-				config = JSON.parse(fs.readFileSync(mcpPath, "utf8")) as Record<string, unknown>;
+				const content = fs.readFileSync(mcpPath, "utf8");
+				config = JSON.parse(content) as Record<string, unknown>;
 			}
 		} catch {
 			config = {};
@@ -298,7 +299,8 @@ export default class ClaudeCodePlugin extends Plugin {
 		try {
 			fs.writeFileSync(mcpPath, JSON.stringify(config, null, 2));
 		} catch (err) {
-			console.error("Glass: failed to write .mcp.json:", err);
+			const errorMsg = err instanceof Error ? err.message : String(err);
+			console.error("Glass: failed to write .mcp.json:", errorMsg);
 		}
 	}
 
@@ -306,9 +308,8 @@ export default class ClaudeCodePlugin extends Plugin {
 		const mcpPath = path.join(vaultRoot, ".mcp.json");
 		try {
 			if (!fs.existsSync(mcpPath)) return;
-			const config = JSON.parse(
-				fs.readFileSync(mcpPath, "utf8")
-			) as Record<string, unknown>;
+			const content = fs.readFileSync(mcpPath, "utf8");
+			const config = JSON.parse(content) as Record<string, unknown>;
 			const servers = config.mcpServers as Record<string, unknown> | undefined;
 			if (!servers) return;
 			delete servers.obsidian;

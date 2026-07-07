@@ -13,7 +13,10 @@ import { PtySessionOptions, PrintModeOptions, PrintModeResult } from "./types";
  */
 function buildEnv(): Record<string, string> {
 	if (process.platform === "win32") {
-		const env: Record<string, string> = { ...(process.env as Record<string, string>) };
+		const env: Record<string, string> = {};
+		for (const [key, value] of Object.entries(process.env)) {
+			if (value !== undefined) env[key] = value;
+		}
 		const userProfile = env.USERPROFILE || "C:\\Users\\Default";
 		const appData = env.APPDATA || "";
 		const localAppData = env.LOCALAPPDATA || "";
@@ -52,18 +55,18 @@ function buildEnv(): Record<string, string> {
 		return env;
 	}
 
-	const env: Record<string, string> = {
-		...(process.env as Record<string, string>),
-	};
+	const env: Record<string, string> = {};
+	for (const [key, value] of Object.entries(process.env)) {
+		if (value !== undefined) env[key] = value;
+	}
 
 	try {
 		const shell = process.env.SHELL || "/bin/zsh";
 		const output = execSync(`${shell} -l -c "env"`, {
 			encoding: "utf8",
 			timeout: 5000,
-		}).trim();
-
-		for (const line of output.split("\n")) {
+		});
+		for (const line of output.trim().split("\n")) {
 			const idx = line.indexOf("=");
 			if (idx > 0) {
 				env[line.slice(0, idx)] = line.slice(idx + 1);
@@ -276,8 +279,10 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		});
 
 		const fullMessage = context ? `${context}\n\n${prompt}` : prompt;
-		proc.stdin.write(fullMessage);
-		proc.stdin.end();
+		if (proc.stdin) {
+			proc.stdin.write(fullMessage);
+			proc.stdin.end();
+		}
 
 		let fullText = "";
 		let killed = false;
@@ -316,7 +321,8 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			window.clearTimeout(timer);
 			if (killed || completed) return;
 			completed = true;
-			const isEnoent = (err as NodeJS.ErrnoException).code === "ENOENT";
+			const errno = (err as NodeJS.ErrnoException).code;
+			const isEnoent = errno === "ENOENT";
 			const isWindows = process.platform === "win32";
 			const hint = isEnoent && isWindows
 				? `Set the full path in Settings → Glass → "Claude binary path".`
@@ -353,19 +359,25 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			});
 
 			const fullMessage = context ? `${context}\n\n${prompt}` : prompt;
-			proc.stdin.write(fullMessage);
-			proc.stdin.end();
+			if (proc.stdin) {
+				proc.stdin.write(fullMessage);
+				proc.stdin.end();
+			}
 
 			let stdout = "";
 			let stderr = "";
 
-			proc.stdout.on("data", (data: Buffer) => {
-				stdout += data.toString();
-			});
+			if (proc.stdout) {
+				proc.stdout.on("data", (data: Buffer) => {
+					stdout += data.toString();
+				});
+			}
 
-			proc.stderr.on("data", (data: Buffer) => {
-				stderr += data.toString();
-			});
+			if (proc.stderr) {
+				proc.stderr.on("data", (data: Buffer) => {
+					stderr += data.toString();
+				});
+			}
 
 			const timer = window.setTimeout(() => {
 				proc.kill();
@@ -408,7 +420,8 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 
 			proc.on("error", (err: Error) => {
 				window.clearTimeout(timer);
-				const isEnoent = (err as NodeJS.ErrnoException).code === "ENOENT";
+				const errno = (err as NodeJS.ErrnoException).code;
+				const isEnoent = errno === "ENOENT";
 				const isWindows = process.platform === "win32";
 				const hint = isEnoent && isWindows
 					? `Set the full path in Settings → Glass → "Claude binary path" (e.g. C:\\Users\\<you>\\.local\\bin\\claude.exe).`
