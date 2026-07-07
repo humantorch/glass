@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access,
-                   @typescript-eslint/no-unsafe-assignment,
-                   @typescript-eslint/no-unsafe-call,
-                   @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access -- DOM element access,
+                   @typescript-eslint/no-unsafe-assignment -- DOM data,
+                   @typescript-eslint/no-unsafe-call -- DOM methods,
+                   @typescript-eslint/no-unsafe-argument -- DOM parameters */
 // Settings tab accesses DOM elements and form inputs with runtime type validation,
 // which require careful property access. These operations are safe with proper checks.
 
@@ -369,3 +369,7 @@ export class SettingsTab extends PluginSettingTab {
 		};
 	}
 }
+/* eslint-enable @typescript-eslint/no-unsafe-member-access,
+                   @typescript-eslint/no-unsafe-assignment,
+                   @typescript-eslint/no-unsafe-call,
+                   @typescript-eslint/no-unsafe-argument */

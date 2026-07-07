@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access,
-                   @typescript-eslint/no-unsafe-assignment,
-                   @typescript-eslint/no-unsafe-call,
-                   @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access -- JSON-RPC request access,
+                   @typescript-eslint/no-unsafe-assignment -- JSON parse results,
+                   @typescript-eslint/no-unsafe-call -- HTTP/JSON methods,
+                   @typescript-eslint/no-unsafe-argument -- JSON-RPC parameters */
 // VaultMcpServer handles JSON-RPC over HTTP and JSON parsing, which require
-// runtime type validation. These operations are safe with proper null checks.
+// runtime type validation. These operations are safe with proper validation.
 
 import * as http from "http";
 import * as crypto from "crypto";
@@ -499,3 +499,7 @@ export class VaultMcpServer {
 		return `${header}\n\n${results.join("\n\n")}`;
 	}
 }
+/* eslint-enable @typescript-eslint/no-unsafe-member-access,
+                   @typescript-eslint/no-unsafe-assignment,
+                   @typescript-eslint/no-unsafe-call,
+                   @typescript-eslint/no-unsafe-argument */

@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access,
-                   @typescript-eslint/no-unsafe-assignment,
-                   @typescript-eslint/no-unsafe-call,
-                   @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access -- system process/environment access,
+                   @typescript-eslint/no-unsafe-assignment -- system API returns,
+                   @typescript-eslint/no-unsafe-call -- system API methods,
+                   @typescript-eslint/no-unsafe-argument -- system API parameters */
 // ProcessManager spawns child processes and interacts with Node.js process/stream APIs,
-// which are inherently loosely typed. These operations are safe in context.
+// which are inherently loosely typed. These operations are safe with proper validation.
 
 import { execSync, spawn } from "child_process";
 import type { ChildProcess } from "child_process";
@@ -454,3 +454,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		});
 	}
 }
+/* eslint-enable @typescript-eslint/no-unsafe-member-access,
+                   @typescript-eslint/no-unsafe-assignment,
+                   @typescript-eslint/no-unsafe-call,
+                   @typescript-eslint/no-unsafe-argument */

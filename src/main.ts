@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access,
-                   @typescript-eslint/no-unsafe-assignment,
-                   @typescript-eslint/no-unsafe-call,
-                   @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access -- file I/O operations,
+                   @typescript-eslint/no-unsafe-assignment -- JSON parse results,
+                   @typescript-eslint/no-unsafe-call -- file/JSON methods,
+                   @typescript-eslint/no-unsafe-argument -- file I/O parameters */
 // Main plugin file handles file I/O (.mcp.json) and JSON parsing, which require
 // runtime type validation. These operations are safe with proper error handling.
 
@@ -341,3 +341,7 @@ export default class ClaudeCodePlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 }
+/* eslint-enable @typescript-eslint/no-unsafe-member-access,
+                   @typescript-eslint/no-unsafe-assignment,
+                   @typescript-eslint/no-unsafe-call,
+                   @typescript-eslint/no-unsafe-argument */

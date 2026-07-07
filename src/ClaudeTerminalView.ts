@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access,
-                   @typescript-eslint/no-unsafe-assignment,
-                   @typescript-eslint/no-unsafe-call,
-                   @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access -- xterm.js and error objects,
+                   @typescript-eslint/no-unsafe-assignment -- terminal data,
+                   @typescript-eslint/no-unsafe-call -- terminal methods,
+                   @typescript-eslint/no-unsafe-argument -- terminal parameters */
 // Terminal view interacts with xterm.js and child process error objects,
 // which require runtime validation. These operations are safe with proper checks.
 
@@ -516,3 +516,7 @@ export class ClaudeTerminalView extends ItemView {
 		this.fitAddon = null;
 	}
 }
+/* eslint-enable @typescript-eslint/no-unsafe-member-access,
+                   @typescript-eslint/no-unsafe-assignment,
+                   @typescript-eslint/no-unsafe-call,
+                   @typescript-eslint/no-unsafe-argument */
