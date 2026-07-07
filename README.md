@@ -16,9 +16,10 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 **Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
 <!-- WHATS-NEW-START -->
-## What's new in 1.8.5
+## What's new in 1.8.6
 
-- **ESLint warning suppressions** — Added file-level eslint-disable comments for system-level operations (process spawning, file I/O, JSON parsing) that require interaction with loosely-typed Node.js APIs. No functional changes.
+- **Cleaner ESLint suppressions** — disable comments now document their reason, reducing confusing blanket linting overrides in the codebase.
+- **Improved release notes** — the README now shows accurate, user-facing changelog entries instead of internal development notes.
 <!-- WHATS-NEW-END -->
 
 ## Features
