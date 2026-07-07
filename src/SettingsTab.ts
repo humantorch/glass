@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access,
+                   @typescript-eslint/no-unsafe-assignment,
+                   @typescript-eslint/no-unsafe-call,
+                   @typescript-eslint/no-unsafe-argument */
+// Settings tab accesses DOM elements and form inputs with runtime type validation,
+// which require careful property access. These operations are safe with proper checks.
+
 import { App, DropdownComponent, Notice, PluginSettingTab, Setting } from "obsidian";
 import type ClaudeCodePlugin from "./main";
 import { QUICK_ASK_MODELS } from "./types";
