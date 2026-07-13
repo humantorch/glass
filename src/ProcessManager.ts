@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
-
 import { execSync, spawn } from "child_process";
 import type { ChildProcess } from "child_process";
 import * as fs from "fs";
