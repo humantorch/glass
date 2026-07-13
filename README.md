@@ -16,9 +16,9 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 **Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
 <!-- WHATS-NEW-START -->
-## What's new in 1.8.10
+## What's new in 1.8.11
 
-- **Stability release** — reverted to the proven 1.8.2 codebase (macOS option key input fix) after remediation attempts introduced checker incompatibilities. No new features, but a reliable, working version.
+- **Clipboard copy fix** — Copying text from the terminal or quick-ask panel no longer fails silently and works reliably again.
 <!-- WHATS-NEW-END -->
 
 ## Features
