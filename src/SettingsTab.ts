@@ -120,6 +120,40 @@ export class SettingsTab extends PluginSettingTab {
 		void this.buildFontDropdowns(familySetting, weightSetting);
 
 		new Setting(containerEl)
+			.setName("Terminal letter spacing")
+			.setDesc("Horizontal spacing between characters in pixels (0-3, default 0). Adds breathing room for cramped fonts.")
+			.addText((text) =>
+				text
+					.setPlaceholder("0")
+					.setValue(String(this.plugin.settings.letterSpacing))
+					.onChange(async (value) => {
+						const parsed = parseFloat(value);
+						if (!isNaN(parsed) && parsed >= 0 && parsed <= 3) {
+							this.plugin.settings.letterSpacing = parsed;
+							await this.plugin.saveSettings();
+							this.plugin.applyFontToTerminal();
+						}
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Terminal line height")
+			.setDesc("Vertical spacing multiplier for lines (1.0-1.4, default 1.0). Adds vertical breathing room.")
+			.addText((text) =>
+				text
+					.setPlaceholder("1")
+					.setValue(String(this.plugin.settings.lineHeight))
+					.onChange(async (value) => {
+						const parsed = parseFloat(value);
+						if (!isNaN(parsed) && parsed >= 1 && parsed <= 1.4) {
+							this.plugin.settings.lineHeight = parsed;
+							await this.plugin.saveSettings();
+							this.plugin.applyFontToTerminal();
+						}
+					})
+			);
+
+		new Setting(containerEl)
 			.setName("Open Claude panel on startup")
 			.setDesc(
 				"Automatically open the Claude Code terminal when Obsidian starts."

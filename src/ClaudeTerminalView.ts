@@ -4,6 +4,7 @@ import { Terminal } from "@xterm/xterm";
 import type { FontWeight, ILink } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
+import { ClipboardAddon } from "@xterm/addon-clipboard";
 import { shell } from "electron";
 import type { ChildProcess } from "child_process";
 import type ClaudeCodePlugin from "./main";
@@ -189,6 +190,8 @@ export class ClaudeTerminalView extends ItemView {
 			fontFamily: this.plugin.settings.fontFamily,
 			fontSize: this.plugin.settings.fontSize,
 			fontWeight: this.plugin.settings.fontWeight as FontWeight,
+			letterSpacing: this.plugin.settings.letterSpacing,
+			lineHeight: this.plugin.settings.lineHeight,
 			theme: getXtermTheme(),
 			cursorBlink: true,
 			allowProposedApi: true,
@@ -199,6 +202,7 @@ export class ClaudeTerminalView extends ItemView {
 
 		this.terminal.loadAddon(this.fitAddon);
 		this.terminal.loadAddon(webLinksAddon);
+		this.terminal.loadAddon(new ClipboardAddon());
 		this.terminal.open(xtermWrapper);
 
 		// Focus the terminal after opening
@@ -486,11 +490,13 @@ export class ClaudeTerminalView extends ItemView {
 		this.mcpIndicator.title = title;
 	}
 
-	updateFont(size: number, family: string, weight: string): void {
+	updateFont(size: number, family: string, weight: string, letterSpacing = 0, lineHeight = 1): void {
 		if (!this.terminal) return;
 		this.terminal.options.fontSize = size;
 		this.terminal.options.fontFamily = family;
 		this.terminal.options.fontWeight = weight as FontWeight;
+		this.terminal.options.letterSpacing = letterSpacing;
+		this.terminal.options.lineHeight = lineHeight;
 		this.fitAddon?.fit();
 	}
 

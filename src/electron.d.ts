@@ -2,5 +2,8 @@ declare module "electron" {
 	const shell: {
 		openExternal(url: string): void;
 	};
-	export { shell };
+	const clipboard: {
+		writeText(text: string): void;
+	};
+	export { shell, clipboard };
 }

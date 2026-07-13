@@ -235,7 +235,9 @@ export default class ClaudeCodePlugin extends Plugin {
 		this.getClaudeView()?.updateFont(
 			this.settings.fontSize,
 			this.settings.fontFamily,
-			this.settings.fontWeight
+			this.settings.fontWeight,
+			this.settings.letterSpacing,
+			this.settings.lineHeight
 		);
 	}
 
