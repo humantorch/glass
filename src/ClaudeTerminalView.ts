@@ -3,6 +3,7 @@ import { Terminal } from "@xterm/xterm";
 import type { FontWeight, ILink } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
+import { ClipboardAddon } from "@xterm/addon-clipboard";
 import { shell } from "electron";
 import type { ChildProcess } from "child_process";
 import type ClaudeCodePlugin from "./main";
@@ -146,7 +147,7 @@ export class ClaudeTerminalView extends ItemView {
 			cls: "claude-code-toolbar-btn claude-code-toolbar-btn--icon",
 		});
 		setIcon(settingsBtn, "settings");
-		settingsBtn.title = "Open Glass settings";
+		settingsBtn.title = "Open glass settings";
 		settingsBtn.addEventListener("click", (e) => {
 			(e.currentTarget as HTMLButtonElement).blur();
 			const app = this.plugin.app as unknown as {
@@ -198,6 +199,7 @@ export class ClaudeTerminalView extends ItemView {
 
 		this.terminal.loadAddon(this.fitAddon);
 		this.terminal.loadAddon(webLinksAddon);
+		this.terminal.loadAddon(new ClipboardAddon());
 		this.terminal.open(xtermWrapper);
 
 		// Focus the terminal after opening

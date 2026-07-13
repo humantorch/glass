@@ -239,12 +239,16 @@ export class ClaudeQuickModal extends Modal {
 
 	private async copyToClipboard(): Promise<void> {
 		if (!this.lastResponse) return;
-		await navigator.clipboard.writeText(this.lastResponse);
-		new Notice("Response copied to clipboard.");
-		if (this.copyBtn) this.copyBtn.textContent = "Copied!";
-		window.setTimeout(() => {
-			if (this.copyBtn) this.copyBtn.textContent = "Copy response";
-		}, 2000);
+		try {
+			await navigator.clipboard.writeText(this.lastResponse);
+			new Notice("Response copied to clipboard.");
+			if (this.copyBtn) this.copyBtn.textContent = "Copied!";
+			window.setTimeout(() => {
+				if (this.copyBtn) this.copyBtn.textContent = "Copy response";
+			}, 2000);
+		} catch {
+			new Notice("Failed to copy to clipboard.");
+		}
 	}
 
 	onClose(): void {
