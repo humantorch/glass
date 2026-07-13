@@ -1,4 +1,5 @@
 import { App, Modal, MarkdownRenderer, Notice, Component } from "obsidian";
+import { clipboard } from "electron";
 import type ClaudeCodePlugin from "./main";
 import { QUICK_ASK_MODELS } from "./types";
 
@@ -121,7 +122,7 @@ export class ClaudeQuickModal extends Modal {
 			cls: "claude-quick-modal-copy-btn",
 		});
 		this.copyBtn.hide();
-		this.copyBtn.addEventListener("click", () => { void this.copyToClipboard(); });
+		this.copyBtn.addEventListener("click", () => { this.copyToClipboard(); });
 
 		// Result area
 		this.resultEl = contentEl.createDiv({ cls: "claude-quick-modal-result" });
@@ -237,10 +238,10 @@ export class ClaudeQuickModal extends Modal {
 		this.copyBtn?.show();
 	}
 
-	private async copyToClipboard(): Promise<void> {
+	private copyToClipboard(): void {
 		if (!this.lastResponse) return;
 		try {
-			await navigator.clipboard.writeText(this.lastResponse);
+			clipboard.writeText(this.lastResponse);
 			new Notice("Response copied to clipboard.");
 			if (this.copyBtn) this.copyBtn.textContent = "Copied!";
 			window.setTimeout(() => {
