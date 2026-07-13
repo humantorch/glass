@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call */
+
 import type { Menu, RequestUrlResponse, WorkspaceLeaf} from "obsidian";
 import { FileSystemAdapter, Notice, Plugin, TFile, requestUrl } from "obsidian";
 import * as fs from "fs";

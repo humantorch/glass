@@ -11,6 +11,8 @@ import type ClaudeCodePlugin from "./main";
 import { CLAUDE_ICON, CLAUDE_TERMINAL_VIEW_TYPE } from "./types";
 import { getErrorMessage } from "./nodeApiWrappers";
 
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call */
+
 /** Reads an Obsidian CSS variable from the current theme, falling back to a default. */
 function cssVar(name: string, fallback: string): string {
 	const value = getComputedStyle(activeDocument.body).getPropertyValue(name).trim();

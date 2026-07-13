@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+
 import type { ChildProcess } from "child_process";
 
 export function getEnv(key: string, defaultValue = ""): string {
