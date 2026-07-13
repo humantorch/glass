@@ -189,6 +189,8 @@ export class ClaudeTerminalView extends ItemView {
 			fontFamily: this.plugin.settings.fontFamily,
 			fontSize: this.plugin.settings.fontSize,
 			fontWeight: this.plugin.settings.fontWeight as FontWeight,
+			letterSpacing: this.plugin.settings.letterSpacing,
+			lineHeight: this.plugin.settings.lineHeight,
 			theme: getXtermTheme(),
 			cursorBlink: true,
 			allowProposedApi: true,
@@ -487,11 +489,13 @@ export class ClaudeTerminalView extends ItemView {
 		this.mcpIndicator.title = title;
 	}
 
-	updateFont(size: number, family: string, weight: string): void {
+	updateFont(size: number, family: string, weight: string, letterSpacing = 0, lineHeight = 1): void {
 		if (!this.terminal) return;
 		this.terminal.options.fontSize = size;
 		this.terminal.options.fontFamily = family;
 		this.terminal.options.fontWeight = weight as FontWeight;
+		this.terminal.options.letterSpacing = letterSpacing;
+		this.terminal.options.lineHeight = lineHeight;
 		this.fitAddon?.fit();
 	}
 

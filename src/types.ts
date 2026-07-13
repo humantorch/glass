@@ -7,6 +7,8 @@ export interface ClaudeCodeSettings {
 	fontSize: number;
 	fontFamily: string;
 	fontWeight: string;
+	letterSpacing: number;
+	lineHeight: number;
 	mcpServerEnabled: boolean;
 	mcpServerPort: number;
 	mcpReadOnly: boolean;
@@ -23,6 +25,8 @@ export const DEFAULT_SETTINGS: ClaudeCodeSettings = {
 	fontSize: 14,
 	fontFamily: "monospace",
 	fontWeight: "normal",
+	letterSpacing: 0,
+	lineHeight: 1,
 	mcpServerEnabled: true,
 	mcpServerPort: 27123,
 	mcpReadOnly: false,
