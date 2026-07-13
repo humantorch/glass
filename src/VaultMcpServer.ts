@@ -2,7 +2,13 @@ import * as http from "http";
 import * as crypto from "crypto";
 import type { App} from "obsidian";
 import { TFile, TFolder } from "obsidian";
-import { isRecord, getErrorMessage } from "./types";
+import {
+	isRecord,
+	getErrorMessage,
+	getStringProperty,
+	getNumberProperty,
+	parseJSON,
+} from "./nodeApiWrappers";
 
 interface JsonRpcRequest {
 	jsonrpc: "2.0";
@@ -141,16 +147,6 @@ function extractToolParams(params: unknown): Record<string, unknown> {
 	return params;
 }
 
-function getString(obj: Record<string, unknown>, key: string, defaultValue = ""): string {
-	const value = obj[key];
-	return typeof value === 'string' ? value : defaultValue;
-}
-
-function getNumber(obj: Record<string, unknown>, key: string, defaultValue = 0): number {
-	const value = obj[key];
-	return typeof value === 'number' ? value : defaultValue;
-}
-
 /**
  * Wraps vault note content in explicit delimiters and a data-boundary instruction.
  * This is a prompt injection defence: it makes the data/instruction boundary
@@ -260,7 +256,18 @@ export class VaultMcpServer {
 		req.on("end", () => {
 			void (async () => {
 				try {
-					const request = JSON.parse(body) as JsonRpcRequest;
+					const request = parseJSON<JsonRpcRequest>(body);
+					if (!request) {
+						res.writeHead(400, { "Content-Type": "application/json" });
+						res.end(
+							JSON.stringify({
+								jsonrpc: "2.0",
+								id: null,
+								error: { code: -32700, message: "Parse error" },
+							})
+						);
+						return;
+					}
 					const response = await this.handleJsonRpc(request);
 					if (response === null) {
 						// Notification — no response body
@@ -357,22 +364,22 @@ export class VaultMcpServer {
 		}
 		switch (name) {
 			case "read_note":
-				return this.readNote(getString(args, "path"));
+				return this.readNote(getStringProperty(args, "path"));
 			case "list_notes":
-				return this.listNotes(getString(args, "directory"));
+				return this.listNotes(getStringProperty(args, "directory"));
 			case "search_vault":
-				return this.searchVault(getString(args, "query"));
+				return this.searchVault(getStringProperty(args, "query"));
 			case "get_active_note":
 				return this.getActiveNote();
 			case "create_note":
-				return this.createNote(getString(args, "path"), getString(args, "content"));
+				return this.createNote(getStringProperty(args, "path"), getStringProperty(args, "content"));
 			case "update_note":
-				return this.updateNote(getString(args, "path"), getString(args, "content"));
+				return this.updateNote(getStringProperty(args, "path"), getStringProperty(args, "content"));
 			case "search_note_content":
 				return this.searchNoteContent(
-					getString(args, "query"),
-					getNumber(args, "max_results", 10),
-					getString(args, "directory")
+					getStringProperty(args, "query"),
+					getNumberProperty(args, "max_results", 10),
+					getStringProperty(args, "directory")
 				);
 			default:
 				throw new Error(`Unknown tool: ${name}`);

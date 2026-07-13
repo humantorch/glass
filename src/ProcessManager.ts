@@ -4,7 +4,15 @@ import * as fs from "fs";
 import pseudoterminalScript from "./pseudoterminal.py";
 import winBridgeScript from "./pty_bridge_win.py";
 import type { PtySessionOptions, PrintModeOptions, PrintModeResult} from "./types";
-import { isErrnoException, isWritableStream } from "./types";
+import {
+	getEnv,
+	buildEnvMap,
+	isErrnoException,
+	isWritableStream,
+	getStderrStream,
+	getStdoutStream,
+	getStdinStream,
+} from "./nodeApiWrappers";
 
 /**
  * Electron inherits a minimal environment — PATH is truncated and shell-profile
@@ -14,10 +22,10 @@ import { isErrnoException, isWritableStream } from "./types";
  */
 function buildEnv(): Record<string, string> {
 	if (process.platform === "win32") {
-		const env: Record<string, string> = { ...(process.env as Record<string, string>) };
-		const userProfile = env.USERPROFILE || "C:\\Users\\Default";
-		const appData = env.APPDATA || "";
-		const localAppData = env.LOCALAPPDATA || "";
+		const env = buildEnvMap();
+		const userProfile = getEnv("USERPROFILE", "C:\\Users\\Default");
+		const appData = getEnv("APPDATA", "");
+		const localAppData = getEnv("LOCALAPPDATA", "");
 		const pathParts = new Set<string>(
 			(env.PATH || "").split(";").filter(Boolean)
 		);
@@ -53,12 +61,10 @@ function buildEnv(): Record<string, string> {
 		return env;
 	}
 
-	const env: Record<string, string> = {
-		...(process.env as Record<string, string>),
-	};
+	const env = buildEnvMap();
 
 	try {
-		const shell = process.env.SHELL || "/bin/zsh";
+		const shell = getEnv("SHELL", "/bin/zsh");
 		const output = execSync(`${shell} -l -c "env"`, {
 			encoding: "utf8",
 			timeout: 5000,
@@ -164,7 +170,8 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 
 	writePty(proc: ChildProcess, data: string): void {
 		try {
-			proc.stdin?.write(data);
+			const stdin = getStdinStream(proc);
+			stdin?.write(data);
 		} catch {
 			// Process may have already exited
 		}
@@ -294,15 +301,23 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			onError(`Request timed out after ${timeoutMs / 1000}s`);
 		}, timeoutMs);
 
-		proc.stdout.on("data", (chunk: Buffer) => {
-			if (killed) return;
-			const delta = chunk.toString();
-			fullText += delta;
-			onToken(delta);
-		});
+		const stdout = getStdoutStream(proc);
+		if (stdout) {
+			stdout.on("data", (chunk: Buffer) => {
+				if (killed) return;
+				const delta = chunk.toString();
+				fullText += delta;
+				onToken(delta);
+			});
+		}
 
 		let stderr = "";
-		proc.stderr.on("data", (d: Buffer) => { stderr += d.toString(); });
+		const stderrStream = getStderrStream(proc);
+		if (stderrStream) {
+			stderrStream.on("data", (d: Buffer) => {
+				stderr += d.toString();
+			});
+		}
 
 		proc.on("close", (code: number | null) => {
 			window.clearTimeout(timer);
@@ -356,19 +371,28 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			});
 
 			const fullMessage = context ? `${context}\n\n${prompt}` : prompt;
-			proc.stdin.write(fullMessage);
-			proc.stdin.end();
+			const stdin = getStdinStream(proc);
+			if (stdin) {
+				stdin.write(fullMessage);
+				stdin.end();
+			}
 
 			let stdout = "";
 			let stderr = "";
 
-			proc.stdout.on("data", (data: Buffer) => {
-				stdout += data.toString();
-			});
+			const stdoutStream = getStdoutStream(proc);
+			if (stdoutStream) {
+				stdoutStream.on("data", (data: Buffer) => {
+					stdout += data.toString();
+				});
+			}
 
-			proc.stderr.on("data", (data: Buffer) => {
-				stderr += data.toString();
-			});
+			const stderrStream = getStderrStream(proc);
+			if (stderrStream) {
+				stderrStream.on("data", (data: Buffer) => {
+					stderr += data.toString();
+				});
+			}
 
 			const timer = window.setTimeout(() => {
 				proc.kill();

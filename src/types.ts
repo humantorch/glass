@@ -66,31 +66,3 @@ export interface PrintModeResult {
 	error?: string;
 }
 
-export function isErrnoException(err: unknown): err is NodeJS.ErrnoException {
-	return err instanceof Error && 'code' in err;
-}
-
-export function getErrorCode(err: unknown): string | undefined {
-	if (isErrnoException(err)) return err.code;
-	return undefined;
-}
-
-export function getErrorMessage(err: unknown): string {
-	if (err instanceof Error) return err.message;
-	if (typeof err === 'string') return err;
-	return String(err);
-}
-
-export function isRecord(value: unknown): value is Record<string, unknown> {
-	return !!value && typeof value === 'object' && !Array.isArray(value);
-}
-
-export function isWritableStream(value: unknown): value is NodeJS.WritableStream {
-	return value !== null && typeof value === 'object' &&
-		typeof (value as { write?: unknown }).write === 'function';
-}
-
-export function isReadableStream(value: unknown): value is NodeJS.ReadableStream {
-	return value !== null && typeof value === 'object' &&
-		typeof (value as { on?: unknown }).on === 'function';
-}

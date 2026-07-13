@@ -1,4 +1,5 @@
-import { App, Modal, MarkdownRenderer, Notice, Component } from "obsidian";
+import type { App } from "obsidian";
+import { Modal, MarkdownRenderer, Notice, Component } from "obsidian";
 import { clipboard } from "electron";
 import type ClaudeCodePlugin from "./main";
 import { QUICK_ASK_MODELS } from "./types";

@@ -8,7 +8,8 @@ import { ClipboardAddon } from "@xterm/addon-clipboard";
 import { shell } from "electron";
 import type { ChildProcess } from "child_process";
 import type ClaudeCodePlugin from "./main";
-import { CLAUDE_ICON, CLAUDE_TERMINAL_VIEW_TYPE, getErrorMessage } from "./types";
+import { CLAUDE_ICON, CLAUDE_TERMINAL_VIEW_TYPE } from "./types";
+import { getErrorMessage } from "./nodeApiWrappers";
 
 /** Reads an Obsidian CSS variable from the current theme, falling back to a default. */
 function cssVar(name: string, fallback: string): string {
