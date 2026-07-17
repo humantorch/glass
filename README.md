@@ -11,7 +11,9 @@ Glass puts [Claude Code](https://claude.ai/code) inside Obsidian with a built-in
 
 Every slash command, every MCP tool, every session you'd have in a standalone terminal. If you already use Claude Code, there's nothing new to learn.
 
-![Blackglass screenshot](assets/blackglass-05.31.png)
+| Light | Dark |
+| --- | --- |
+| ![Glass screenshot, light mode](assets/glass-7.16.light.png) | ![Glass screenshot, dark mode](assets/glass-7.16.dark.png) |
 
 **Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
