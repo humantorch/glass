@@ -18,7 +18,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 **Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
 <!-- WHATS-NEW-START -->
-## What's new in 1.9.1
+## What's new in 1.9.3
 
 - **Quick-ask model list** — Added Sonnet 5 and Fable 5 as selectable models for quick-ask.
 <!-- WHATS-NEW-END -->
