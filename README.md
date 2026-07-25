@@ -20,7 +20,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 <!-- WHATS-NEW-START -->
 ## What's new in 1.10.0
 
-- **Quick-ask model list** — Added Opus 5 as selectable models for quick-ask.
+**Quick Ask model update** — The Quick Ask modal now uses Opus 5 instead of the previous Opus model.
 <!-- WHATS-NEW-END -->
 
 ## Features
