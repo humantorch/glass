@@ -41,7 +41,7 @@ export const QUICK_ASK_MODELS: [string, string][] = [
 	["", "Default"],
 	["claude-haiku-4-5-20251001", "Haiku 4.5"],
 	["claude-sonnet-5", "Sonnet 5"],
-	["claude-opus-4-8", "Opus 4.8"],
+	["claude-opus-5", "Opus 5"],
 	["claude-fable-5", "Fable 5"],
 ];
 
