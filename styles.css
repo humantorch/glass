@@ -322,6 +322,7 @@
 .claude-quick-modal-textarea:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px var(--interactive-accent);
 }
 
 .claude-quick-modal-actions {
@@ -447,4 +448,24 @@
 
 @keyframes claude-blink {
 	50% { opacity: 0; }
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+	.claude-code-status-dot,
+	.claude-code-mcp-dot {
+		transition: none;
+	}
+
+	.claude-quick-modal-spinner {
+		animation: none;
+		border-top-color: var(--background-modifier-border);
+	}
+
+	.claude-quick-modal-stream--active::after {
+		animation: none;
+	}
 }

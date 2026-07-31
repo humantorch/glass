@@ -148,6 +148,7 @@ export class ClaudeTerminalView extends ItemView {
 		});
 		setIcon(settingsBtn, "settings");
 		settingsBtn.title = "Open glass settings";
+		settingsBtn.setAttribute("aria-label", "Open glass settings");
 		settingsBtn.addEventListener("click", (e) => {
 			(e.currentTarget as HTMLButtonElement).blur();
 			const app = this.plugin.app as unknown as {
@@ -158,12 +159,15 @@ export class ClaudeTerminalView extends ItemView {
 		});
 
 		const sessionIndicator = toolbar.createDiv({ cls: "claude-code-indicator" });
+		sessionIndicator.setAttribute("role", "status");
 		this.statusDot = sessionIndicator.createDiv({ cls: "claude-code-status-dot" });
 		sessionIndicator.createSpan({ cls: "claude-code-indicator-label", text: "session" });
 		this.statusDot.title = "No session";
 		sessionIndicator.title = "No session";
+		sessionIndicator.setAttribute("aria-label", "Session status: no session");
 
 		this.mcpIndicator = toolbar.createDiv({ cls: "claude-code-indicator" });
+		this.mcpIndicator.setAttribute("role", "status");
 		this.mcpDot = this.mcpIndicator.createDiv({ cls: "claude-code-mcp-dot" });
 		this.mcpIndicator.createSpan({ cls: "claude-code-indicator-label", text: "MCP" });
 		this.updateMcpStatus();
@@ -192,7 +196,7 @@ export class ClaudeTerminalView extends ItemView {
 			letterSpacing: this.plugin.settings.letterSpacing,
 			lineHeight: this.plugin.settings.lineHeight,
 			theme: getXtermTheme(),
-			cursorBlink: true,
+			cursorBlink: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
 			allowProposedApi: true,
 			customGlyphs: true,
 			scrollback: this.plugin.settings.scrollback,
@@ -308,7 +312,10 @@ export class ClaudeTerminalView extends ItemView {
 		const title = active ? "Session active" : "Session ended";
 		this.statusDot.toggleClass("claude-code-status-dot--active", active);
 		this.statusDot.title = title;
-		if (this.statusDot.parentElement) this.statusDot.parentElement.title = title;
+		if (this.statusDot.parentElement) {
+			this.statusDot.parentElement.title = title;
+			this.statusDot.parentElement.setAttribute("aria-label", `Session status: ${title.toLowerCase()}`);
+		}
 	}
 
 	private startSession(resumeLastSession?: boolean): void {
@@ -487,6 +494,7 @@ export class ClaudeTerminalView extends ItemView {
 				: "Vault MCP server disabled";
 		this.mcpDot.title = title;
 		this.mcpIndicator.title = title;
+		this.mcpIndicator.setAttribute("aria-label", title);
 	}
 
 	updateFont(size: number, family: string, weight: string, letterSpacing = 0, lineHeight = 1): void {

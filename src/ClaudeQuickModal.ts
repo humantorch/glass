@@ -126,6 +126,7 @@ export class ClaudeQuickModal extends Modal {
 
 		// Result area
 		this.resultEl = contentEl.createDiv({ cls: "claude-quick-modal-result" });
+		this.resultEl.setAttribute("aria-live", "polite");
 		this.resultEl.hide();
 	}
 
@@ -189,6 +190,7 @@ export class ClaudeQuickModal extends Modal {
 	}
 
 	private startStreamAnimation(): void {
+		const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 		const step = () => {
 			if (this.charQueue.length === 0) {
 				this.animationId = null;
@@ -199,8 +201,11 @@ export class ClaudeQuickModal extends Modal {
 				}
 				return;
 			}
-			// Slow when queue is small (visible streaming), fast when backlogged
-			const n = this.charQueue.length > 1000 ? 50 : this.charQueue.length > 300 ? 15 : 5;
+			// Slow when queue is small (visible streaming), fast when backlogged.
+			// Under reduced motion, flush immediately instead of a typewriter reveal.
+			const n = reducedMotion
+				? this.charQueue.length
+				: this.charQueue.length > 1000 ? 50 : this.charQueue.length > 300 ? 15 : 5;
 			this.streamText += this.charQueue.splice(0, n).join("");
 			if (this.streamEl) {
 				this.streamEl.textContent = this.streamText;
