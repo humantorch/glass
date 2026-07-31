@@ -18,9 +18,9 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 **Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
 <!-- WHATS-NEW-START -->
-## What's new in 1.10.0
+## What's new in 1.11.0
 
-**Quick Ask model update** — The Quick Ask modal now uses Opus 5 instead of the previous Opus model.
+- **Accessibility improvements** — Added support for reduced-motion preferences, visible focus outlines, and ARIA labels to improve usability for keyboard and screen reader users.
 <!-- WHATS-NEW-END -->
 
 ## Features
