@@ -10,7 +10,8 @@
     "isolatedModules": true,
     "strictNullChecks": true,
     "allowArbitraryExtensions": true,
-    "lib": ["ES6", "DOM"]
+    "lib": ["ES6", "DOM"],
+    "types": ["node"]
   },
   "include": ["src/**/*.ts"]
 }
