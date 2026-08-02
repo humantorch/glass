@@ -21,6 +21,10 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 ## What's new in 1.11.0
 
 - **Accessibility improvements** — Added support for reduced-motion preferences, visible focus outlines, and ARIA labels to improve usability for keyboard and screen reader users.
+
+## 1.11.1
+
+Maintenance release — no user-facing changes.
 <!-- WHATS-NEW-END -->
 
 ## Features
