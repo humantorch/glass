@@ -118,6 +118,9 @@ Claude Code gains the following vault tools:
 | `list_notes` | List notes and subfolders at a path (defaults to vault root) |
 | `search_vault` | Find notes whose path or filename matches a query string |
 | `search_note_content` | Full-text search across note content, returns matching lines with context |
+| `get_backlinks` | Find all notes that link to a given note |
+| `get_outlinks` | List the notes (and unresolved link targets) a given note links to |
+| `list_tags` | List tags used across the vault (or a directory), sorted by how many notes use each one |
 | `get_active_note` | Get the path and content of the currently open note |
 | `create_note` | Create a new note at a vault-relative path |
 | `update_note` | Replace the content of an existing note |

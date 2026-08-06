@@ -1,6 +1,6 @@
 import * as http from "http";
 import * as crypto from "crypto";
-import { App, TFile, TFolder } from "obsidian";
+import { App, TFile, TFolder, getAllTags } from "obsidian";
 
 interface JsonRpcRequest {
 	jsonrpc: "2.0";
@@ -128,6 +128,53 @@ const TOOL_DEFINITIONS = [
 				},
 			},
 			required: ["query"],
+		},
+	},
+	{
+		name: "get_backlinks",
+		description:
+			"Find all notes in the vault that link to a given note (its backlinks). Use this to " +
+			"understand what references a note before renaming, deleting, or restructuring it.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				path: {
+					type: "string",
+					description: "Vault-relative path to the note, e.g. 'Projects/blackglass.md'",
+				},
+			},
+			required: ["path"],
+		},
+	},
+	{
+		name: "get_outlinks",
+		description:
+			"List all notes and unresolved link targets that a given note links to. Resolved links point " +
+			"to existing notes; unresolved links reference note titles that don't exist yet.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				path: {
+					type: "string",
+					description: "Vault-relative path to the note, e.g. 'Projects/blackglass.md'",
+				},
+			},
+			required: ["path"],
+		},
+	},
+	{
+		name: "list_tags",
+		description:
+			"List all tags used across the vault (from frontmatter and inline #tags), with the number of " +
+			"notes each tag appears in, sorted by frequency (most-used first). Optionally scope to a directory.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				directory: {
+					type: "string",
+					description: "Limit to notes under this vault-relative directory. Omit to scan the whole vault.",
+				},
+			},
 		},
 	},
 ];
@@ -359,6 +406,12 @@ export class VaultMcpServer {
 					(args.max_results as number | undefined) ?? 10,
 					(args.directory as string | undefined) ?? ""
 				);
+			case "get_backlinks":
+				return this.getBacklinks(args.path as string);
+			case "get_outlinks":
+				return this.getOutlinks(args.path as string);
+			case "list_tags":
+				return this.listTags((args.directory as string) ?? "");
 			default:
 				throw new Error(`Unknown tool: ${name}`);
 		}
@@ -485,5 +538,76 @@ export class VaultMcpServer {
 
 		const header = `Found ${results.length} note${results.length === 1 ? "" : "s"} containing "${query}"${results.length === limit ? ` (limit ${limit} reached)` : ""}:`;
 		return `${header}\n\n${results.join("\n\n")}`;
+	}
+
+	private async getBacklinks(path: string): Promise<string> {
+		const file = this.app.vault.getAbstractFileByPath(path);
+		if (!(file instanceof TFile)) throw new Error(`Note not found: ${path}`);
+
+		const resolvedLinks = this.app.metadataCache.resolvedLinks;
+		const backlinks: string[] = [];
+		for (const [sourcePath, targets] of Object.entries(resolvedLinks)) {
+			if (sourcePath === path) continue;
+			if (Object.prototype.hasOwnProperty.call(targets, path)) {
+				backlinks.push(sourcePath);
+			}
+		}
+
+		if (backlinks.length === 0) return `No notes link to ${path}.`;
+		backlinks.sort();
+		return `${backlinks.length} note(s) link to ${path}:\n${backlinks.join("\n")}`;
+	}
+
+	private async getOutlinks(path: string): Promise<string> {
+		const file = this.app.vault.getAbstractFileByPath(path);
+		if (!(file instanceof TFile)) throw new Error(`Note not found: ${path}`);
+
+		const resolved = Object.keys(this.app.metadataCache.resolvedLinks[path] ?? {}).sort();
+		const unresolved = Object.keys(this.app.metadataCache.unresolvedLinks[path] ?? {}).sort();
+
+		if (resolved.length === 0 && unresolved.length === 0) {
+			return `${path} has no outgoing links.`;
+		}
+
+		const lines: string[] = [];
+		if (resolved.length > 0) {
+			lines.push("Links to existing notes:");
+			lines.push(...resolved.map((p) => `  ${p}`));
+		}
+		if (unresolved.length > 0) {
+			lines.push("Links to non-existent notes (unresolved):");
+			lines.push(...unresolved.map((t) => `  ${t}`));
+		}
+		return lines.join("\n");
+	}
+
+	private async listTags(directory: string): Promise<string> {
+		let files = this.app.vault.getMarkdownFiles();
+		if (directory) {
+			const prefix = directory.endsWith("/") ? directory : directory + "/";
+			files = files.filter((f) => f.path.startsWith(prefix));
+			if (files.length === 0) {
+				throw new Error(`Directory not found or contains no notes: ${directory}`);
+			}
+		}
+
+		const counts = new Map<string, number>();
+		for (const file of files) {
+			const cache = this.app.metadataCache.getFileCache(file);
+			if (!cache) continue;
+			for (const tag of getAllTags(cache) ?? []) {
+				counts.set(tag, (counts.get(tag) ?? 0) + 1);
+			}
+		}
+
+		if (counts.size === 0) {
+			return directory ? `No tags found under ${directory}.` : "No tags found in the vault.";
+		}
+
+		const sorted = Array.from(counts.entries()).sort(
+			(a, b) => b[1] - a[1] || a[0].localeCompare(b[0])
+		);
+		const lines = sorted.map(([tag, count]) => `${tag} (${count})`);
+		return `Found ${sorted.length} tag(s):\n${lines.join("\n")}`;
 	}
 }

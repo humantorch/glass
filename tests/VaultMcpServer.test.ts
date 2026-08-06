@@ -28,7 +28,12 @@ vi.mock("obsidian", () => {
 			this.children = children;
 		}
 	}
-	return { TFile, TFolder, App: class App {} };
+	return {
+		TFile,
+		TFolder,
+		App: class App {},
+		getAllTags: (cache: { tags?: string[] } | null) => cache?.tags ?? [],
+	};
 });
 
 import { TFile, TFolder } from "obsidian";
@@ -36,7 +41,14 @@ import { TFile, TFolder } from "obsidian";
 type MockTFile = InstanceType<typeof TFile>;
 type MockTFolder = InstanceType<typeof TFolder>;
 
-function buildMockApp(files: Record<string, string> = {}) {
+function buildMockApp(
+	files: Record<string, string> = {},
+	graph: {
+		resolvedLinks?: Record<string, Record<string, number>>;
+		unresolvedLinks?: Record<string, Record<string, number>>;
+		tags?: Record<string, string[]>;
+	} = {}
+) {
 	const fileObjects = new Map<string, MockTFile>();
 	const folderObjects = new Map<string, MockTFolder>();
 	const contentMap = new Map<string, string>();
@@ -96,6 +108,14 @@ function buildMockApp(files: Record<string, string> = {}) {
 		workspace: {
 			getActiveFile: () => activeFile,
 		},
+		metadataCache: {
+			resolvedLinks: graph.resolvedLinks ?? {},
+			unresolvedLinks: graph.unresolvedLinks ?? {},
+			getFileCache: (file: MockTFile) => {
+				const tags = graph.tags?.[file.path];
+				return tags ? { tags } : null;
+			},
+		},
 	};
 
 	return {
@@ -141,6 +161,21 @@ const FIXTURE_FILES = {
 	"inbox.md": "# Inbox\nPTY bridge tasks. Weekly review pending.",
 };
 
+const FIXTURE_RESOLVED_LINKS: Record<string, Record<string, number>> = {
+	"inbox.md": { "Projects/blackglass.md": 1 },
+	"Weekly/2026-05-12.md": { "Projects/blackglass.md": 1 },
+};
+
+const FIXTURE_UNRESOLVED_LINKS: Record<string, Record<string, number>> = {
+	"inbox.md": { Someday: 1 },
+};
+
+const FIXTURE_TAGS: Record<string, string[]> = {
+	"inbox.md": ["#task", "#weekly"],
+	"Weekly/2026-05-12.md": ["#weekly"],
+	"Projects/blackglass.md": ["#project"],
+};
+
 describe("VaultMcpServer", () => {
 	let server: VaultMcpServer;
 	let mock: MockApp;
@@ -148,7 +183,11 @@ describe("VaultMcpServer", () => {
 	let token: string;
 
 	beforeEach(async () => {
-		mock = buildMockApp(FIXTURE_FILES);
+		mock = buildMockApp(FIXTURE_FILES, {
+			resolvedLinks: FIXTURE_RESOLVED_LINKS,
+			unresolvedLinks: FIXTURE_UNRESOLVED_LINKS,
+			tags: FIXTURE_TAGS,
+		});
 		server = new VaultMcpServer(mock.app as any, TEST_PORT);
 		port = await server.start();
 		token = server.getToken();
@@ -249,6 +288,9 @@ describe("VaultMcpServer", () => {
 			expect(names).toContain("search_vault");
 			expect(names).toContain("create_note");
 			expect(names).toContain("update_note");
+			expect(names).toContain("get_backlinks");
+			expect(names).toContain("get_outlinks");
+			expect(names).toContain("list_tags");
 		});
 
 		it("omits write tools in read-only mode", async () => {
@@ -548,6 +590,111 @@ describe("VaultMcpServer", () => {
 			const { body } = await rpc(port, token, "tools/call", {
 				name: "search_note_content",
 				arguments: { query: "anything", directory: "EmptyOrMissing" },
+			});
+			expect(body.result.isError).toBe(true);
+		});
+	});
+
+	// -------------------------------------------------------------------------
+	// get_backlinks
+	// -------------------------------------------------------------------------
+
+	describe("get_backlinks", () => {
+		it("returns notes linking to the given note", async () => {
+			const { body } = await rpc(port, token, "tools/call", {
+				name: "get_backlinks",
+				arguments: { path: "Projects/blackglass.md" },
+			});
+			const text: string = body.result.content[0].text;
+			expect(text).toContain("inbox.md");
+			expect(text).toContain("Weekly/2026-05-12.md");
+		});
+
+		it("returns a no-backlinks message when nothing links to the note", async () => {
+			const { body } = await rpc(port, token, "tools/call", {
+				name: "get_backlinks",
+				arguments: { path: "Weekly/2026-05-05.md" },
+			});
+			expect(body.result.content[0].text).toContain("No notes link to");
+		});
+
+		it("returns an error for a missing note", async () => {
+			const { body } = await rpc(port, token, "tools/call", {
+				name: "get_backlinks",
+				arguments: { path: "ghost.md" },
+			});
+			expect(body.result.isError).toBe(true);
+			expect(body.result.content[0].text).toContain("Note not found");
+		});
+	});
+
+	// -------------------------------------------------------------------------
+	// get_outlinks
+	// -------------------------------------------------------------------------
+
+	describe("get_outlinks", () => {
+		it("returns resolved and unresolved links for a note", async () => {
+			const { body } = await rpc(port, token, "tools/call", {
+				name: "get_outlinks",
+				arguments: { path: "inbox.md" },
+			});
+			const text: string = body.result.content[0].text;
+			expect(text).toContain("Projects/blackglass.md");
+			expect(text).toContain("Someday");
+			expect(text).toContain("unresolved");
+		});
+
+		it("returns a no-outlinks message for a note with no links", async () => {
+			const { body } = await rpc(port, token, "tools/call", {
+				name: "get_outlinks",
+				arguments: { path: "Weekly/2026-05-05.md" },
+			});
+			expect(body.result.content[0].text).toContain("has no outgoing links");
+		});
+
+		it("returns an error for a missing note", async () => {
+			const { body } = await rpc(port, token, "tools/call", {
+				name: "get_outlinks",
+				arguments: { path: "ghost.md" },
+			});
+			expect(body.result.isError).toBe(true);
+			expect(body.result.content[0].text).toContain("Note not found");
+		});
+	});
+
+	// -------------------------------------------------------------------------
+	// list_tags
+	// -------------------------------------------------------------------------
+
+	describe("list_tags", () => {
+		it("returns tags sorted by frequency, most-used first", async () => {
+			const { body } = await rpc(port, token, "tools/call", {
+				name: "list_tags",
+				arguments: {},
+			});
+			const text: string = body.result.content[0].text;
+			expect(text).toContain("#weekly (2)");
+			expect(text).toContain("#project (1)");
+			expect(text).toContain("#task (1)");
+			expect(text.indexOf("#weekly")).toBeLessThan(text.indexOf("#project"));
+			expect(text.indexOf("#project")).toBeLessThan(text.indexOf("#task"));
+		});
+
+		it("respects the directory filter", async () => {
+			const { body } = await rpc(port, token, "tools/call", {
+				name: "list_tags",
+				arguments: { directory: "Weekly" },
+			});
+			const text: string = body.result.content[0].text;
+			expect(text).toContain("#weekly (1)");
+			expect(text).not.toContain("#project");
+			expect(text).not.toContain("#task");
+		});
+
+		it("errors for a directory that contains no notes", async () => {
+			const { body } = await rpc(port, token, "tools/call", {
+				name: "list_tags",
+				arguments: { directory: "EmptyOrMissing" },
 			});
 			expect(body.result.isError).toBe(true);
 		});
