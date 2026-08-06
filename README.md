@@ -18,13 +18,9 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 **Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
 <!-- WHATS-NEW-START -->
-## What's new in 1.11.0
+## What's new in 1.12.0
 
-- **Accessibility improvements** — Added support for reduced-motion preferences, visible focus outlines, and ARIA labels to improve usability for keyboard and screen reader users.
-
-## 1.11.1 & 1.11.2
-
-Maintenance releases — no user-facing changes.
+- **Vault graph MCP tools** — added `get_backlinks`, `get_outlinks`, and `list_tags` tools so external MCP clients can query note relationships and tags in the vault.
 <!-- WHATS-NEW-END -->
 
 ## Features
