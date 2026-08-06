@@ -20,7 +20,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 <!-- WHATS-NEW-START -->
 ## What's new in 1.12.0
 
-- **Vault graph MCP tools** — added `get_backlinks`, `get_outlinks`, and `list_tags` tools so external MCP clients can query note relationships and tags in the vault.
+- **Vault graph MCP tools** — three new tools on the built-in vault MCP server, `get_backlinks`, `get_outlinks`, and `list_tags`, let Claude understand how your notes link together and which tags they use, right from the terminal session.
 <!-- WHATS-NEW-END -->
 
 ## Features
