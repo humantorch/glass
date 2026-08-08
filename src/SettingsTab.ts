@@ -1,6 +1,10 @@
-import { App, DropdownComponent, Notice, PluginSettingTab, Setting } from "obsidian";
+import { App, ButtonComponent, DropdownComponent, Notice, PluginSettingTab, Setting } from "obsidian";
+import * as fs from "fs";
+import * as path from "path";
 import type ClaudeCodePlugin from "./main";
 import { QUICK_ASK_MODELS } from "./types";
+import { generateClaudeMd } from "./ClaudeMdGenerator";
+import { ConfirmModal } from "./ConfirmModal";
 
 interface FontData {
 	family: string;
@@ -252,6 +256,45 @@ export class SettingsTab extends PluginSettingTab {
 						}
 					})
 			);
+
+		new Setting(containerEl).setName("Vault context").setHeading();
+
+		new Setting(containerEl)
+			.setName("Generate CLAUDE.md")
+			.setDesc(
+				"Creates a CLAUDE.md file at your vault root summarizing its structure and tags — Claude Code " +
+				"loads this automatically at the start of every session. Safe to run again anytime; if a CLAUDE.md " +
+				"already exists, you'll be asked to confirm before it's replaced."
+			)
+			.addButton((button) => {
+				button.setButtonText("Generate CLAUDE.md").onClick(() => {
+					const vaultRoot = this.plugin.contextBuilder.getVaultRoot();
+					const claudeMdPath = vaultRoot ? path.join(vaultRoot, "CLAUDE.md") : "";
+					if (claudeMdPath && fs.existsSync(claudeMdPath)) {
+						new ConfirmModal(
+							this.app,
+							"Overwrite CLAUDE.md?",
+							"A CLAUDE.md already exists at your vault root. Generating a new one will replace it.",
+							() => this.runGenerateClaudeMd(button)
+						).open();
+					} else {
+						void this.runGenerateClaudeMd(button);
+					}
+				});
+			});
+	}
+
+	private async runGenerateClaudeMd(button: ButtonComponent): Promise<void> {
+		button.setDisabled(true);
+		button.setButtonText("Generating...");
+		const result = await generateClaudeMd(this.plugin);
+		button.setDisabled(false);
+		button.setButtonText("Generate CLAUDE.md");
+		if (result.success) {
+			new Notice("CLAUDE.md created at your vault root.");
+		} else {
+			new Notice(`Failed to generate CLAUDE.md: ${result.error}`);
+		}
 	}
 
 	private async buildFontDropdowns(familySetting: Setting, weightSetting: Setting): Promise<void> {

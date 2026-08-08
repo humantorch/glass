@@ -438,6 +438,27 @@
 }
 
 /* ============================================================
+   Onboarding / confirm modals
+   ============================================================ */
+
+.claude-onboarding-modal .modal-content,
+.claude-confirm-modal .modal-content {
+	padding: 16px;
+}
+
+.claude-onboarding-modal-status {
+	font-size: 0.85em;
+	color: var(--text-muted);
+}
+
+.claude-onboarding-modal-actions,
+.claude-confirm-modal-actions {
+	display: flex;
+	gap: 8px;
+	margin-top: 12px;
+}
+
+/* ============================================================
    Spinner animation
    ============================================================ */
 

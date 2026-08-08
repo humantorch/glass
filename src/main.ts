@@ -13,6 +13,7 @@ import { ProcessManager } from "./ProcessManager";
 import { ClaudeTerminalView } from "./ClaudeTerminalView";
 import { ClaudeQuickModal } from "./ClaudeQuickModal";
 import { VaultMcpServer } from "./VaultMcpServer";
+import { ClaudeMdOnboardingModal } from "./ClaudeMdOnboardingModal";
 
 interface GitHubRelease {
 	tag_name: string;
@@ -24,6 +25,7 @@ export default class ClaudeCodePlugin extends Plugin {
 	contextBuilder!: ContextBuilder;
 	vaultMcpServer: VaultMcpServer | null = null;
 	availableVersion: string | null = null;
+	private isPreExistingInstall = false;
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
@@ -167,6 +169,11 @@ export default class ClaudeCodePlugin extends Plugin {
 		this.registerInterval(
 			window.setInterval(() => { void this.checkForUpdate(); }, 24 * 60 * 60 * 1000)
 		);
+
+		// Offer to generate CLAUDE.md once, only for a genuinely fresh install
+		if (!this.isPreExistingInstall && !this.settings.claudeMdOfferShown) {
+			this.app.workspace.onLayoutReady(() => { void this.maybeOfferClaudeMdGeneration(); });
+		}
 	}
 
 	onunload(): void {
@@ -321,11 +328,22 @@ export default class ClaudeCodePlugin extends Plugin {
 	}
 
 	async loadSettings(): Promise<void> {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			await this.loadData()
-		) as ClaudeCodeSettings;
+		const raw = (await this.loadData()) as Record<string, unknown> | null;
+		this.isPreExistingInstall = raw !== null && raw !== undefined;
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, raw);
+	}
+
+	private async maybeOfferClaudeMdGeneration(): Promise<void> {
+		this.settings.claudeMdOfferShown = true;
+		await this.saveSettings();
+
+		const vaultRoot = this.contextBuilder.getVaultRoot();
+		if (!vaultRoot) return;
+
+		const claudeMdPath = path.join(vaultRoot, "CLAUDE.md");
+		if (fs.existsSync(claudeMdPath)) return;
+
+		new ClaudeMdOnboardingModal(this.app, this).open();
 	}
 
 	async saveSettings(): Promise<void> {

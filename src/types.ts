@@ -14,6 +14,7 @@ export interface ClaudeCodeSettings {
 	mcpReadOnly: boolean;
 	skipPermissions: boolean;
 	scrollback: number;
+	claudeMdOfferShown: boolean;
 }
 
 export const DEFAULT_SETTINGS: ClaudeCodeSettings = {
@@ -32,6 +33,7 @@ export const DEFAULT_SETTINGS: ClaudeCodeSettings = {
 	mcpReadOnly: false,
 	skipPermissions: false,
 	scrollback: 5000,
+	claudeMdOfferShown: false,
 };
 
 export const CLAUDE_TERMINAL_VIEW_TYPE = "claude-code-terminal";
@@ -59,6 +61,7 @@ export interface PrintModeOptions {
 	workingDirectory: string;
 	model?: string;
 	timeoutMs?: number;
+	disallowedTools?: string[];
 }
 
 export interface PrintModeResult {

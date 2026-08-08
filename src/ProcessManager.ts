@@ -345,6 +345,9 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 
 			const args = ["--print", "--output-format", "json"];
 			if (options.model) args.push("--model", options.model);
+			if (options.disallowedTools && options.disallowedTools.length > 0) {
+				args.push("--disallowedTools", options.disallowedTools.join(","));
+			}
 
 			const proc = spawn(options.claudePath, args, {
 				cwd: options.workingDirectory || undefined,

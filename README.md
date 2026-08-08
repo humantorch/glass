@@ -34,6 +34,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 - **Vault-aware quick ask**: pre-fill the modal with the active note or selected text
 - **Per-query model selector**: choose the model directly in the quick ask modal; overrides the default without changing your setting
 - **Session resume**: picks up where you left off (`--continue`) on every open
+- **CLAUDE.md vault context**: offers once, on first install, to generate a CLAUDE.md summarizing your vault's structure and tags — loaded automatically by Claude Code every session; regenerate anytime from Settings
 - **Theme-adaptive terminal**: terminal colors derived from the active Obsidian theme; updates live when you switch themes
 - **Cross-platform**: macOS, Linux, and Windows (Windows requires `pip install pywinpty`)
 
@@ -126,6 +127,14 @@ Claude Code gains the following vault tools:
 To disable the MCP server, toggle it off in Settings - Glass - "Enable vault MCP server". To use a different port, change the "MCP server port" setting (valid range: 1024-65535). To prevent Claude from writing to your vault, enable "Read-only vault access"; this hides `create_note` and `update_note` from Claude entirely.
 
 **Note:** `.mcp.json` in the vault root is managed by Glass. If you already have a `.mcp.json` with other servers, Glass will merge its `mcpServers.obsidian` entry rather than overwriting the whole file.
+
+## Vault context (CLAUDE.md)
+
+Claude Code automatically loads a `CLAUDE.md` file from its working directory at the start of every session. Glass can generate one for you, summarizing your vault's top-level folder structure, tag usage, and a sample of note paths.
+
+On first install, Glass offers once to generate this file (skipped automatically if a `CLAUDE.md` already exists at your vault root, or if you dismiss the offer). You can generate or regenerate it anytime from Settings → Glass → "Generate CLAUDE.md" — if one already exists, you'll be asked to confirm before it's replaced.
+
+The generated file lives at your vault root as a normal note, so you can open and edit it directly in Obsidian. It's a starting point, not something Glass keeps in sync automatically — edit it freely as your vault evolves.
 
 ## Remote access
 
