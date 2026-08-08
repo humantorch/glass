@@ -18,9 +18,11 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 **Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
 <!-- WHATS-NEW-START -->
-## What's new in 1.12.0
+## What's new in 1.13.0
 
-- **Vault graph MCP tools** — three new tools on the built-in vault MCP server, `get_backlinks`, `get_outlinks`, and `list_tags`, let Claude understand how your notes link together and which tags they use, right from the terminal session.
+- **CLAUDE.md vault context generator** — Glass can generate a CLAUDE.md summarizing your vault's folder structure and tags, which Claude Code loads automatically every session.
+- **First-install onboarding offer** — on a fresh install, Glass offers once to generate this file (skipped if a CLAUDE.md already exists or you dismiss the offer).
+- **On-demand regeneration** — generate or regenerate the file anytime from Settings → Glass → "Generate CLAUDE.md," with a confirmation prompt before replacing an existing one.
 <!-- WHATS-NEW-END -->
 
 ## Features
