@@ -13,6 +13,11 @@
  *   6. Creates a GitHub release with main.js, manifest.json, styles.css attached
  *   7. Bumps the version badge on the gh-pages website
  *   8. Cleans up local temp files
+ *
+ * README "What's new" section: patch releases APPEND a "## X.Y.Z" entry below
+ * the existing content, so a run of patches under one minor version stay
+ * visible together. Minor/major releases REPLACE the whole block and start a
+ * fresh "## What's new in X.Y.0" cycle.
  */
 
 import { execSync, spawnSync } from "child_process";
@@ -118,12 +123,24 @@ try {
 			const firstBullet = bullets.search(/^[-*]/m);
 			if (firstBullet > 0) bullets = bullets.slice(firstBullet);
 			const readmePath = resolve(root, "README.md");
-			let readme = readFileSync(readmePath, "utf8");
-			const newSection =
-				`<!-- WHATS-NEW-START -->\n## What's new in ${version}\n\n${bullets}\n<!-- WHATS-NEW-END -->`;
-			readme = readme.replace(/<!-- WHATS-NEW-START -->[\s\S]*?<!-- WHATS-NEW-END -->/, newSection);
-			writeFileSync(readmePath, readme);
-			console.log("README What's new section updated.");
+			const readme = readFileSync(readmePath, "utf8");
+			const blockMatch = readme.match(/<!-- WHATS-NEW-START -->([\s\S]*?)<!-- WHATS-NEW-END -->/);
+
+			if (blockMatch) {
+				// Patch releases append below the existing content, so prior
+				// entries for the current minor/major stay visible until the
+				// next minor/major release starts a fresh cycle and replaces
+				// the whole block.
+				const newBlockInner =
+					bumpType === "patch"
+						? `${blockMatch[1].trim()}\n\n## ${version}\n\n${bullets}`
+						: `## What's new in ${version}\n\n${bullets}`;
+				const newSection = `<!-- WHATS-NEW-START -->\n${newBlockInner}\n<!-- WHATS-NEW-END -->`;
+				writeFileSync(readmePath, readme.replace(blockMatch[0], newSection));
+				console.log(`README What's new section updated (${bumpType === "patch" ? "appended" : "replaced"}).`);
+			} else {
+				console.log("No WHATS-NEW markers found in README, skipping update.");
+			}
 		} else {
 			console.log("No user-facing changes detected, skipping README update.");
 		}
