@@ -264,7 +264,8 @@ export class SettingsTab extends PluginSettingTab {
 			.setDesc(
 				"Creates a CLAUDE.md file at your vault root summarizing its structure and tags — Claude Code " +
 				"loads this automatically at the start of every session. Safe to run again anytime; if a CLAUDE.md " +
-				"already exists, you'll be asked to confirm before it's replaced."
+				"already exists, you'll be asked to confirm, and the current one is saved as CLAUDE.bak.md before " +
+				"it's replaced."
 			)
 			.addButton((button) => {
 				button.setButtonText("Generate CLAUDE.md").onClick(() => {
@@ -274,7 +275,8 @@ export class SettingsTab extends PluginSettingTab {
 						new ConfirmModal(
 							this.app,
 							"Overwrite CLAUDE.md?",
-							"A CLAUDE.md already exists at your vault root. Generating a new one will replace it.",
+							"A CLAUDE.md already exists at your vault root. The current one will be saved as " +
+							"CLAUDE.bak.md (overwriting any previous backup) before the new one is written.",
 							() => this.runGenerateClaudeMd(button)
 						).open();
 					} else {

@@ -134,7 +134,7 @@ To disable the MCP server, toggle it off in Settings - Glass - "Enable vault MCP
 
 Claude Code automatically loads a `CLAUDE.md` file from its working directory at the start of every session. Glass can generate one for you, summarizing your vault's top-level folder structure, tag usage, and a sample of note paths.
 
-On first install, Glass offers once to generate this file (skipped automatically if a `CLAUDE.md` already exists at your vault root, or if you dismiss the offer). You can generate or regenerate it anytime from Settings → Glass → "Generate CLAUDE.md" — if one already exists, you'll be asked to confirm before it's replaced.
+On first install, Glass offers once to generate this file (skipped automatically if a `CLAUDE.md` already exists at your vault root, or if you dismiss the offer). You can generate or regenerate it anytime from Settings → Glass → "Generate CLAUDE.md" — if one already exists, you'll be asked to confirm, and the current file is saved as `CLAUDE.bak.md` before being replaced. This is a single rolling backup: regenerating again overwrites `CLAUDE.bak.md` with whatever was just replaced, rather than accumulating timestamped copies.
 
 The generated file lives at your vault root as a normal note, so you can open and edit it directly in Obsidian. It's a starting point, not something Glass keeps in sync automatically — edit it freely as your vault evolves.
 

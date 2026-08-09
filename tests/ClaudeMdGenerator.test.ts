@@ -1,5 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
-import { buildVaultSurvey, stripCodeFence } from "../src/ClaudeMdGenerator";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
+import { buildVaultSurvey, stripCodeFence, writeClaudeMdWithBackup } from "../src/ClaudeMdGenerator";
 
 vi.mock("obsidian", () => {
 	class TFile {
@@ -87,5 +90,37 @@ describe("stripCodeFence", () => {
 
 	it("passes unfenced text through unchanged", () => {
 		expect(stripCodeFence("# Hello")).toBe("# Hello");
+	});
+});
+
+describe("writeClaudeMdWithBackup", () => {
+	let tmpDir: string;
+
+	afterEach(() => {
+		if (tmpDir) fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it("writes CLAUDE.md directly when none exists yet", () => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "claude-md-test-"));
+		writeClaudeMdWithBackup(tmpDir, "# New content");
+		expect(fs.readFileSync(path.join(tmpDir, "CLAUDE.md"), "utf8")).toBe("# New content");
+		expect(fs.existsSync(path.join(tmpDir, "CLAUDE.bak.md"))).toBe(false);
+	});
+
+	it("backs up an existing CLAUDE.md before overwriting it", () => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "claude-md-test-"));
+		fs.writeFileSync(path.join(tmpDir, "CLAUDE.md"), "# Old content");
+		writeClaudeMdWithBackup(tmpDir, "# New content");
+		expect(fs.readFileSync(path.join(tmpDir, "CLAUDE.md"), "utf8")).toBe("# New content");
+		expect(fs.readFileSync(path.join(tmpDir, "CLAUDE.bak.md"), "utf8")).toBe("# Old content");
+	});
+
+	it("keeps only a single rolling backup across repeated regenerations", () => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "claude-md-test-"));
+		writeClaudeMdWithBackup(tmpDir, "# Version 1");
+		writeClaudeMdWithBackup(tmpDir, "# Version 2");
+		writeClaudeMdWithBackup(tmpDir, "# Version 3");
+		expect(fs.readFileSync(path.join(tmpDir, "CLAUDE.md"), "utf8")).toBe("# Version 3");
+		expect(fs.readFileSync(path.join(tmpDir, "CLAUDE.bak.md"), "utf8")).toBe("# Version 2");
 	});
 });

@@ -122,10 +122,31 @@ export async function generateClaudeMd(plugin: ClaudeCodePlugin): Promise<Genera
 
 	const content = stripCodeFence(result.text);
 	try {
-		fs.writeFileSync(path.join(vaultRoot, "CLAUDE.md"), content);
+		writeClaudeMdWithBackup(vaultRoot, content);
 	} catch (err) {
 		return { success: false, error: `Failed to write CLAUDE.md: ${(err as Error).message}` };
 	}
 
 	return { success: true };
+}
+
+/**
+ * Writes CLAUDE.md at the vault root, first backing up any existing file to
+ * CLAUDE.bak.md. Named with a .md extension (not .bak) so Obsidian's file
+ * explorer actually shows it — Obsidian's file tree filters out unrecognized
+ * extensions, so a literal ".bak" file is created on disk but invisible in
+ * the app. Claude Code only ever auto-loads a file named exactly "CLAUDE.md",
+ * so the backup can't accidentally become project context.
+ * A single rolling backup — each regeneration overwrites the previous backup
+ * rather than accumulating timestamped copies, so a vault never ends up
+ * cluttered with old generations. Only the most recent prior version is
+ * recoverable; that's the deliberate tradeoff for keeping the vault root clean.
+ */
+export function writeClaudeMdWithBackup(vaultRoot: string, content: string): void {
+	const claudeMdPath = path.join(vaultRoot, "CLAUDE.md");
+	const backupPath = path.join(vaultRoot, "CLAUDE.bak.md");
+	if (fs.existsSync(claudeMdPath)) {
+		fs.copyFileSync(claudeMdPath, backupPath);
+	}
+	fs.writeFileSync(claudeMdPath, content);
 }
