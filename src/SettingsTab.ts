@@ -1,4 +1,4 @@
-import { App, ButtonComponent, DropdownComponent, Notice, PluginSettingTab, Setting } from "obsidian";
+import { App, ButtonComponent, DropdownComponent, Notice, PluginSettingTab, Setting, SettingDefinitionItem } from "obsidian";
 import * as fs from "fs";
 import * as path from "path";
 import type ClaudeCodePlugin from "./main";
@@ -31,8 +31,6 @@ export class SettingsTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
-
-		new Setting(containerEl).setName("Claude Code").setHeading();
 
 		new Setting(containerEl)
 			.setName("Claude binary path")
@@ -267,23 +265,252 @@ export class SettingsTab extends PluginSettingTab {
 				"already exists, you'll be asked to confirm, and the current one is saved as CLAUDE.bak.md before " +
 				"it's replaced."
 			)
-			.addButton((button) => {
-				button.setButtonText("Generate CLAUDE.md").onClick(() => {
-					const vaultRoot = this.plugin.contextBuilder.getVaultRoot();
-					const claudeMdPath = vaultRoot ? path.join(vaultRoot, "CLAUDE.md") : "";
-					if (claudeMdPath && fs.existsSync(claudeMdPath)) {
-						new ConfirmModal(
-							this.app,
-							"Overwrite CLAUDE.md?",
-							"A CLAUDE.md already exists at your vault root. The current one will be saved as " +
-							"CLAUDE.bak.md (overwriting any previous backup) before the new one is written.",
-							() => this.runGenerateClaudeMd(button)
-						).open();
-					} else {
-						void this.runGenerateClaudeMd(button);
-					}
-				});
-			});
+			.addButton((button) => this.wireGenerateClaudeMdButton(button));
+	}
+
+	getSettingDefinitions(): SettingDefinitionItem[] {
+		return [
+			{
+				type: "group",
+				items: [
+					{
+						name: "Claude binary path",
+						desc: "Path to the Claude CLI executable. Use 'Claude' if it's on your system path, or provide the full absolute path.",
+						control: { type: "text", key: "claudeBinaryPath", placeholder: "Claude" },
+					},
+					{
+						name: "Working directory",
+						desc: "Directory Claude Code starts in. Leave blank to use vault root. Claude will have access to files in this directory.",
+						control: { type: "text", key: "workingDirectory", placeholder: "(Vault root)" },
+					},
+					{
+						name: "Quick ask model",
+						desc: "Claude model to use for the quick ask modal.",
+						control: { type: "dropdown", key: "quickAskModel", options: Object.fromEntries(QUICK_ASK_MODELS) },
+					},
+					{
+						name: "Terminal font size",
+						desc: "Font size in pixels for the terminal panel.",
+						control: {
+							type: "number",
+							key: "fontSize",
+							placeholder: "14",
+							min: 1,
+							step: 1,
+							validate: (value) => (value > 0 ? undefined : "Must be greater than 0."),
+						},
+					},
+					{
+						name: "Terminal scrollback",
+						desc: "Number of lines to keep in the terminal's scroll history (default 5000). Takes effect the next time the terminal is opened.",
+						control: {
+							type: "number",
+							key: "scrollback",
+							placeholder: "5000",
+							min: 100,
+							max: 100000,
+							step: 1,
+							validate: (value) => (value >= 100 && value <= 100000 ? undefined : "Must be between 100 and 100000."),
+						},
+					},
+					{
+						name: "Terminal font family",
+						desc: "Font family for the terminal panel.",
+						render: (setting, group) => {
+							setting.setDesc("Font family for the terminal panel. Loading fonts...");
+							let weightSetting: Setting | undefined;
+							// SettingGroup.addSetting needs 1.11.0, but this render callback is only ever invoked
+							// by hosts new enough to call getSettingDefinitions() in the first place (1.13.0+),
+							// so it's unreachable on older Obsidian versions despite the manifest's 1.7.7 floor.
+							// eslint-disable-next-line obsidianmd/no-unsupported-api
+							group.addSetting((s) => {
+								s.setName("Terminal font weight").setDesc(
+									"Weight or style variant for the selected font. Loading fonts..."
+								);
+								weightSetting = s;
+							});
+							void this.buildFontDropdowns(setting, weightSetting as Setting);
+						},
+					},
+					{
+						name: "Terminal letter spacing",
+						desc: "Horizontal spacing between characters in pixels (0-3, default 0). Adds breathing room for cramped fonts.",
+						control: {
+							type: "number",
+							key: "letterSpacing",
+							placeholder: "0",
+							min: 0,
+							max: 3,
+							step: 0.1,
+							validate: (value) => (value >= 0 && value <= 3 ? undefined : "Must be between 0 and 3."),
+						},
+					},
+					{
+						name: "Terminal line height",
+						desc: "Vertical spacing multiplier for lines (1.0-1.4, default 1.0). Adds vertical breathing room.",
+						control: {
+							type: "number",
+							key: "lineHeight",
+							placeholder: "1",
+							min: 1,
+							max: 1.4,
+							step: 0.1,
+							validate: (value) => (value >= 1 && value <= 1.4 ? undefined : "Must be between 1.0 and 1.4."),
+						},
+					},
+					{
+						name: "Open Claude panel on startup",
+						desc: "Automatically open the Claude Code terminal when Obsidian starts.",
+						control: { type: "toggle", key: "autoOpenOnStartup" },
+					},
+					{
+						name: "Resume last Claude session",
+						desc: "Pass --continue when starting a new session to resume the previous conversation context.",
+						control: { type: "toggle", key: "resumeLastSession" },
+					},
+					{
+						name: "Skip permission prompts",
+						desc:
+							"Pass --dangerously-skip-permissions to Claude Code. Claude will execute tool calls without " +
+							"asking for confirmation. Only enable this if you trust the tasks you are running.",
+						control: { type: "toggle", key: "skipPermissions" },
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: "Vault MCP server",
+				items: [
+					{
+						name: "Enable vault MCP server",
+						desc:
+							"Starts a local MCP server that gives Claude vault-aware tools (read, search, create, update notes). " +
+							"Registers automatically in .mcp.json in the vault root.",
+						control: { type: "toggle", key: "mcpServerEnabled" },
+					},
+					{
+						name: "Read-only vault access",
+						desc:
+							"When enabled, Claude can read and search notes but cannot create or update them. " +
+							"Takes effect the next time the MCP server starts.",
+						control: { type: "toggle", key: "mcpReadOnly" },
+					},
+					{
+						name: "MCP server port",
+						desc:
+							"Port the vault MCP server listens on (default 27123). If the port is in use, the next " +
+							"available port up to +4 is used automatically. Restart the plugin after changing.",
+						control: {
+							type: "number",
+							key: "mcpServerPort",
+							placeholder: "27123",
+							min: 1024,
+							max: 65535,
+							step: 1,
+							validate: (value) => (value > 1023 && value < 65536 ? undefined : "Must be between 1024 and 65535."),
+						},
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: "Vault context",
+				items: [
+					{
+						name: "Generate CLAUDE.md",
+						desc:
+							"Creates a CLAUDE.md file at your vault root summarizing its structure and tags — Claude Code " +
+							"loads this automatically at the start of every session. Safe to run again anytime; if a CLAUDE.md " +
+							"already exists, you'll be asked to confirm, and the current one is saved as CLAUDE.bak.md before " +
+							"it's replaced.",
+						render: (setting) => {
+							setting.addButton((button) => this.wireGenerateClaudeMdButton(button));
+						},
+					},
+				],
+			},
+		];
+	}
+
+	async setControlValue(key: string, value: unknown): Promise<void> {
+		const settings = this.plugin.settings;
+		switch (key) {
+			case "claudeBinaryPath":
+				settings.claudeBinaryPath = (value as string).trim() || "claude";
+				break;
+			case "workingDirectory":
+				settings.workingDirectory = (value as string).trim();
+				break;
+			case "quickAskModel":
+				settings.quickAskModel = value as string;
+				break;
+			case "autoOpenOnStartup":
+				settings.autoOpenOnStartup = value as boolean;
+				break;
+			case "resumeLastSession":
+				settings.resumeLastSession = value as boolean;
+				break;
+			case "skipPermissions":
+				settings.skipPermissions = value as boolean;
+				break;
+			case "mcpReadOnly":
+				settings.mcpReadOnly = value as boolean;
+				break;
+			case "mcpServerPort":
+				settings.mcpServerPort = value as number;
+				break;
+			case "scrollback":
+				settings.scrollback = value as number;
+				break;
+			case "fontSize":
+				settings.fontSize = value as number;
+				await this.plugin.saveSettings();
+				this.plugin.applyFontToTerminal();
+				return;
+			case "letterSpacing":
+				settings.letterSpacing = value as number;
+				await this.plugin.saveSettings();
+				this.plugin.applyFontToTerminal();
+				return;
+			case "lineHeight":
+				settings.lineHeight = value as number;
+				await this.plugin.saveSettings();
+				this.plugin.applyFontToTerminal();
+				return;
+			case "mcpServerEnabled": {
+				settings.mcpServerEnabled = value as boolean;
+				await this.plugin.saveSettings();
+				if (value) {
+					await this.plugin.startVaultMcpServer();
+					new Notice("Vault MCP server started. Start a new session for Claude to pick it up.");
+				} else {
+					this.plugin.stopVaultMcpServer();
+					new Notice("Vault MCP server stopped. Start a new session for the change to take effect in Claude.");
+				}
+				return;
+			}
+			default:
+				return;
+		}
+		await this.plugin.saveSettings();
+	}
+
+	private wireGenerateClaudeMdButton(button: ButtonComponent): void {
+		button.setButtonText("Generate CLAUDE.md").onClick(() => {
+			const vaultRoot = this.plugin.contextBuilder.getVaultRoot();
+			const claudeMdPath = vaultRoot ? path.join(vaultRoot, "CLAUDE.md") : "";
+			if (claudeMdPath && fs.existsSync(claudeMdPath)) {
+				new ConfirmModal(
+					this.app,
+					"Overwrite CLAUDE.md?",
+					"A CLAUDE.md already exists at your vault root. The current one will be saved as " +
+					"CLAUDE.bak.md (overwriting any previous backup) before the new one is written.",
+					() => this.runGenerateClaudeMd(button)
+				).open();
+			} else {
+				void this.runGenerateClaudeMd(button);
+			}
+		});
 	}
 
 	private async runGenerateClaudeMd(button: ButtonComponent): Promise<void> {
