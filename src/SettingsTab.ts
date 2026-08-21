@@ -22,6 +22,7 @@ declare global {
 export class SettingsTab extends PluginSettingTab {
 	plugin: ClaudeCodePlugin;
 	private fontVariantMap: Map<string, Array<{ label: string; weight: string }>> = new Map();
+	private pendingFontFamilySetting: Setting | undefined;
 
 	constructor(app: App, plugin: ClaudeCodePlugin) {
 		super(app, plugin);
@@ -316,20 +317,17 @@ export class SettingsTab extends PluginSettingTab {
 					{
 						name: "Terminal font family",
 						desc: "Font family for the terminal panel.",
-						render: (setting, group) => {
+						render: (setting) => {
 							setting.setDesc("Font family for the terminal panel. Loading fonts...");
-							let weightSetting: Setting | undefined;
-							// SettingGroup.addSetting needs 1.11.0, but this render callback is only ever invoked
-							// by hosts new enough to call getSettingDefinitions() in the first place (1.13.0+),
-							// so it's unreachable on older Obsidian versions despite the manifest's 1.7.7 floor.
-							// eslint-disable-next-line obsidianmd/no-unsupported-api
-							group.addSetting((s) => {
-								s.setName("Terminal font weight").setDesc(
-									"Weight or style variant for the selected font. Loading fonts..."
-								);
-								weightSetting = s;
-							});
-							void this.buildFontDropdowns(setting, weightSetting as Setting);
+							this.pendingFontFamilySetting = setting;
+						},
+					},
+					{
+						name: "Terminal font weight",
+						desc: "Weight or style variant for the selected font.",
+						render: (setting) => {
+							setting.setDesc("Weight or style variant for the selected font. Loading fonts...");
+							void this.buildFontDropdowns(this.pendingFontFamilySetting as Setting, setting);
 						},
 					},
 					{
