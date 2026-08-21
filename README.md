@@ -27,6 +27,11 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 ## 1.13.1
 
 - **CLAUDE.md backups** — regenerating the vault's CLAUDE.md now backs up the existing file before overwriting it, so prior content isn't lost.
+
+## 1.13.2
+
+- **Settings search integration** — plugin settings now show up in Obsidian's global settings search on Obsidian 1.13+.
+- **Cleaner settings tab** — removed the redundant "Claude Code" heading that duplicated the plugin name already shown in Obsidian's settings chrome.
 <!-- WHATS-NEW-END -->
 
 ## Features
