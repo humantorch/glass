@@ -1,4 +1,5 @@
 import { App, Modal } from "obsidian";
+import { strings } from "./i18n";
 
 export class ConfirmModal extends Modal {
 	constructor(
@@ -18,12 +19,12 @@ export class ConfirmModal extends Modal {
 		contentEl.createEl("p", { text: this.bodyText });
 
 		const actions = contentEl.createDiv({ cls: "claude-confirm-modal-actions" });
-		const confirmBtn = actions.createEl("button", { text: "Continue", cls: "mod-warning" });
+		const confirmBtn = actions.createEl("button", { text: strings.modals.confirm.continueButton, cls: "mod-warning" });
 		confirmBtn.addEventListener("click", () => {
 			this.close();
 			void this.onConfirm();
 		});
-		const cancelBtn = actions.createEl("button", { text: "Cancel" });
+		const cancelBtn = actions.createEl("button", { text: strings.modals.confirm.cancelButton });
 		cancelBtn.addEventListener("click", () => this.close());
 	}
 

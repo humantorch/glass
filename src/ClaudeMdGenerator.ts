@@ -2,6 +2,7 @@ import { App, getAllTags } from "obsidian";
 import * as fs from "fs";
 import * as path from "path";
 import type ClaudeCodePlugin from "./main";
+import { strings } from "./i18n";
 
 export interface GenerateClaudeMdResult {
 	success: boolean;
@@ -98,7 +99,7 @@ export function stripCodeFence(text: string): string {
 export async function generateClaudeMd(plugin: ClaudeCodePlugin): Promise<GenerateClaudeMdResult> {
 	const vaultRoot = plugin.contextBuilder.getVaultRoot();
 	if (!vaultRoot) {
-		return { success: false, error: "Could not determine vault root." };
+		return { success: false, error: strings.errors.vaultRootNotFound };
 	}
 
 	const survey = buildVaultSurvey(plugin.app, path.basename(vaultRoot));
@@ -117,14 +118,14 @@ export async function generateClaudeMd(plugin: ClaudeCodePlugin): Promise<Genera
 	);
 
 	if (!result.success || !result.text.trim()) {
-		return { success: false, error: result.error || "Claude returned an empty response." };
+		return { success: false, error: result.error || strings.errors.emptyClaudeResponse };
 	}
 
 	const content = stripCodeFence(result.text);
 	try {
 		writeClaudeMdWithBackup(vaultRoot, content);
 	} catch (err) {
-		return { success: false, error: `Failed to write CLAUDE.md: ${(err as Error).message}` };
+		return { success: false, error: strings.errors.failedToWriteClaudeMd((err as Error).message) };
 	}
 
 	return { success: true };

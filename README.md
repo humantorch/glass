@@ -2,7 +2,7 @@
 
 [![GitHub release](https://img.shields.io/github/v/release/humantorch/glass)](https://github.com/humantorch/glass/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Obsidian](https://img.shields.io/badge/Obsidian-1.7.7%2B-7c3aed)](https://obsidian.md)
+[![Obsidian](https://img.shields.io/badge/Obsidian-1.8.7%2B-7c3aed)](https://obsidian.md)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey)](https://github.com/humantorch/glass#requirements)
 [![Python 3](https://img.shields.io/badge/python-3.6%2B-blue)](https://www.python.org/downloads/)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕-yellow)](https://buymeacoffee.com/scottkosman)
@@ -41,7 +41,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 
 ## Requirements
 
-- Obsidian desktop app (1.7.7+)
+- Obsidian desktop app (1.8.7+)
 - [Claude Code CLI](https://claude.ai/code) installed and on your PATH (`claude --version` should work in your terminal)
 - Python 3 (used by the terminal bridge; ships with macOS, available via your package manager on Linux; install from [python.org](https://www.python.org/downloads/) on Windows)
 

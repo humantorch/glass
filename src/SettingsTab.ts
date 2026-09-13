@@ -5,6 +5,7 @@ import type ClaudeCodePlugin from "./main";
 import { QUICK_ASK_MODELS } from "./types";
 import { generateClaudeMd } from "./ClaudeMdGenerator";
 import { ConfirmModal } from "./ConfirmModal";
+import { strings } from "./i18n";
 
 interface FontData {
 	family: string;
@@ -34,13 +35,11 @@ export class SettingsTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName("Claude binary path")
-			.setDesc(
-				"Path to the Claude CLI executable. Use 'Claude' if it's on your system path, or provide the full absolute path."
-			)
+			.setName(strings.settings.claudeBinaryPath.name)
+			.setDesc(strings.settings.claudeBinaryPath.desc)
 			.addText((text) =>
 				text
-					.setPlaceholder("Claude")
+					.setPlaceholder(strings.settings.claudeBinaryPath.placeholder)
 					.setValue(this.plugin.settings.claudeBinaryPath)
 					.onChange(async (value) => {
 						this.plugin.settings.claudeBinaryPath = value.trim() || "claude";
@@ -49,13 +48,11 @@ export class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Working directory")
-			.setDesc(
-				"Directory Claude Code starts in. Leave blank to use vault root. Claude will have access to files in this directory."
-			)
+			.setName(strings.settings.workingDirectory.name)
+			.setDesc(strings.settings.workingDirectory.desc)
 			.addText((text) =>
 				text
-					.setPlaceholder("(Vault root)")
+					.setPlaceholder(strings.settings.workingDirectory.placeholder)
 					.setValue(this.plugin.settings.workingDirectory)
 					.onChange(async (value) => {
 						this.plugin.settings.workingDirectory = value.trim();
@@ -64,8 +61,8 @@ export class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Quick ask model")
-			.setDesc("Claude model to use for the quick ask modal.")
+			.setName(strings.settings.quickAskModel.name)
+			.setDesc(strings.settings.quickAskModel.desc)
 			.addDropdown((dropdown) => {
 				for (const [value, label] of QUICK_ASK_MODELS) {
 					dropdown.addOption(value, label);
@@ -79,11 +76,11 @@ export class SettingsTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName("Terminal font size")
-			.setDesc("Font size in pixels for the terminal panel.")
+			.setName(strings.settings.fontSize.name)
+			.setDesc(strings.settings.fontSize.desc)
 			.addText((text) =>
 				text
-					.setPlaceholder("14")
+					.setPlaceholder(strings.settings.fontSize.placeholder)
 					.setValue(String(this.plugin.settings.fontSize))
 					.onChange(async (value) => {
 						const parsed = parseInt(value, 10);
@@ -96,11 +93,11 @@ export class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Terminal scrollback")
-			.setDesc("Number of lines to keep in the terminal's scroll history (default 5000). Takes effect the next time the terminal is opened.")
+			.setName(strings.settings.scrollback.name)
+			.setDesc(strings.settings.scrollback.desc)
 			.addText((text) =>
 				text
-					.setPlaceholder("5000")
+					.setPlaceholder(strings.settings.scrollback.placeholder)
 					.setValue(String(this.plugin.settings.scrollback))
 					.onChange(async (value) => {
 						const parsed = parseInt(value, 10);
@@ -114,19 +111,19 @@ export class SettingsTab extends PluginSettingTab {
 		// Create stubs synchronously so they appear in the right position,
 		// then fill in the dropdowns asynchronously once font data is loaded.
 		const familySetting = new Setting(containerEl)
-			.setName("Terminal font family")
-			.setDesc("Font family for the terminal panel. Loading fonts...");
+			.setName(strings.settings.fontFamily.name)
+			.setDesc(strings.settings.fontFamily.descLoading);
 		const weightSetting = new Setting(containerEl)
-			.setName("Terminal font weight")
-			.setDesc("Weight or style variant for the selected font. Loading fonts...");
+			.setName(strings.settings.fontWeight.name)
+			.setDesc(strings.settings.fontWeight.descLoading);
 		void this.buildFontDropdowns(familySetting, weightSetting);
 
 		new Setting(containerEl)
-			.setName("Terminal letter spacing")
-			.setDesc("Horizontal spacing between characters in pixels (0-3, default 0). Adds breathing room for cramped fonts.")
+			.setName(strings.settings.letterSpacing.name)
+			.setDesc(strings.settings.letterSpacing.desc)
 			.addText((text) =>
 				text
-					.setPlaceholder("0")
+					.setPlaceholder(strings.settings.letterSpacing.placeholder)
 					.setValue(String(this.plugin.settings.letterSpacing))
 					.onChange(async (value) => {
 						const parsed = parseFloat(value);
@@ -139,11 +136,11 @@ export class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Terminal line height")
-			.setDesc("Vertical spacing multiplier for lines (1.0-1.4, default 1.0). Adds vertical breathing room.")
+			.setName(strings.settings.lineHeight.name)
+			.setDesc(strings.settings.lineHeight.desc)
 			.addText((text) =>
 				text
-					.setPlaceholder("1")
+					.setPlaceholder(strings.settings.lineHeight.placeholder)
 					.setValue(String(this.plugin.settings.lineHeight))
 					.onChange(async (value) => {
 						const parsed = parseFloat(value);
@@ -156,10 +153,8 @@ export class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Open Claude panel on startup")
-			.setDesc(
-				"Automatically open the Claude Code terminal when Obsidian starts."
-			)
+			.setName(strings.settings.autoOpenOnStartup.name)
+			.setDesc(strings.settings.autoOpenOnStartup.desc)
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.autoOpenOnStartup)
@@ -170,10 +165,8 @@ export class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Resume last Claude session")
-			.setDesc(
-				"Pass --continue when starting a new session to resume the previous conversation context."
-			)
+			.setName(strings.settings.resumeLastSession.name)
+			.setDesc(strings.settings.resumeLastSession.desc)
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.resumeLastSession)
@@ -184,12 +177,8 @@ export class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Skip permission prompts")
-			.setDesc(
-				"Pass --dangerously-skip-permissions to Claude Code. " +
-				"Claude will execute tool calls without asking for confirmation. " +
-				"Only enable this if you trust the tasks you are running."
-			)
+			.setName(strings.settings.skipPermissions.name)
+			.setDesc(strings.settings.skipPermissions.desc)
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.skipPermissions)
@@ -199,14 +188,11 @@ export class SettingsTab extends PluginSettingTab {
 					})
 			);
 
-		new Setting(containerEl).setName("Vault MCP server").setHeading();
+		new Setting(containerEl).setName(strings.settings.mcpServerHeading).setHeading();
 
 		new Setting(containerEl)
-			.setName("Enable vault MCP server")
-			.setDesc(
-				"Starts a local MCP server that gives Claude vault-aware tools (read, search, create, update notes). " +
-				"Registers automatically in .mcp.json in the vault root."
-			)
+			.setName(strings.settings.mcpServerEnabled.name)
+			.setDesc(strings.settings.mcpServerEnabled.desc)
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.mcpServerEnabled)
@@ -215,20 +201,17 @@ export class SettingsTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 						if (value) {
 							await this.plugin.startVaultMcpServer();
-							new Notice("Vault MCP server started. Start a new session for Claude to pick it up.");
+							new Notice(strings.notices.mcpServerStarted);
 						} else {
 							this.plugin.stopVaultMcpServer();
-							new Notice("Vault MCP server stopped. Start a new session for the change to take effect in Claude.");
+							new Notice(strings.notices.mcpServerStopped);
 						}
 					})
 			);
 
 		new Setting(containerEl)
-			.setName("Read-only vault access")
-			.setDesc(
-				"When enabled, Claude can read and search notes but cannot create or update them. " +
-				"Takes effect the next time the MCP server starts."
-			)
+			.setName(strings.settings.mcpReadOnly.name)
+			.setDesc(strings.settings.mcpReadOnly.desc)
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.mcpReadOnly)
@@ -239,13 +222,11 @@ export class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("MCP server port")
-			.setDesc(
-				"Port the vault MCP server listens on (default 27123). If the port is in use, the next available port up to +4 is used automatically. Restart the plugin after changing."
-			)
+			.setName(strings.settings.mcpServerPort.name)
+			.setDesc(strings.settings.mcpServerPort.desc)
 			.addText((text) =>
 				text
-					.setPlaceholder("27123")
+					.setPlaceholder(strings.settings.mcpServerPort.placeholder)
 					.setValue(String(this.plugin.settings.mcpServerPort))
 					.onChange(async (value) => {
 						const parsed = parseInt(value, 10);
@@ -256,16 +237,11 @@ export class SettingsTab extends PluginSettingTab {
 					})
 			);
 
-		new Setting(containerEl).setName("Vault context").setHeading();
+		new Setting(containerEl).setName(strings.settings.vaultContextHeading).setHeading();
 
 		new Setting(containerEl)
-			.setName("Generate CLAUDE.md")
-			.setDesc(
-				"Creates a CLAUDE.md file at your vault root summarizing its structure and tags — Claude Code " +
-				"loads this automatically at the start of every session. Safe to run again anytime; if a CLAUDE.md " +
-				"already exists, you'll be asked to confirm, and the current one is saved as CLAUDE.bak.md before " +
-				"it's replaced."
-			)
+			.setName(strings.settings.generateClaudeMd.name)
+			.setDesc(strings.settings.generateClaudeMd.desc)
 			.addButton((button) => this.wireGenerateClaudeMdButton(button));
 	}
 
@@ -275,152 +251,142 @@ export class SettingsTab extends PluginSettingTab {
 				type: "group",
 				items: [
 					{
-						name: "Claude binary path",
-						desc: "Path to the Claude CLI executable. Use 'Claude' if it's on your system path, or provide the full absolute path.",
-						control: { type: "text", key: "claudeBinaryPath", placeholder: "Claude" },
+						name: strings.settings.claudeBinaryPath.name,
+						desc: strings.settings.claudeBinaryPath.desc,
+						control: { type: "text", key: "claudeBinaryPath", placeholder: strings.settings.claudeBinaryPath.placeholder },
 					},
 					{
-						name: "Working directory",
-						desc: "Directory Claude Code starts in. Leave blank to use vault root. Claude will have access to files in this directory.",
-						control: { type: "text", key: "workingDirectory", placeholder: "(Vault root)" },
+						name: strings.settings.workingDirectory.name,
+						desc: strings.settings.workingDirectory.desc,
+						control: { type: "text", key: "workingDirectory", placeholder: strings.settings.workingDirectory.placeholder },
 					},
 					{
-						name: "Quick ask model",
-						desc: "Claude model to use for the quick ask modal.",
+						name: strings.settings.quickAskModel.name,
+						desc: strings.settings.quickAskModel.desc,
 						control: { type: "dropdown", key: "quickAskModel", options: Object.fromEntries(QUICK_ASK_MODELS) },
 					},
 					{
-						name: "Terminal font size",
-						desc: "Font size in pixels for the terminal panel.",
+						name: strings.settings.fontSize.name,
+						desc: strings.settings.fontSize.desc,
 						control: {
 							type: "number",
 							key: "fontSize",
-							placeholder: "14",
+							placeholder: strings.settings.fontSize.placeholder,
 							min: 1,
 							step: 1,
-							validate: (value) => (value > 0 ? undefined : "Must be greater than 0."),
+							validate: (value) => (value > 0 ? undefined : strings.settings.validation.mustBeGreaterThanZero),
 						},
 					},
 					{
-						name: "Terminal scrollback",
-						desc: "Number of lines to keep in the terminal's scroll history (default 5000). Takes effect the next time the terminal is opened.",
+						name: strings.settings.scrollback.name,
+						desc: strings.settings.scrollback.desc,
 						control: {
 							type: "number",
 							key: "scrollback",
-							placeholder: "5000",
+							placeholder: strings.settings.scrollback.placeholder,
 							min: 100,
 							max: 100000,
 							step: 1,
-							validate: (value) => (value >= 100 && value <= 100000 ? undefined : "Must be between 100 and 100000."),
+							validate: (value) =>
+								value >= 100 && value <= 100000 ? undefined : strings.settings.validation.mustBeBetween100And100000,
 						},
 					},
 					{
-						name: "Terminal font family",
-						desc: "Font family for the terminal panel.",
+						name: strings.settings.fontFamily.name,
+						desc: strings.settings.fontFamily.desc,
 						render: (setting) => {
-							setting.setDesc("Font family for the terminal panel. Loading fonts...");
+							setting.setDesc(strings.settings.fontFamily.descLoading);
 							this.pendingFontFamilySetting = setting;
 						},
 					},
 					{
-						name: "Terminal font weight",
-						desc: "Weight or style variant for the selected font.",
+						name: strings.settings.fontWeight.name,
+						desc: strings.settings.fontWeight.desc,
 						render: (setting) => {
-							setting.setDesc("Weight or style variant for the selected font. Loading fonts...");
+							setting.setDesc(strings.settings.fontWeight.descLoading);
 							void this.buildFontDropdowns(this.pendingFontFamilySetting as Setting, setting);
 						},
 					},
 					{
-						name: "Terminal letter spacing",
-						desc: "Horizontal spacing between characters in pixels (0-3, default 0). Adds breathing room for cramped fonts.",
+						name: strings.settings.letterSpacing.name,
+						desc: strings.settings.letterSpacing.desc,
 						control: {
 							type: "number",
 							key: "letterSpacing",
-							placeholder: "0",
+							placeholder: strings.settings.letterSpacing.placeholder,
 							min: 0,
 							max: 3,
 							step: 0.1,
-							validate: (value) => (value >= 0 && value <= 3 ? undefined : "Must be between 0 and 3."),
+							validate: (value) => (value >= 0 && value <= 3 ? undefined : strings.settings.validation.mustBeBetween0And3),
 						},
 					},
 					{
-						name: "Terminal line height",
-						desc: "Vertical spacing multiplier for lines (1.0-1.4, default 1.0). Adds vertical breathing room.",
+						name: strings.settings.lineHeight.name,
+						desc: strings.settings.lineHeight.desc,
 						control: {
 							type: "number",
 							key: "lineHeight",
-							placeholder: "1",
+							placeholder: strings.settings.lineHeight.placeholder,
 							min: 1,
 							max: 1.4,
 							step: 0.1,
-							validate: (value) => (value >= 1 && value <= 1.4 ? undefined : "Must be between 1.0 and 1.4."),
+							validate: (value) => (value >= 1 && value <= 1.4 ? undefined : strings.settings.validation.mustBeBetween1And1_4),
 						},
 					},
 					{
-						name: "Open Claude panel on startup",
-						desc: "Automatically open the Claude Code terminal when Obsidian starts.",
+						name: strings.settings.autoOpenOnStartup.name,
+						desc: strings.settings.autoOpenOnStartup.desc,
 						control: { type: "toggle", key: "autoOpenOnStartup" },
 					},
 					{
-						name: "Resume last Claude session",
-						desc: "Pass --continue when starting a new session to resume the previous conversation context.",
+						name: strings.settings.resumeLastSession.name,
+						desc: strings.settings.resumeLastSession.desc,
 						control: { type: "toggle", key: "resumeLastSession" },
 					},
 					{
-						name: "Skip permission prompts",
-						desc:
-							"Pass --dangerously-skip-permissions to Claude Code. Claude will execute tool calls without " +
-							"asking for confirmation. Only enable this if you trust the tasks you are running.",
+						name: strings.settings.skipPermissions.name,
+						desc: strings.settings.skipPermissions.desc,
 						control: { type: "toggle", key: "skipPermissions" },
 					},
 				],
 			},
 			{
 				type: "group",
-				heading: "Vault MCP server",
+				heading: strings.settings.mcpServerHeading,
 				items: [
 					{
-						name: "Enable vault MCP server",
-						desc:
-							"Starts a local MCP server that gives Claude vault-aware tools (read, search, create, update notes). " +
-							"Registers automatically in .mcp.json in the vault root.",
+						name: strings.settings.mcpServerEnabled.name,
+						desc: strings.settings.mcpServerEnabled.desc,
 						control: { type: "toggle", key: "mcpServerEnabled" },
 					},
 					{
-						name: "Read-only vault access",
-						desc:
-							"When enabled, Claude can read and search notes but cannot create or update them. " +
-							"Takes effect the next time the MCP server starts.",
+						name: strings.settings.mcpReadOnly.name,
+						desc: strings.settings.mcpReadOnly.desc,
 						control: { type: "toggle", key: "mcpReadOnly" },
 					},
 					{
-						name: "MCP server port",
-						desc:
-							"Port the vault MCP server listens on (default 27123). If the port is in use, the next " +
-							"available port up to +4 is used automatically. Restart the plugin after changing.",
+						name: strings.settings.mcpServerPort.name,
+						desc: strings.settings.mcpServerPort.desc,
 						control: {
 							type: "number",
 							key: "mcpServerPort",
-							placeholder: "27123",
+							placeholder: strings.settings.mcpServerPort.placeholder,
 							min: 1024,
 							max: 65535,
 							step: 1,
-							validate: (value) => (value > 1023 && value < 65536 ? undefined : "Must be between 1024 and 65535."),
+							validate: (value) =>
+								value > 1023 && value < 65536 ? undefined : strings.settings.validation.mustBeBetween1024And65535,
 						},
 					},
 				],
 			},
 			{
 				type: "group",
-				heading: "Vault context",
+				heading: strings.settings.vaultContextHeading,
 				items: [
 					{
-						name: "Generate CLAUDE.md",
-						desc:
-							"Creates a CLAUDE.md file at your vault root summarizing its structure and tags — Claude Code " +
-							"loads this automatically at the start of every session. Safe to run again anytime; if a CLAUDE.md " +
-							"already exists, you'll be asked to confirm, and the current one is saved as CLAUDE.bak.md before " +
-							"it's replaced.",
+						name: strings.settings.generateClaudeMd.name,
+						desc: strings.settings.generateClaudeMd.desc,
 						render: (setting) => {
 							setting.addButton((button) => this.wireGenerateClaudeMdButton(button));
 						},
@@ -480,10 +446,10 @@ export class SettingsTab extends PluginSettingTab {
 				await this.plugin.saveSettings();
 				if (value) {
 					await this.plugin.startVaultMcpServer();
-					new Notice("Vault MCP server started. Start a new session for Claude to pick it up.");
+					new Notice(strings.notices.mcpServerStarted);
 				} else {
 					this.plugin.stopVaultMcpServer();
-					new Notice("Vault MCP server stopped. Start a new session for the change to take effect in Claude.");
+					new Notice(strings.notices.mcpServerStopped);
 				}
 				return;
 			}
@@ -494,15 +460,14 @@ export class SettingsTab extends PluginSettingTab {
 	}
 
 	private wireGenerateClaudeMdButton(button: ButtonComponent): void {
-		button.setButtonText("Generate CLAUDE.md").onClick(() => {
+		button.setButtonText(strings.settings.generateClaudeMd.button).onClick(() => {
 			const vaultRoot = this.plugin.contextBuilder.getVaultRoot();
 			const claudeMdPath = vaultRoot ? path.join(vaultRoot, "CLAUDE.md") : "";
 			if (claudeMdPath && fs.existsSync(claudeMdPath)) {
 				new ConfirmModal(
 					this.app,
-					"Overwrite CLAUDE.md?",
-					"A CLAUDE.md already exists at your vault root. The current one will be saved as " +
-					"CLAUDE.bak.md (overwriting any previous backup) before the new one is written.",
+					strings.modals.confirmClaudeMdOverwrite.title,
+					strings.modals.confirmClaudeMdOverwrite.body,
 					() => this.runGenerateClaudeMd(button)
 				).open();
 			} else {
@@ -513,14 +478,14 @@ export class SettingsTab extends PluginSettingTab {
 
 	private async runGenerateClaudeMd(button: ButtonComponent): Promise<void> {
 		button.setDisabled(true);
-		button.setButtonText("Generating...");
+		button.setButtonText(strings.settings.generateClaudeMd.buttonGenerating);
 		const result = await generateClaudeMd(this.plugin);
 		button.setDisabled(false);
-		button.setButtonText("Generate CLAUDE.md");
+		button.setButtonText(strings.settings.generateClaudeMd.button);
 		if (result.success) {
-			new Notice("CLAUDE.md created at your vault root.");
+			new Notice(strings.notices.claudeMdCreated);
 		} else {
-			new Notice(`Failed to generate CLAUDE.md: ${result.error}`);
+			new Notice(strings.notices.claudeMdGenerationFailed(result.error));
 		}
 	}
 
@@ -530,7 +495,7 @@ export class SettingsTab extends PluginSettingTab {
 
 		let variantDropdown: DropdownComponent | null = null;
 
-		familySetting.setDesc("Font family for the terminal panel.");
+		familySetting.setDesc(strings.settings.fontFamily.desc);
 		familySetting.addDropdown((dd) => {
 			for (const font of families) {
 				dd.addOption(font, font);
@@ -552,7 +517,7 @@ export class SettingsTab extends PluginSettingTab {
 			});
 		});
 
-		weightSetting.setDesc("Weight or style variant for the selected font.");
+		weightSetting.setDesc(strings.settings.fontWeight.desc);
 		weightSetting.addDropdown((dd) => {
 			variantDropdown = dd;
 			this.populateVariantOptions(dd, this.plugin.settings.fontFamily);
@@ -576,11 +541,12 @@ export class SettingsTab extends PluginSettingTab {
 				dd.addOption(v.weight, v.label);
 			}
 		} else {
-			dd.addOption("normal", "Normal");
-			dd.addOption("300", "Light (300)");
-			dd.addOption("500", "Medium (500)");
-			dd.addOption("600", "SemiBold (600)");
-			dd.addOption("bold", "Bold");
+			const fallback = strings.settings.fontWeightFallbackOptions;
+			dd.addOption("normal", fallback.normal);
+			dd.addOption("300", fallback.light);
+			dd.addOption("500", fallback.medium);
+			dd.addOption("600", fallback.semibold);
+			dd.addOption("bold", fallback.bold);
 		}
 	}
 

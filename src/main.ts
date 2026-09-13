@@ -14,6 +14,7 @@ import { ClaudeTerminalView } from "./ClaudeTerminalView";
 import { ClaudeQuickModal } from "./ClaudeQuickModal";
 import { VaultMcpServer } from "./VaultMcpServer";
 import { ClaudeMdOnboardingModal } from "./ClaudeMdOnboardingModal";
+import { strings } from "./i18n";
 
 interface GitHubRelease {
 	tag_name: string;
@@ -41,7 +42,7 @@ export default class ClaudeCodePlugin extends Plugin {
 		);
 
 		// Ribbon icon
-		this.addRibbonIcon(CLAUDE_ICON, "Open Claude Code", () => {
+		this.addRibbonIcon(CLAUDE_ICON, strings.ribbon.tooltip, () => {
 			void this.activateClaudeView();
 		});
 
@@ -51,13 +52,13 @@ export default class ClaudeCodePlugin extends Plugin {
 		// Commands
 		this.addCommand({
 			id: "open-terminal",
-			name: "Open Claude Code terminal",
+			name: strings.commands.openTerminal,
 			callback: () => { void this.activateClaudeView(); },
 		});
 
 		this.addCommand({
 			id: "quick-ask",
-			name: "Ask Claude (quick)",
+			name: strings.commands.quickAsk,
 			callback: () => {
 				new ClaudeQuickModal(this.app, this).open();
 			},
@@ -65,11 +66,11 @@ export default class ClaudeCodePlugin extends Plugin {
 
 		this.addCommand({
 			id: "ask-about-note",
-			name: "Ask Claude about this note",
+			name: strings.commands.askAboutNote,
 			callback: async () => {
 				const content = await this.contextBuilder.getActiveFileContent();
 				if (!content) {
-					new Notice("No active note.");
+					new Notice(strings.notices.noActiveNote);
 					return;
 				}
 				const relativePath =
@@ -84,11 +85,11 @@ export default class ClaudeCodePlugin extends Plugin {
 
 		this.addCommand({
 			id: "ask-about-selection",
-			name: "Ask Claude about selection",
+			name: strings.commands.askAboutSelection,
 			editorCallback: (editor) => {
 				const selection = this.contextBuilder.getActiveSelection(editor);
 				if (!selection) {
-					new Notice("No text selected.");
+					new Notice(strings.notices.noTextSelected);
 					return;
 				}
 				const context =
@@ -99,20 +100,20 @@ export default class ClaudeCodePlugin extends Plugin {
 
 		this.addCommand({
 			id: "insert-note-reference",
-			name: "Insert note reference into terminal",
+			name: strings.commands.insertNoteReference,
 			callback: () => {
 				const view = this.getClaudeView();
 				if (view) {
 					view.insertNoteReference();
 				} else {
-					new Notice("Open the Claude Code terminal first.");
+					new Notice(strings.notices.openTerminalFirst);
 				}
 			},
 		});
 
 		this.addCommand({
 			id: "new-session",
-			name: "Start new Claude Code session",
+			name: strings.commands.newSession,
 			callback: () => {
 				const view = this.getClaudeView();
 				if (!view) {
@@ -138,7 +139,7 @@ export default class ClaudeCodePlugin extends Plugin {
 				if (!(file instanceof TFile) || file.extension !== "md") return;
 				menu.addItem((item) => {
 					item
-						.setTitle("Ask Claude about this")
+						.setTitle(strings.contextMenu.askAboutThis)
 						.setIcon(CLAUDE_ICON)
 						.onClick(async () => {
 							const content = await this.app.vault.read(file);
@@ -217,10 +218,7 @@ export default class ClaudeCodePlugin extends Plugin {
 			if (latest && latest !== current && this.isNewerVersion(latest, current)) {
 				this.availableVersion = latest;
 				this.getClaudeView()?.showUpdateAvailable(latest);
-				new Notice(
-					`Glass ${latest} is available. Click the version in the toolbar to update.`,
-					10000
-				);
+				new Notice(strings.notices.newVersionAvailable(latest), 10000);
 			}
 		} catch {
 			// Network unavailable or API rate-limited — silently skip

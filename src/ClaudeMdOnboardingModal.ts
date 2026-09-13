@@ -1,6 +1,7 @@
 import { App, Modal, Notice } from "obsidian";
 import type ClaudeCodePlugin from "./main";
 import { generateClaudeMd } from "./ClaudeMdGenerator";
+import { strings } from "./i18n";
 
 export class ClaudeMdOnboardingModal extends Modal {
 	private plugin: ClaudeCodePlugin;
@@ -18,23 +19,19 @@ export class ClaudeMdOnboardingModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass("claude-onboarding-modal");
 
-		contentEl.createEl("h2", { text: "Set up vault context for Claude?" });
+		contentEl.createEl("h2", { text: strings.modals.claudeMdOnboarding.title });
 		contentEl.createEl("p", {
-			text:
-				"Glass can generate a CLAUDE.md file summarizing this vault's structure and tags. " +
-				"Claude Code loads this automatically at the start of every session, so it understands your " +
-				"vault without you explaining it each time. You can review and edit the file afterward, and " +
-				"regenerate it anytime from Settings → Glass.",
+			text: strings.modals.claudeMdOnboarding.body,
 		});
 
 		this.statusEl = contentEl.createEl("p", { cls: "claude-onboarding-modal-status" });
 		this.statusEl.hide();
 
 		const actions = contentEl.createDiv({ cls: "claude-onboarding-modal-actions" });
-		this.generateBtn = actions.createEl("button", { text: "Generate CLAUDE.md", cls: "mod-cta" });
+		this.generateBtn = actions.createEl("button", { text: strings.modals.claudeMdOnboarding.generateButton, cls: "mod-cta" });
 		this.generateBtn.addEventListener("click", () => { void this.runGeneration(); });
 
-		this.dismissBtn = actions.createEl("button", { text: "Not now" });
+		this.dismissBtn = actions.createEl("button", { text: strings.modals.claudeMdOnboarding.notNowButton });
 		this.dismissBtn.addEventListener("click", () => this.close());
 	}
 
@@ -43,16 +40,16 @@ export class ClaudeMdOnboardingModal extends Modal {
 		this.generateBtn.disabled = true;
 		this.dismissBtn.disabled = true;
 		this.statusEl.show();
-		this.statusEl.textContent = "Generating CLAUDE.md — this can take a moment...";
+		this.statusEl.textContent = strings.modals.claudeMdOnboarding.generating;
 
 		const result = await generateClaudeMd(this.plugin);
 
 		if (result.success) {
-			this.statusEl.textContent = "Done. CLAUDE.md created at your vault root.";
-			new Notice("CLAUDE.md created. Claude will use it starting with your next session.");
+			this.statusEl.textContent = strings.modals.claudeMdOnboarding.done;
+			new Notice(strings.modals.claudeMdOnboarding.doneNotice);
 			window.setTimeout(() => this.close(), 1200);
 		} else {
-			this.statusEl.textContent = `Failed: ${result.error}`;
+			this.statusEl.textContent = strings.modals.claudeMdOnboarding.failed(result.error);
 			this.generateBtn.disabled = false;
 			this.dismissBtn.disabled = false;
 		}

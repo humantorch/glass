@@ -4,6 +4,7 @@ import * as fs from "fs";
 import pseudoterminalScript from "./pseudoterminal.py";
 import winBridgeScript from "./pty_bridge_win.py";
 import { PtySessionOptions, PrintModeOptions, PrintModeResult } from "./types";
+import { strings } from "./i18n";
 
 /**
  * Electron inherits a minimal environment — PATH is truncated and shell-profile
@@ -241,9 +242,9 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		}
 
 		const installHint = isWindows
-			? "Install Python 3 from https://www.python.org/downloads/"
-			: "Install it via Homebrew: brew install python3";
-		throw new Error(`Python 3 not found. ${installHint}`);
+			? strings.errors.installPythonDownloadLink
+			: strings.errors.installPythonHomebrew;
+		throw new Error(strings.errors.pythonNotFound(installHint));
 	}
 
 	/**
@@ -288,7 +289,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			if (killed || completed) return;
 			killed = true;
 			proc.kill();
-			onError(`Request timed out after ${timeoutMs / 1000}s`);
+			onError(strings.errors.requestTimedOut(timeoutMs / 1000));
 		}, timeoutMs);
 
 		proc.stdout.on("data", (chunk: Buffer) => {
@@ -308,7 +309,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			if (code === 0) {
 				onComplete(fullText);
 			} else {
-				onError(stderr.trim() || `Claude exited with code ${code}`);
+				onError(stderr.trim() || strings.errors.claudeExitedWithCode(code));
 			}
 		});
 
@@ -319,9 +320,9 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			const isEnoent = (err as NodeJS.ErrnoException).code === "ENOENT";
 			const isWindows = process.platform === "win32";
 			const hint = isEnoent && isWindows
-				? `Set the full path in Settings → Glass → "Claude binary path".`
-				: `Is '${options.claudePath}' on your PATH?`;
-			onError(`Failed to start Claude: ${err.message}. ${hint}`);
+				? strings.errors.setBinaryPathHint
+				: strings.errors.isOnPathHint(options.claudePath);
+			onError(strings.errors.failedToStartClaude(err.message, hint));
 		});
 
 		return () => {
@@ -375,7 +376,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 				resolve({
 					success: false,
 					text: "",
-					error: `Request timed out after ${timeoutMs / 1000}s`,
+					error: strings.errors.requestTimedOut(timeoutMs / 1000),
 				});
 			}, timeoutMs);
 
@@ -386,7 +387,7 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 					resolve({
 						success: false,
 						text: "",
-						error: stderr.trim() || `Claude exited with code ${code}`,
+						error: stderr.trim() || strings.errors.claudeExitedWithCode(code),
 					});
 					return;
 				}
@@ -414,12 +415,12 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 				const isEnoent = (err as NodeJS.ErrnoException).code === "ENOENT";
 				const isWindows = process.platform === "win32";
 				const hint = isEnoent && isWindows
-					? `Set the full path in Settings → Glass → "Claude binary path" (e.g. C:\\Users\\<you>\\.local\\bin\\claude.exe).`
-					: `Is '${options.claudePath}' on your PATH?`;
+					? strings.errors.setBinaryPathHintWindows("C:\\Users\\<you>\\.local\\bin\\claude.exe")
+					: strings.errors.isOnPathHint(options.claudePath);
 				resolve({
 					success: false,
 					text: "",
-					error: `Failed to start Claude: ${err.message}. ${hint}`,
+					error: strings.errors.failedToStartClaude(err.message, hint),
 				});
 			});
 		});

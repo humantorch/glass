@@ -2,6 +2,7 @@ import { App, Modal, MarkdownRenderer, Notice, Component } from "obsidian";
 import { clipboard } from "electron";
 import type ClaudeCodePlugin from "./main";
 import { QUICK_ASK_MODELS } from "./types";
+import { strings } from "./i18n";
 
 export class ClaudeQuickModal extends Modal {
 	private plugin: ClaudeCodePlugin;
@@ -34,13 +35,13 @@ export class ClaudeQuickModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass("claude-quick-modal");
 
-		contentEl.createEl("h2", { text: "Ask Claude" });
+		contentEl.createEl("h2", { text: strings.modals.quickAsk.title });
 
 		// Context preview (if prefill provided)
 		if (this.prefill) {
 			const contextSection = contentEl.createDiv({ cls: "claude-quick-modal-context" });
 			contextSection.createEl("p", {
-				text: "Context:",
+				text: strings.modals.quickAsk.contextLabel,
 				cls: "claude-quick-modal-context-label",
 			});
 			const preview = this.prefill.length > 200
@@ -57,7 +58,7 @@ export class ClaudeQuickModal extends Modal {
 		this.promptTextarea = promptSection.createEl("textarea", {
 			cls: "claude-quick-modal-textarea",
 			attr: {
-				placeholder: "Ask Claude anything...",
+				placeholder: strings.modals.quickAsk.promptPlaceholder,
 				rows: "4",
 			},
 		});
@@ -75,13 +76,13 @@ export class ClaudeQuickModal extends Modal {
 		const actionBar = contentEl.createDiv({ cls: "claude-quick-modal-actions" });
 
 		this.submitBtn = actionBar.createEl("button", {
-			text: "Ask Claude",
+			text: strings.modals.quickAsk.askButton,
 			cls: "mod-cta",
 		});
 		this.submitBtn.addEventListener("click", () => this.submit());
 
 		this.stopBtn = actionBar.createEl("button", {
-			text: "Stop",
+			text: strings.modals.quickAsk.stopButton,
 			cls: "claude-quick-modal-stop-btn",
 		});
 		this.stopBtn.hide();
@@ -105,7 +106,7 @@ export class ClaudeQuickModal extends Modal {
 		// Model selector — defaults to the setting, overridable per-query
 		const modelWrapper = actionBar.createDiv({ cls: "claude-quick-modal-model-wrapper" });
 		modelWrapper.createEl("label", {
-			text: "Model:",
+			text: strings.modals.quickAsk.modelLabel,
 			cls: "claude-quick-modal-model-label",
 		});
 		this.modelSelect = modelWrapper.createEl("select", {
@@ -118,7 +119,7 @@ export class ClaudeQuickModal extends Modal {
 		this.modelSelect.value = this.plugin.settings.quickAskModel;
 
 		this.copyBtn = actionBar.createEl("button", {
-			text: "Copy response",
+			text: strings.modals.quickAsk.copyButton,
 			cls: "claude-quick-modal-copy-btn",
 		});
 		this.copyBtn.hide();
@@ -135,7 +136,7 @@ export class ClaudeQuickModal extends Modal {
 
 		const prompt = this.promptTextarea.value.trim();
 		if (!prompt) {
-			new Notice("Please enter a prompt.");
+			new Notice(strings.modals.quickAsk.promptRequired);
 			return;
 		}
 
@@ -146,7 +147,7 @@ export class ClaudeQuickModal extends Modal {
 		this.streamText = "";
 
 		this.submitBtn.disabled = true;
-		this.submitBtn.textContent = "Asking...";
+		this.submitBtn.textContent = strings.modals.quickAsk.asking;
 		this.stopBtn?.show();
 		this.copyBtn?.hide();
 
@@ -183,7 +184,7 @@ export class ClaudeQuickModal extends Modal {
 				this.finishStreaming();
 				if (this.resultEl) {
 					this.resultEl.empty();
-					this.resultEl.createEl("p", { text: `Error: ${error}`, cls: "claude-quick-modal-error" });
+					this.resultEl.createEl("p", { text: strings.modals.quickAsk.errorPrefix(error), cls: "claude-quick-modal-error" });
 				}
 			}
 		);
@@ -224,7 +225,7 @@ export class ClaudeQuickModal extends Modal {
 		this.pendingCompleteText = null;
 		if (this.submitBtn) {
 			this.submitBtn.disabled = false;
-			this.submitBtn.textContent = "Ask Claude";
+			this.submitBtn.textContent = strings.modals.quickAsk.askButton;
 		}
 		this.stopBtn?.hide();
 		this.streamEl = null;
@@ -247,13 +248,13 @@ export class ClaudeQuickModal extends Modal {
 		if (!this.lastResponse) return;
 		try {
 			clipboard.writeText(this.lastResponse);
-			new Notice("Response copied to clipboard.");
-			if (this.copyBtn) this.copyBtn.textContent = "Copied!";
+			new Notice(strings.modals.quickAsk.copiedToClipboard);
+			if (this.copyBtn) this.copyBtn.textContent = strings.modals.quickAsk.copied;
 			window.setTimeout(() => {
-				if (this.copyBtn) this.copyBtn.textContent = "Copy response";
+				if (this.copyBtn) this.copyBtn.textContent = strings.modals.quickAsk.copyButton;
 			}, 2000);
 		} catch {
-			new Notice("Failed to copy to clipboard.");
+			new Notice(strings.modals.quickAsk.copyFailed);
 		}
 	}
 

@@ -1,3 +1,5 @@
+import { strings } from "./i18n";
+
 export interface ClaudeCodeSettings {
 	claudeBinaryPath: string;
 	workingDirectory: string;
@@ -40,7 +42,7 @@ export const CLAUDE_TERMINAL_VIEW_TYPE = "claude-code-terminal";
 export const CLAUDE_ICON = "bot";
 
 export const QUICK_ASK_MODELS: [string, string][] = [
-	["", "Default"],
+	["", strings.settings.quickAskModel.defaultOption],
 	["claude-haiku-4-5-20251001", "Haiku 4.5"],
 	["claude-sonnet-5", "Sonnet 5"],
 	["claude-opus-5", "Opus 5"],

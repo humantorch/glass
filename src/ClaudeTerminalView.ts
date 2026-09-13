@@ -8,6 +8,7 @@ import { shell } from "electron";
 import type { ChildProcess } from "child_process";
 import type ClaudeCodePlugin from "./main";
 import { CLAUDE_ICON, CLAUDE_TERMINAL_VIEW_TYPE } from "./types";
+import { strings } from "./i18n";
 
 /** Reads an Obsidian CSS variable from the current theme, falling back to a default. */
 function cssVar(name: string, fallback: string): string {
@@ -54,7 +55,7 @@ class FilePickerModal extends FuzzySuggestModal<TFile> {
 	constructor(app: App, callback: (file: TFile) => void) {
 		super(app);
 		this.callback = callback;
-		this.setPlaceholder("Type to search notes...");
+		this.setPlaceholder(strings.terminal.filePicker.placeholder);
 	}
 
 	getItems(): TFile[] {
@@ -94,7 +95,7 @@ export class ClaudeTerminalView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return "Claude Code";
+		return strings.terminal.viewDisplayText;
 	}
 
 	getIcon(): string {
@@ -110,34 +111,34 @@ export class ClaudeTerminalView extends ItemView {
 		const toolbar = container.createDiv({ cls: "claude-code-toolbar" });
 
 		const wordmark = toolbar.createDiv({ cls: "claude-code-wordmark" });
-		wordmark.createSpan({ text: "GLASS" });
-		wordmark.createSpan({ cls: "claude-code-wordmark-byline", text: "by Blackglass" });
+		wordmark.createSpan({ text: strings.terminal.wordmark });
+		wordmark.createSpan({ cls: "claude-code-wordmark-byline", text: strings.terminal.byline });
 
 		const newSessionBtn = toolbar.createEl("button", {
-			text: "New session",
+			text: strings.terminal.toolbar.newSession,
 			cls: "claude-code-toolbar-btn",
 		});
-		newSessionBtn.title = "Start a new Claude Code session";
+		newSessionBtn.title = strings.terminal.toolbar.newSessionTooltip;
 		newSessionBtn.addEventListener("click", (e) => {
 			(e.currentTarget as HTMLButtonElement).blur();
 			this.restartSession();
 		});
 
 		const clearBtn = toolbar.createEl("button", {
-			text: "Clear",
+			text: strings.terminal.toolbar.clear,
 			cls: "claude-code-toolbar-btn",
 		});
-		clearBtn.title = "Clear terminal output without ending the session";
+		clearBtn.title = strings.terminal.toolbar.clearTooltip;
 		clearBtn.addEventListener("click", (e) => {
 			(e.currentTarget as HTMLButtonElement).blur();
 			this.terminal?.clear();
 		});
 
 		const atBtn = toolbar.createEl("button", {
-			text: "@",
+			text: strings.terminal.toolbar.insertReference,
 			cls: "claude-code-toolbar-btn",
 		});
-		atBtn.title = "Insert a note reference into the terminal (@filename)";
+		atBtn.title = strings.terminal.toolbar.insertReferenceTooltip;
 		atBtn.addEventListener("click", (e) => {
 			(e.currentTarget as HTMLButtonElement).blur();
 			this.insertNoteReference();
@@ -147,8 +148,8 @@ export class ClaudeTerminalView extends ItemView {
 			cls: "claude-code-toolbar-btn claude-code-toolbar-btn--icon",
 		});
 		setIcon(settingsBtn, "settings");
-		settingsBtn.title = "Open glass settings";
-		settingsBtn.setAttribute("aria-label", "Open glass settings");
+		settingsBtn.title = strings.terminal.toolbar.settingsTooltip;
+		settingsBtn.setAttribute("aria-label", strings.terminal.toolbar.settingsTooltip);
 		settingsBtn.addEventListener("click", (e) => {
 			(e.currentTarget as HTMLButtonElement).blur();
 			const app = this.plugin.app as unknown as {
@@ -161,15 +162,15 @@ export class ClaudeTerminalView extends ItemView {
 		const sessionIndicator = toolbar.createDiv({ cls: "claude-code-indicator" });
 		sessionIndicator.setAttribute("role", "status");
 		this.statusDot = sessionIndicator.createDiv({ cls: "claude-code-status-dot" });
-		sessionIndicator.createSpan({ cls: "claude-code-indicator-label", text: "session" });
-		this.statusDot.title = "No session";
-		sessionIndicator.title = "No session";
-		sessionIndicator.setAttribute("aria-label", "Session status: no session");
+		sessionIndicator.createSpan({ cls: "claude-code-indicator-label", text: strings.terminal.status.sessionLabel });
+		this.statusDot.title = strings.terminal.status.noSession;
+		sessionIndicator.title = strings.terminal.status.noSession;
+		sessionIndicator.setAttribute("aria-label", strings.terminal.status.sessionStatusNoSession);
 
 		this.mcpIndicator = toolbar.createDiv({ cls: "claude-code-indicator" });
 		this.mcpIndicator.setAttribute("role", "status");
 		this.mcpDot = this.mcpIndicator.createDiv({ cls: "claude-code-mcp-dot" });
-		this.mcpIndicator.createSpan({ cls: "claude-code-indicator-label", text: "MCP" });
+		this.mcpIndicator.createSpan({ cls: "claude-code-indicator-label", text: strings.terminal.status.mcpLabel });
 		this.updateMcpStatus();
 
 		const version = this.plugin.manifest.version;
@@ -313,12 +314,12 @@ export class ClaudeTerminalView extends ItemView {
 
 	private setSessionStatus(active: boolean): void {
 		if (!this.statusDot) return;
-		const title = active ? "Session active" : "Session ended";
+		const title = active ? strings.terminal.status.sessionActive : strings.terminal.status.sessionEnded;
 		this.statusDot.toggleClass("claude-code-status-dot--active", active);
 		this.statusDot.title = title;
 		if (this.statusDot.parentElement) {
 			this.statusDot.parentElement.title = title;
-			this.statusDot.parentElement.setAttribute("aria-label", `Session status: ${title.toLowerCase()}`);
+			this.statusDot.parentElement.setAttribute("aria-label", strings.terminal.status.sessionStatus(title));
 		}
 	}
 
@@ -347,20 +348,17 @@ export class ClaudeTerminalView extends ItemView {
 			});
 		} catch (err) {
 			const msg = (err as Error).message;
-			this.terminal.writeln(`\r\n\x1b[31mFailed to start Claude Code: ${msg}\x1b[0m`);
+			const banners = strings.terminal.banners;
+			this.terminal.writeln(banners.failedToStart(msg));
 			if (process.platform === "win32" && msg.includes("Python")) {
-				this.terminal.writeln(`\r\n\x1b[33mSetup steps:\x1b[0m`);
-				this.terminal.writeln(`\r\n\x1b[33m  1. Install Python 3: https://www.python.org/downloads/\x1b[0m`);
-				this.terminal.writeln(`\r\n\x1b[33m  2. Run in PowerShell: pip install pywinpty\x1b[0m`);
-				this.terminal.writeln(`\r\n\x1b[33m  3. Reload Obsidian\x1b[0m`);
+				this.terminal.writeln(banners.windowsSetupHeading);
+				this.terminal.writeln(banners.windowsSetupStep1);
+				this.terminal.writeln(banners.windowsSetupStep2);
+				this.terminal.writeln(banners.windowsSetupStep3);
 			} else if (process.platform === "win32") {
-				this.terminal.writeln(
-					`\r\n\x1b[33mCheck that '${settings.claudeBinaryPath}' is on your PATH. If pywinpty is missing: pip install pywinpty\x1b[0m`
-				);
+				this.terminal.writeln(banners.checkPathWindowsPywinpty(settings.claudeBinaryPath));
 			} else {
-				this.terminal.writeln(
-					`\r\n\x1b[33mCheck that '${settings.claudeBinaryPath}' is on your PATH and that Python 3 is installed.\x1b[0m`
-				);
+				this.terminal.writeln(banners.checkPathUnixPython(settings.claudeBinaryPath));
 			}
 			return;
 		}
@@ -403,10 +401,10 @@ export class ClaudeTerminalView extends ItemView {
 			this.pty = null;
 			this.setSessionStatus(false);
 			const setupHint = process.platform === "win32"
-				? " Python 3 and pywinpty are required (pip install pywinpty)."
-				: " Check that Python 3 is installed.";
-			this.terminal?.writeln(`\r\n\x1b[31mFailed to start Claude Code: ${err.message}\x1b[0m`);
-			this.terminal?.writeln(`\r\n\x1b[33mCheck that '${settings.claudeBinaryPath}' is on your PATH.${setupHint}\x1b[0m`);
+				? strings.terminal.banners.setupHintWindows
+				: strings.terminal.banners.setupHintUnix;
+			this.terminal?.writeln(strings.terminal.banners.failedToStart(err.message));
+			this.terminal?.writeln(strings.terminal.banners.checkPathWithHint(settings.claudeBinaryPath, setupHint));
 		});
 
 		// PTY exit
@@ -428,16 +426,12 @@ export class ClaudeTerminalView extends ItemView {
 			// retry without it rather than showing an error.
 			const elapsed = Date.now() - startTime;
 			if (exitCode === 1 && shouldResume && elapsed < 3000) {
-				this.terminal?.writeln(
-					`\r\n\x1b[33m[No previous session found — starting fresh]\x1b[0m\r\n`
-				);
+				this.terminal?.writeln(strings.terminal.banners.noPreviousSession);
 				this.startSession(false);
 				return;
 			}
 
-			this.terminal?.writeln(
-				`\r\n\x1b[90m[Claude Code session ended with exit code ${exitCode}]\x1b[0m`
-			);
+			this.terminal?.writeln(strings.terminal.banners.sessionEndedWithCode(exitCode));
 		});
 
 		// Terminal input -> PTY stdin.
@@ -467,7 +461,7 @@ export class ClaudeTerminalView extends ItemView {
 		if (!this.versionLabel) return;
 		this.versionLabel.setText(`v${version} ↑`);
 		this.versionLabel.addClass("claude-code-version--update");
-		this.versionLabel.title = `Glass ${version} is available — click to update`;
+		this.versionLabel.title = strings.terminal.status.updateAvailable(version);
 		this.versionLabel.onclick = () => {
 			const app = this.plugin.app as unknown as {
 				setting: { open(): void; openTabById(id: string): void };
@@ -482,7 +476,7 @@ export class ClaudeTerminalView extends ItemView {
 			if (this.pty) {
 				this.plugin.processManager.writePty(this.pty, `@${file.path}`);
 			} else {
-				new Notice("No active Claude Code session.");
+				new Notice(strings.notices.noActiveSession);
 			}
 		}).open();
 	}
@@ -492,10 +486,10 @@ export class ClaudeTerminalView extends ItemView {
 		const mcpPort = this.plugin.vaultMcpServer?.getActualPort() ?? null;
 		this.mcpDot.toggleClass("claude-code-mcp-dot--active", mcpPort !== null);
 		const title = mcpPort !== null
-			? `Vault MCP server running on port ${mcpPort}`
+			? strings.terminal.status.mcpRunning(mcpPort)
 			: this.plugin.settings.mcpServerEnabled
-				? "Vault MCP server failed to start"
-				: "Vault MCP server disabled";
+				? strings.terminal.status.mcpFailed
+				: strings.terminal.status.mcpDisabled;
 		this.mcpDot.title = title;
 		this.mcpIndicator.title = title;
 		this.mcpIndicator.setAttribute("aria-label", title);
