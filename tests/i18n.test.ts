@@ -19,11 +19,23 @@ describe("i18n", () => {
 		getLanguageMock.mockReset();
 	});
 
-	it("resolves to English regardless of detected language, since no locale file is registered yet", async () => {
-		getLanguageMock.mockReturnValue("de");
+	it("resolves to English when the detected language has no locale file registered", async () => {
+		getLanguageMock.mockReturnValue("xx");
 		const strings = await loadStrings();
 		expect(strings.settings.claudeBinaryPath.name).toBe("Claude binary path");
 		expect(strings.commands.openTerminal).toBe("Open Claude Code terminal");
+	});
+
+	it.each([
+		["de", "Claude-Binärpfad", "Claude-Code-Terminal öffnen"],
+		["es", "Ruta del binario de Claude", "Abrir terminal de Claude Code"],
+		["nl", "Pad naar Claude-programma", "Claude Code-terminal openen"],
+		["fr", "Chemin du binaire Claude", "Ouvrir le terminal Claude Code"],
+	])("resolves to the registered locale's strings for %s", async (lang, binaryPathName, openTerminal) => {
+		getLanguageMock.mockReturnValue(lang);
+		const strings = await loadStrings();
+		expect(strings.settings.claudeBinaryPath.name).toBe(binaryPathName);
+		expect(strings.commands.openTerminal).toBe(openTerminal);
 	});
 
 	it("resolves to English when getLanguage() throws", async () => {

@@ -38,6 +38,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 - **CLAUDE.md vault context**: offers once, on first install, to generate a CLAUDE.md summarizing your vault's structure and tags — loaded automatically by Claude Code every session; regenerate anytime from Settings
 - **Theme-adaptive terminal**: terminal colors derived from the active Obsidian theme; updates live when you switch themes
 - **Cross-platform**: macOS, Linux, and Windows (Windows requires `pip install pywinpty`)
+- **Localized UI**: follows Obsidian's configured display language, with machine-translated drafts available for German, Spanish, Dutch, and French (falls back to English for anything untranslated — see [`src/i18n/README.md`](src/i18n/README.md))
 
 ## Requirements
 
@@ -268,7 +269,8 @@ src/
 ├── VaultMcpServer.ts          # Built-in MCP server exposing vault tools to Claude
 ├── ClaudeMdGenerator.ts       # Generates the vault-summarizing CLAUDE.md file
 ├── ClaudeMdOnboardingModal.ts # First-install offer to generate CLAUDE.md
-└── ConfirmModal.ts            # Reusable yes/no confirmation dialog
+├── ConfirmModal.ts            # Reusable yes/no confirmation dialog
+└── i18n/                      # UI strings and locale resolution (see src/i18n/README.md)
 ```
 
 **Dual-mode design:** The terminal view runs a persistent PTY session (full interactive Claude Code). The quick modal uses `claude --print --output-format json` for one-shot queries without needing an open terminal session.

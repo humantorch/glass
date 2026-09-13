@@ -1,5 +1,9 @@
 import { getLanguage } from "obsidian";
 import { en } from "./en";
+import { de } from "./de";
+import { es } from "./es";
+import { nl } from "./nl";
+import { fr } from "./fr";
 
 export type LocaleStrings = typeof en;
 
@@ -19,11 +23,16 @@ type DeepPartial<T> = {
 			: Widen<T[K]>;
 };
 
-// Locale registry. Only English exists today; adding a language is:
-//   1. create src/i18n/<code>.ts exporting a DeepPartial<LocaleStrings>
-//      (translate as many or as few keys as you have)
-//   2. import it above and add it here, keyed by its ISO code, e.g.: { de }
-const LOCALES: Record<string, DeepPartial<LocaleStrings> | undefined> = {};
+// Locale registry. See src/i18n/README.md for translation status and how to
+// add or improve a language. Adding one: create src/i18n/<code>.ts exporting
+// a DeepPartial<LocaleStrings> (translate as many or as few keys as you
+// have), import it above, and add it here keyed by its ISO code.
+const LOCALES: Record<string, DeepPartial<LocaleStrings> | undefined> = {
+	de,
+	es,
+	nl,
+	fr,
+};
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);

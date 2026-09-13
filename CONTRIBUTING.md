@@ -66,6 +66,11 @@ Installing the [hot-reload](https://github.com/pjeby/hot-reload) community plugi
 | `ContextBuilder.ts` | Builds note/selection context passed into quick-ask |
 | `SettingsTab.ts` | Plugin settings UI |
 | `types.ts` | Shared types and settings defaults |
+| `i18n/` | UI strings and locale resolution — see `src/i18n/README.md` |
+
+## Localization
+
+UI text lives in `src/i18n/` rather than as string literals in the source files — see [`src/i18n/README.md`](src/i18n/README.md) for the structure, current translation status, and how to fix a translation or add a new language. Existing non-English locales are AI-generated drafts, not reviewed by native speakers, so corrections are especially welcome.
 
 ## Before submitting a PR
 
