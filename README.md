@@ -22,6 +22,10 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 
 - **Canvas MCP tools** — Claude can now create, read, and update Obsidian Canvas files: spatial boards of cards connected by arrows, not just linear notes. Ask it to turn a note into a mind map, lay out a project as a kanban board, or read back an existing canvas to reason about its structure.
 - **Read-only mode covers canvases too** — the Read-only vault access setting now also hides `create_canvas` and `update_canvas`, matching how it already handles notes.
+
+## 1.15.1
+
+- **Localized UI** — Glass now follows Obsidian's configured display language, with machine-translated drafts for German, Spanish, Dutch, and French (falls back to English for anything untranslated). See [`src/i18n/README.md`](src/i18n/README.md) for translation status or to contribute a correction.
 <!-- WHATS-NEW-END -->
 
 ## Features
