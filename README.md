@@ -26,6 +26,10 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 ## 1.15.1
 
 - **Localized UI** — Glass now follows Obsidian's configured display language, with machine-translated drafts for German, Spanish, Dutch, and French (falls back to English for anything untranslated). See [`src/i18n/README.md`](src/i18n/README.md) for translation status or to contribute a correction.
+
+## 1.15.2
+
+- **First-run session detection** — Widened the retry window for detecting a previous session on first run, reducing false negatives when Blackglass checks for an existing session shortly after startup.
 <!-- WHATS-NEW-END -->
 
 ## Features
