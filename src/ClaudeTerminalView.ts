@@ -423,9 +423,15 @@ export class ClaudeTerminalView extends ItemView {
 			const exitCode = code ?? 1;
 
 			// If --continue caused an immediate exit (no previous session exists),
-			// retry without it rather than showing an error.
+			// retry without it rather than showing an error. The window is generous
+			// (not truly "immediate") because on a first-ever run in a vault, Claude
+			// Code also has to read the just-registered .mcp.json and attempt the MCP
+			// handshake before it gets around to noticing --continue has nothing to
+			// resume — that alone can take longer than a few seconds, especially with
+			// a cold CLI cache, and previously caused this fallback to miss its window
+			// on exactly the first-run case it exists for.
 			const elapsed = Date.now() - startTime;
-			if (exitCode === 1 && shouldResume && elapsed < 3000) {
+			if (exitCode === 1 && shouldResume && elapsed < 10000) {
 				this.terminal?.writeln(strings.terminal.banners.noPreviousSession);
 				this.startSession(false);
 				return;
