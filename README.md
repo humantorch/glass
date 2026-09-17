@@ -29,7 +29,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 
 ## 1.15.2
 
-- **First-run session detection** — Widened the retry window for detecting a previous session on first run, reducing false negatives when Blackglass checks for an existing session shortly after startup.
+- **Fixed a first-run error** — opening the terminal in a brand-new vault could show a bare error instead of starting a session, since Claude Code registering the vault's MCP server for the first time could take longer than Glass's window for detecting "no previous session to resume." Widened that window so it no longer requires manually clicking "New session" to recover.
 <!-- WHATS-NEW-END -->
 
 ## Features
