@@ -373,11 +373,11 @@ export class ClaudeTerminalView extends ItemView {
 
 		// PTY output -> terminal display
 		const onData = (chunk: Buffer) => {
-			const data = chunk.toString("utf-8");
-			this.terminal?.write(data);
+			// Raw bytes on purpose: xterm decodes UTF-8 across writes, but per-chunk toString() splits multi-byte characters at read boundaries.
+			this.terminal?.write(chunk);
 			// Force repaint when a TUI (e.g. /mcp dialog) exits the alternate screen.
 			// Without this, xterm.js leaves rendering artifacts from the TUI overlay.
-			if (data.includes("\x1b[?1049l")) {
+			if (chunk.includes("\x1b[?1049l")) {
 				window.requestAnimationFrame(() => {
 					this.fitAddon?.fit();
 					if (this.pty && this.terminal) {
