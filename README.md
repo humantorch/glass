@@ -30,6 +30,10 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 ## 1.15.2
 
 - **Fixed a first-run error** — opening the terminal in a brand-new vault could show a bare error instead of starting a session, since Claude Code registering the vault's MCP server for the first time could take longer than Glass's window for detecting "no previous session to resume." Widened that window so it no longer requires manually clicking "New session" to recover.
+
+## 1.15.3
+
+- **Terminal text rendering**: Emoji, accented letters, and other multi-byte characters no longer show up garbled or broken in the Claude Code terminal.
 <!-- WHATS-NEW-END -->
 
 ## Features
