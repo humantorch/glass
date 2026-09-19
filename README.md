@@ -33,7 +33,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 
 ## 1.15.3
 
-- **Terminal text rendering**: Emoji, accented letters, and other multi-byte characters no longer show up garbled or broken in the Claude Code terminal.
+- **Fixed garbled terminal display** — the terminal could occasionally scramble mid-session, most often while typing a longer message, and only clearing up after resizing the pane. The cause was multi-byte characters (emoji, accented letters, CJK text, box-drawing borders) being split across chunks of output and turning into broken replacement symbols. They now render correctly.
 <!-- WHATS-NEW-END -->
 
 ## Features
