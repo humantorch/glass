@@ -34,6 +34,10 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 ## 1.15.3
 
 - **Fixed garbled terminal display** — the terminal could occasionally scramble mid-session, most often while typing a longer message, and only clearing up after resizing the pane. The cause was multi-byte characters (emoji, accented letters, CJK text, box-drawing borders) being split across chunks of output and turning into broken replacement symbols. They now render correctly.
+
+## 1.15.4
+
+- **Quick-ask models**: The quick-ask model picker now offers Sonnet 5.5, Opus 5.5, and Fable 5.1.
 <!-- WHATS-NEW-END -->
 
 ## Features
