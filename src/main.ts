@@ -121,15 +121,9 @@ export default class ClaudeCodePlugin extends Plugin {
 					void this.activateClaudeView();
 					return;
 				}
-				// ClaudeTerminalView.restartSession is private — close and reopen
-				// to trigger a clean new session
-				const leaves = this.app.workspace.getLeavesOfType(
-					CLAUDE_TERMINAL_VIEW_TYPE
-				);
-				for (const leaf of leaves) {
-					leaf.detach();
-				}
-				void this.activateClaudeView();
+				// Restart in place rather than closing and reopening the view: with a
+				// persistent tmux session, reopening would just reattach to it.
+				view.restartSession();
 			},
 		});
 

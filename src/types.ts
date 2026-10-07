@@ -6,6 +6,7 @@ export interface ClaudeCodeSettings {
 	quickAskModel: string;
 	autoOpenOnStartup: boolean;
 	resumeLastSession: boolean;
+	persistentTmuxSession: boolean;
 	fontSize: number;
 	fontFamily: string;
 	fontWeight: string;
@@ -25,6 +26,7 @@ export const DEFAULT_SETTINGS: ClaudeCodeSettings = {
 	quickAskModel: "",
 	autoOpenOnStartup: false,
 	resumeLastSession: true,
+	persistentTmuxSession: false,
 	fontSize: 14,
 	fontFamily: "monospace",
 	fontWeight: "normal",
@@ -56,6 +58,13 @@ export interface PtySessionOptions {
 	skipPermissions: boolean;
 	cols: number;
 	rows: number;
+	/** macOS/Linux only: run Claude inside this tmux session instead of directly. */
+	tmux?: TmuxSessionTarget;
+}
+
+export interface TmuxSessionTarget {
+	tmuxPath: string;
+	sessionName: string;
 }
 
 export interface PrintModeOptions {

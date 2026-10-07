@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import type ClaudeCodePlugin from "./main";
 import { QUICK_ASK_MODELS } from "./types";
+import { tmuxSessionName } from "./tmux";
 import { generateClaudeMd } from "./ClaudeMdGenerator";
 import { ConfirmModal } from "./ConfirmModal";
 import { strings } from "./i18n";
@@ -176,6 +177,20 @@ export class SettingsTab extends PluginSettingTab {
 					})
 			);
 
+		if (process.platform !== "win32") {
+			new Setting(containerEl)
+				.setName(strings.settings.persistentTmuxSession.name)
+				.setDesc(strings.settings.persistentTmuxSession.desc(tmuxSessionName(this.app.vault.getName())))
+				.addToggle((toggle) =>
+					toggle
+						.setValue(this.plugin.settings.persistentTmuxSession)
+						.onChange(async (value) => {
+							this.plugin.settings.persistentTmuxSession = value;
+							await this.plugin.saveSettings();
+						})
+				);
+		}
+
 		new Setting(containerEl)
 			.setName(strings.settings.skipPermissions.name)
 			.setDesc(strings.settings.skipPermissions.desc)
@@ -343,6 +358,14 @@ export class SettingsTab extends PluginSettingTab {
 						desc: strings.settings.resumeLastSession.desc,
 						control: { type: "toggle", key: "resumeLastSession" },
 					},
+					// tmux is macOS/Linux only, so the setting is hidden on Windows.
+					...(process.platform !== "win32"
+						? [{
+							name: strings.settings.persistentTmuxSession.name,
+							desc: strings.settings.persistentTmuxSession.desc(tmuxSessionName(this.app.vault.getName())),
+							control: { type: "toggle" as const, key: "persistentTmuxSession" },
+						}]
+						: []),
 					{
 						name: strings.settings.skipPermissions.name,
 						desc: strings.settings.skipPermissions.desc,
@@ -413,6 +436,9 @@ export class SettingsTab extends PluginSettingTab {
 				break;
 			case "resumeLastSession":
 				settings.resumeLastSession = value as boolean;
+				break;
+			case "persistentTmuxSession":
+				settings.persistentTmuxSession = value as boolean;
 				break;
 			case "skipPermissions":
 				settings.skipPermissions = value as boolean;

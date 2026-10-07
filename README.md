@@ -112,6 +112,7 @@ Settings → Glass:
 | Terminal scrollback | `5000` | Number of lines kept in scroll history. Takes effect on next terminal open. Valid range: 100–100,000. |
 | Open panel on startup | off | Auto-open the terminal when Obsidian launches. |
 | Resume last session | on | Passes `--continue` to resume the previous conversation. |
+| Keep session running in tmux | off | macOS/Linux only; requires `tmux`. Runs Claude in a per-vault tmux session (`glass-<vault name>`) that survives closing the panel or quitting Obsidian. Reopening the panel reattaches, and `tmux attach -t glass-<vault name>` works from any terminal. **New session** ends the tmux session and starts fresh. After restarting Obsidian, start a new session to reconnect the vault MCP tools. |
 | Enable vault MCP server | on | Starts the built-in MCP server. Disable to run without vault tool access. |
 | MCP server port | `27123` | Port the MCP server binds to. Increments automatically if the port is in use. Valid range: 1024-65535. |
 | Read-only vault access | off | Hides `create_note`, `update_note`, `create_canvas`, and `update_canvas` from Claude. Claude can still read and search notes and canvases. |

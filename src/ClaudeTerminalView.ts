@@ -8,6 +8,8 @@ import { shell } from "electron";
 import type { ChildProcess } from "child_process";
 import type ClaudeCodePlugin from "./main";
 import { CLAUDE_ICON, CLAUDE_TERMINAL_VIEW_TYPE } from "./types";
+import type { TmuxSessionTarget } from "./types";
+import { tmuxSessionName } from "./tmux";
 import { strings } from "./i18n";
 
 /** Reads an Obsidian CSS variable from the current theme, falling back to a default. */
@@ -77,6 +79,9 @@ export class ClaudeTerminalView extends ItemView {
 	private terminal: Terminal | null = null;
 	private fitAddon: FitAddon | null = null;
 	private pty: ChildProcess | null = null;
+	// Set while the current PTY is a tmux client, so New session can end the
+	// tmux session too rather than just detaching from it.
+	private tmuxSession: TmuxSessionTarget | null = null;
 	private resizeObserver: ResizeObserver | null = null;
 	private themeObserver: MutationObserver | null = null;
 	private terminalInputDisposable: { dispose(): void } | null = null;
@@ -337,6 +342,19 @@ export class ClaudeTerminalView extends ItemView {
 
 		const startTime = Date.now();
 
+		let tmux: TmuxSessionTarget | null = null;
+		let attachedToExisting = false;
+		if (settings.persistentTmuxSession && process.platform !== "win32") {
+			const tmuxPath = this.plugin.processManager.resolveTmux();
+			if (tmuxPath) {
+				tmux = { tmuxPath, sessionName: tmuxSessionName(this.plugin.app.vault.getName()) };
+				attachedToExisting = this.plugin.processManager.tmuxSessionExists(tmux);
+			} else {
+				this.terminal.writeln(strings.terminal.banners.tmuxNotFound);
+			}
+		}
+		this.tmuxSession = tmux;
+
 		try {
 			this.pty = this.plugin.processManager.startPtySession({
 				claudePath: settings.claudeBinaryPath,
@@ -345,6 +363,7 @@ export class ClaudeTerminalView extends ItemView {
 				skipPermissions: settings.skipPermissions,
 				cols: this.terminal.cols,
 				rows: this.terminal.rows,
+				tmux: tmux ?? undefined,
 			});
 		} catch (err) {
 			const msg = (err as Error).message;
@@ -422,6 +441,24 @@ export class ClaudeTerminalView extends ItemView {
 
 			const exitCode = code ?? 1;
 
+			if (tmux) {
+				// The tmux client's exit code says nothing about Claude's, so decide by
+				// whether the tmux session is still alive instead.
+				if (this.plugin.processManager.tmuxSessionExists(tmux)) {
+					this.terminal?.writeln(strings.terminal.banners.tmuxDetached(tmux.sessionName));
+					return;
+				}
+				// Same --continue fallback as below, but only when this pane created the
+				// session; attaching to an existing one never passed --continue to Claude.
+				if (shouldResume && !attachedToExisting && Date.now() - startTime < 10000) {
+					this.terminal?.writeln(strings.terminal.banners.noPreviousSession);
+					this.startSession(false);
+					return;
+				}
+				this.terminal?.writeln(strings.terminal.banners.tmuxSessionEnded);
+				return;
+			}
+
 			// If --continue caused an immediate exit (no previous session exists),
 			// retry without it rather than showing an error. The window is generous
 			// (not truly "immediate") because on a first-ever run in a vault, Claude
@@ -450,10 +487,16 @@ export class ClaudeTerminalView extends ItemView {
 		});
 	}
 
-	private restartSession(): void {
+	restartSession(): void {
 		if (this.pty) {
 			this.plugin.processManager.killPty(this.pty);
 			this.pty = null;
+		}
+		// Killing the PTY only detaches a tmux client; end the tmux session too so
+		// New session really starts a fresh Claude.
+		if (this.tmuxSession) {
+			this.plugin.processManager.killTmuxSession(this.tmuxSession);
+			this.tmuxSession = null;
 		}
 		this.setSessionStatus(false);
 		// Full terminal reset — safe because the PTY is already dead.

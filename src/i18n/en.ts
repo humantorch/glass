@@ -60,6 +60,11 @@ export const en = {
 			name: "Resume last Claude session",
 			desc: "Pass --continue when starting a new session to resume the previous conversation context.",
 		},
+		persistentTmuxSession: {
+			name: "Keep session running in tmux",
+			desc: (sessionName: string) =>
+				`Runs Claude inside the tmux session '${sessionName}' so it keeps running when you close the panel or quit Obsidian, and reattaches when you reopen it. Attach from any terminal with: tmux attach -t ${sessionName}. New session ends it. Requires tmux (macOS and Linux). After restarting Obsidian, click New session to reconnect the vault MCP tools. Takes effect the next time a session starts.`,
+		},
 		skipPermissions: {
 			name: "Skip permission prompts",
 			desc:
@@ -218,6 +223,10 @@ export const en = {
 			noPreviousSession: `\r\n\x1b[33m[No previous session found — starting fresh]\x1b[0m\r\n`,
 			sessionEndedWithCode: (exitCode: number) =>
 				`\r\n\x1b[90m[Claude Code session ended with exit code ${exitCode}]\x1b[0m`,
+			tmuxNotFound: `\r\n\x1b[33m[tmux not found, starting without a persistent session. Install tmux (for example: brew install tmux) or turn off "Keep session running in tmux".]\x1b[0m\r\n`,
+			tmuxDetached: (sessionName: string) =>
+				`\r\n\x1b[90m[Detached from tmux session '${sessionName}'. Claude is still running there.]\x1b[0m`,
+			tmuxSessionEnded: `\r\n\x1b[90m[Claude Code session ended]\x1b[0m`,
 		},
 	},
 	errors: {
