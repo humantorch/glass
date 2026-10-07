@@ -18,26 +18,11 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 **Note:** This plugin was formerly called Blackglass. The name has been shortened to Glass; the plugin ID remains `blackglass` so existing installations update seamlessly.
 
 <!-- WHATS-NEW-START -->
-## What's new in 1.15.0
+## What's new in 1.16.0
 
-- **Canvas MCP tools** — Claude can now create, read, and update Obsidian Canvas files: spatial boards of cards connected by arrows, not just linear notes. Ask it to turn a note into a mind map, lay out a project as a kanban board, or read back an existing canvas to reason about its structure.
-- **Read-only mode covers canvases too** — the Read-only vault access setting now also hides `create_canvas` and `update_canvas`, matching how it already handles notes.
-
-## 1.15.1
-
-- **Localized UI** — Glass now follows Obsidian's configured display language, with machine-translated drafts for German, Spanish, Dutch, and French (falls back to English for anything untranslated). See [`src/i18n/README.md`](src/i18n/README.md) for translation status or to contribute a correction.
-
-## 1.15.2
-
-- **Fixed a first-run error** — opening the terminal in a brand-new vault could show a bare error instead of starting a session, since Claude Code registering the vault's MCP server for the first time could take longer than Glass's window for detecting "no previous session to resume." Widened that window so it no longer requires manually clicking "New session" to recover.
-
-## 1.15.3
-
-- **Fixed garbled terminal display** — the terminal could occasionally scramble mid-session, most often while typing a longer message, and only clearing up after resizing the pane. The cause was multi-byte characters (emoji, accented letters, CJK text, box-drawing borders) being split across chunks of output and turning into broken replacement symbols. They now render correctly.
-
-## 1.15.4
-
-- **Quick-ask models**: The quick-ask model picker now offers Sonnet 5.5, Opus 5.5, and Fable 5.1.
+- **Persistent tmux sessions**: A new opt-in setting keeps your Claude Code terminal running in tmux, so the session survives when Obsidian closes or the view reloads.
+- **Haiku 5.5 in quick-ask**: The quick-ask model list now offers Haiku 5.5 in place of Haiku 4.5.
+- **Windows PATH fix**: On Windows systems where the environment variable is spelled "Path", the terminal now keeps your PATH instead of losing it.
 <!-- WHATS-NEW-END -->
 
 ## Features
