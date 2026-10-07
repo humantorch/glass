@@ -18,8 +18,15 @@ function buildEnv(): Record<string, string> {
 		const userProfile = env.USERPROFILE || "C:\\Users\\Default";
 		const appData = env.APPDATA || "";
 		const localAppData = env.LOCALAPPDATA || "";
+		// Windows env var names are case-insensitive and usually spelled "Path",
+		// but spreading process.env yields a plain object with case-sensitive keys.
+		// Find the real key so the inherited PATH isn't dropped, and remove it so
+		// the child doesn't receive both "Path" and "PATH".
+		const pathKey = Object.keys(env).find((k) => k.toUpperCase() === "PATH");
+		const inheritedPath = pathKey ? env[pathKey] : "";
+		if (pathKey) delete env[pathKey];
 		const pathParts = new Set<string>(
-			(env.PATH || "").split(";").filter(Boolean)
+			(inheritedPath || "").split(";").filter(Boolean)
 		);
 
 		// Enumerate Python installs under %LOCALAPPDATA%\Programs\Python\ —
