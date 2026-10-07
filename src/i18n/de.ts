@@ -61,6 +61,11 @@ export const de = {
 			name: "Letzte Claude-Sitzung fortsetzen",
 			desc: "Übergibt --continue beim Start einer neuen Sitzung, um den vorherigen Gesprächskontext fortzusetzen.",
 		},
+		persistentTmuxSession: {
+			name: "Sitzung in tmux weiterlaufen lassen",
+			desc: (sessionName: string) =>
+				`Führt Claude in der tmux-Sitzung '${sessionName}' aus, sodass sie weiterläuft, wenn Sie das Panel schließen oder Obsidian beenden, und beim erneuten Öffnen wieder verbunden wird. Von jedem Terminal aus verbinden mit: tmux attach -t ${sessionName}. Neue Sitzung beendet sie. Erfordert tmux (macOS und Linux). Klicken Sie nach einem Neustart von Obsidian auf Neue Sitzung, um die MCP-Werkzeuge des Vaults wieder zu verbinden. Wird beim nächsten Sitzungsstart wirksam.`,
+		},
 		skipPermissions: {
 			name: "Berechtigungsabfragen überspringen",
 			desc:
@@ -219,6 +224,10 @@ export const de = {
 			noPreviousSession: `\r\n\x1b[33m[Keine vorherige Sitzung gefunden — neue Sitzung wird gestartet]\x1b[0m\r\n`,
 			sessionEndedWithCode: (exitCode: number) =>
 				`\r\n\x1b[90m[Claude-Code-Sitzung mit Exit-Code ${exitCode} beendet]\x1b[0m`,
+			tmuxNotFound: `\r\n\x1b[33m[tmux nicht gefunden, Start ohne dauerhafte Sitzung. Installieren Sie tmux (zum Beispiel: brew install tmux) oder deaktivieren Sie "Sitzung in tmux weiterlaufen lassen".]\x1b[0m\r\n`,
+			tmuxDetached: (sessionName: string) =>
+				`\r\n\x1b[90m[Von der tmux-Sitzung '${sessionName}' getrennt. Claude läuft dort weiter.]\x1b[0m`,
+			tmuxSessionEnded: `\r\n\x1b[90m[Claude-Code-Sitzung beendet]\x1b[0m`,
 		},
 	},
 	errors: {

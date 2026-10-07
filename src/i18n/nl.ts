@@ -61,6 +61,11 @@ export const nl = {
 			name: "Laatste Claude-sessie hervatten",
 			desc: "Geeft --continue mee bij het starten van een nieuwe sessie om de vorige gespreksinhoud te hervatten.",
 		},
+		persistentTmuxSession: {
+			name: "Sessie actief houden in tmux",
+			desc: (sessionName: string) =>
+				`Draait Claude in de tmux-sessie '${sessionName}', zodat deze blijft draaien als u het paneel sluit of Obsidian afsluit, en opnieuw wordt gekoppeld als u het weer opent. Koppel vanuit elke terminal met: tmux attach -t ${sessionName}. Nieuwe sessie beëindigt deze. Vereist tmux (macOS en Linux). Klik na het herstarten van Obsidian op Nieuwe sessie om de MCP-tools van de kluis opnieuw te verbinden. Wordt van kracht bij de volgende sessiestart.`,
+		},
 		skipPermissions: {
 			name: "Toestemmingsvragen overslaan",
 			desc:
@@ -219,6 +224,10 @@ export const nl = {
 			noPreviousSession: `\r\n\x1b[33m[Geen eerdere sessie gevonden — nieuwe sessie wordt gestart]\x1b[0m\r\n`,
 			sessionEndedWithCode: (exitCode: number) =>
 				`\r\n\x1b[90m[Claude Code-sessie beëindigd met afsluitcode ${exitCode}]\x1b[0m`,
+			tmuxNotFound: `\r\n\x1b[33m[tmux niet gevonden, starten zonder blijvende sessie. Installeer tmux (bijvoorbeeld: brew install tmux) of schakel "Sessie actief houden in tmux" uit.]\x1b[0m\r\n`,
+			tmuxDetached: (sessionName: string) =>
+				`\r\n\x1b[90m[Losgekoppeld van tmux-sessie '${sessionName}'. Claude draait daar nog.]\x1b[0m`,
+			tmuxSessionEnded: `\r\n\x1b[90m[Claude Code-sessie beëindigd]\x1b[0m`,
 		},
 	},
 	errors: {

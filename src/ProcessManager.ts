@@ -1,9 +1,10 @@
-import { execSync, spawn } from "child_process";
+import { execFileSync, execSync, spawn } from "child_process";
 import type { ChildProcess } from "child_process";
 import * as fs from "fs";
 import pseudoterminalScript from "./pseudoterminal.py";
 import winBridgeScript from "./pty_bridge_win.py";
-import { PtySessionOptions, PrintModeOptions, PrintModeResult } from "./types";
+import { PtySessionOptions, PrintModeOptions, PrintModeResult, TmuxSessionTarget } from "./types";
+import { buildTmuxArgs, tmuxTarget } from "./tmux";
 import { strings } from "./i18n";
 
 /**
@@ -116,9 +117,21 @@ export class ProcessManager {
 		if (options.resumeLastSession) args.push("--continue");
 		if (options.skipPermissions) args.push("--dangerously-skip-permissions");
 
-		const proc = spawn(python, ["-c", pseudoterminalScript, ...args], {
-			cwd: options.workingDirectory || this.resolvedEnv["HOME"] || "/",
-			env: { ...this.resolvedEnv, TERM: "xterm-color", COLORTERM: "truecolor" },
+		const cwd = options.workingDirectory || this.resolvedEnv["HOME"] || "/";
+		const env: Record<string, string> = { ...this.resolvedEnv, TERM: "xterm-color", COLORTERM: "truecolor" };
+		let command = args;
+		if (options.tmux) {
+			command = [options.tmux.tmuxPath, ...buildTmuxArgs(options.tmux.sessionName, cwd, args)];
+			// tmux degrades to 8 colours under xterm-color; xterm.js handles 256.
+			env.TERM = "xterm-256color";
+			// If Obsidian itself was launched from inside tmux, tmux refuses to nest.
+			delete env.TMUX;
+			delete env.TMUX_PANE;
+		}
+
+		const proc = spawn(python, ["-c", pseudoterminalScript, ...command], {
+			cwd,
+			env,
 			stdio: ["pipe", "pipe", "pipe", "pipe"],
 		});
 
@@ -174,6 +187,42 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 			proc.kill("SIGTERM");
 		} catch {
 			// Process may have already exited
+		}
+	}
+
+	/** Locates the tmux binary on the resolved PATH, or returns null if it isn't installed. */
+	resolveTmux(): string | null {
+		if (process.platform === "win32") return null;
+		try {
+			const result = execSync("which tmux", { env: this.resolvedEnv, timeout: 3000 });
+			return result.toString().trim().split("\n")[0].trim() || null;
+		} catch {
+			return null;
+		}
+	}
+
+	tmuxSessionExists(target: TmuxSessionTarget): boolean {
+		try {
+			execFileSync(target.tmuxPath, ["has-session", "-t", tmuxTarget(target.sessionName)], {
+				env: this.resolvedEnv,
+				stdio: "ignore",
+				timeout: 3000,
+			});
+			return true;
+		} catch {
+			return false;
+		}
+	}
+
+	killTmuxSession(target: TmuxSessionTarget): void {
+		try {
+			execFileSync(target.tmuxPath, ["kill-session", "-t", tmuxTarget(target.sessionName)], {
+				env: this.resolvedEnv,
+				stdio: "ignore",
+				timeout: 3000,
+			});
+		} catch {
+			// Session already gone
 		}
 	}
 
