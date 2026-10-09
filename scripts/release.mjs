@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Release script for Blackglass.
+ * Release script for Glass.
  *
  * Usage: npm run release:patch | release:minor | release:major
  *
@@ -98,14 +98,16 @@ execSync("npm run build", { cwd: root, stdio: "inherit" });
 console.log("\nUpdating README What's new section...");
 try {
 	const bulletPrompt =
-		`Summarize user-facing changes in version ${version} of Blackglass, an Obsidian plugin.\n\n` +
+		`Summarize user-facing changes in version ${version} of Glass, an Obsidian plugin.\n` +
+		`The plugin is called Glass. Never call it Blackglass (its old name, still used for the plugin ID and repo paths).\n` +
+		`Never use em dashes.\n\n` +
 		`IMPORTANT: Only include changes users directly experience. Ignore:\n` +
 		`- Code refactoring or type safety improvements\n` +
 		`- Documentation changes\n` +
 		`- CI/CD or build process changes\n` +
 		`- ESLint/linting configuration\n\n` +
 		`If there are no user-facing changes, output: (no user-facing changes in this release)\n\n` +
-		`Otherwise, format as markdown bullet list (3–6 items max). Each bullet: **Feature**, em dash, one sentence.\n` +
+		`Otherwise, format as markdown bullet list (3–6 items max). Each bullet: **Feature**, a colon, one sentence.\n` +
 		`Output ONLY the bullets or the note above. No heading, preamble, or commentary.\n\n` +
 		`Commits:\n${commits}`;
 
@@ -162,14 +164,16 @@ console.log("\nGenerating release notes...");
 let notesArg = "--generate-notes";
 try {
 	const prompt =
-		`Write release notes for version ${version} of Blackglass, an Obsidian plugin.\n\n` +
+		`Write release notes for version ${version} of Glass, an Obsidian plugin.\n` +
+		`The plugin is called Glass. Never call it Blackglass (its old name, still used for the plugin ID and repo paths).\n` +
+		`Never use em dashes.\n\n` +
 		`IMPORTANT: Only document user-facing changes. Ignore:\n` +
 		`- Code refactoring or type safety improvements\n` +
 		`- Documentation updates or README changes\n` +
 		`- CI/CD, build, or release process changes\n` +
 		`- ESLint/linting or code style configuration\n` +
 		`- Internal maintenance\n\n` +
-		`If there are no user-facing changes, output only: (maintenance release — no user-facing changes)\n\n` +
+		`If there are no user-facing changes, output only: (maintenance release: no user-facing changes)\n\n` +
 		`Otherwise, format as markdown starting with "## What's new". Keep it concise.\n` +
 		`Output ONLY the markdown. No preamble, meta-commentary, or explanation.\n\n` +
 		`Commits since ${lastTag || "the beginning"}:\n${commits}`;
