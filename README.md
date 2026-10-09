@@ -1,6 +1,6 @@
 <a name="glass"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/glass-hero-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/glass-hero-dark.png">
   <img alt="Glass: Claude Code, inside Obsidian" src="assets/readme/glass-hero-light.png" width="100%">
 </picture>
 
@@ -34,12 +34,12 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 
 <a name="features"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-features-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-features-dark.png">
   <img alt="Features" src="assets/readme/h-features-light.png" width="100%">
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/features-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/features-dark.png">
   <img alt="Real Claude Code terminal, vault MCP server, quick ask, theme-adaptive terminal" src="assets/readme/features-light.png" width="100%">
 </picture>
 
@@ -62,7 +62,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 
 <a name="requirements"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-requirements-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-requirements-dark.png">
   <img alt="Requirements" src="assets/readme/h-requirements-light.png" width="100%">
 </picture>
 
@@ -82,7 +82,7 @@ pip install pywinpty
 
 <a name="installation"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-installation-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-installation-dark.png">
   <img alt="Installation" src="assets/readme/h-installation-light.png" width="100%">
 </picture>
 
@@ -92,7 +92,7 @@ Search for **Glass** in Settings → Community Plugins → Browse, then install 
 
 <a name="commands"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-commands-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-commands-dark.png">
   <img alt="Commands" src="assets/readme/h-commands-light.png" width="100%">
 </picture>
 
@@ -113,7 +113,7 @@ Right-clicking any `.md` file in the file explorer shows an **Ask Claude about t
 
 <a name="settings"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-settings-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-settings-dark.png">
   <img alt="Settings" src="assets/readme/h-settings-light.png" width="100%">
 </picture>
 
@@ -140,7 +140,7 @@ Settings → Glass:
 
 <a name="vault-mcp-server"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-mcp-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-mcp-dark.png">
   <img alt="Vault MCP server" src="assets/readme/h-mcp-light.png" width="100%">
 </picture>
 
@@ -187,7 +187,7 @@ To disable the MCP server, toggle it off in Settings - Glass - "Enable vault MCP
 
 <a name="vault-context-claudemd"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-context-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-context-dark.png">
   <img alt="Vault context (CLAUDE.md)" src="assets/readme/h-context-light.png" width="100%">
 </picture>
 
@@ -199,7 +199,7 @@ The generated file lives at your vault root as a normal note, so you can open an
 
 <a name="remote-access"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-remote-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-remote-dark.png">
   <img alt="Remote access" src="assets/readme/h-remote-light.png" width="100%">
 </picture>
 
@@ -217,7 +217,7 @@ The vault MCP server keeps running on your desktop, so Claude can still read, se
 
 <a name="network-usage"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-network-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-network-dark.png">
   <img alt="Network usage" src="assets/readme/h-network-light.png" width="100%">
 </picture>
 
@@ -227,7 +227,7 @@ The Claude Code CLI that Glass runs is a separate process that sends your prompt
 
 <a name="security"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-security-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-security-dark.png">
   <img alt="Security" src="assets/readme/h-security-light.png" width="100%">
 </picture>
 
@@ -244,7 +244,7 @@ Glass gives Claude Code full shell access in the context of your vault's working
 
 <a name="building-from-source"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-build-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-build-dark.png">
   <img alt="Building from source" src="assets/readme/h-build-light.png" width="100%">
 </picture>
 
@@ -318,7 +318,7 @@ The symlink folder name should match the plugin ID (`blackglass`) so Obsidian ca
 
 <a name="architecture"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-architecture-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-architecture-dark.png">
   <img alt="Architecture" src="assets/readme/h-architecture-light.png" width="100%">
 </picture>
 
@@ -344,7 +344,7 @@ src/
 
 <a name="license"></a>
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/h-license-dark.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-license-dark.png">
   <img alt="License" src="assets/readme/h-license-light.png" width="100%">
 </picture>
 
