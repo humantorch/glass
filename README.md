@@ -7,7 +7,7 @@
 [![Python 3](https://img.shields.io/badge/python-3.6%2B-blue)](https://www.python.org/downloads/)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕-yellow)](https://buymeacoffee.com/scottkosman)
 
-Glass puts [Claude Code](https://claude.ai/code) inside Obsidian with a built-in MCP server that gives Claude direct access to your vault — reading, searching, and writing notes without any configuration on your part. Not a chat UI, not a reimplementation: the actual Claude Code CLI running in a real terminal alongside your notes.
+Glass puts [Claude Code](https://claude.ai/code) inside Obsidian with a built-in MCP server that gives Claude direct access to your vault: reading, searching, and writing notes without any configuration on your part. Not a chat UI, not a reimplementation: the actual Claude Code CLI running in a real terminal alongside your notes.
 
 Every slash command, every MCP tool, every session you'd have in a standalone terminal. If you already use Claude Code, there's nothing new to learn.
 
@@ -36,18 +36,21 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 ## Features
 
 - **Real Claude Code terminal**: not a chat UI or a wrapper; the actual Claude Code CLI running in a full xterm.js terminal in your sidebar. All slash commands, all MCP tools, full session continuity.
-- **Built-in vault MCP server**: gives Claude structured read/write access to your notes the moment the plugin loads; no configuration required
+- **Built-in vault MCP server**: gives Claude structured access to your vault the moment the plugin loads, with no configuration required. Claude can read, search, create, and update notes, and follow backlinks, outlinks, and tags ([full tool list](#vault-mcp-server))
+- **Obsidian UI control**: Claude can open notes, split panes, jump to a heading, list your open panes, and show notices, so requests like "open that in a split on the right" just work
+- **Canvas support**: Claude can create, read, and update Obsidian Canvas files. Turn a note into a mind map, lay out a project as a board, or have Claude reason about an existing canvas. Input is validated, so a bad request fails with a clear error instead of writing a broken canvas
 - **Authenticated MCP server**: auto-generated Bearer token written to `.mcp.json` on every launch; any other local process is denied access
-- **Read-only vault mode**: optional setting to hide write tools from Claude entirely, limiting it to read and search only
+- **Read-only vault mode**: optional setting that hides the vault-writing MCP tools, leaving Claude's vault tools read and search only (Claude's own shell and file tools can still write; see [Security](#security))
 - **Quick ask modal**: one-shot queries using Claude Code's `--print` mode; no terminal required; renders responses as Markdown
 - **File explorer context menu**: right-click any `.md` file and choose "Ask Claude about this" to query Claude about it without opening it
 - **Vault-aware quick ask**: pre-fill the modal with the active note or selected text
 - **Per-query model selector**: choose the model directly in the quick ask modal; overrides the default without changing your setting
 - **Session resume**: picks up where you left off (`--continue`) on every open
-- **CLAUDE.md vault context**: offers once, on first install, to generate a CLAUDE.md summarizing your vault's structure and tags — loaded automatically by Claude Code every session; regenerate anytime from Settings
+- **Persistent tmux sessions** (opt-in, macOS and Linux): keep Claude running after you close the panel or quit Obsidian, then reattach from Glass or from any terminal with `tmux attach`
+- **CLAUDE.md vault context**: offers once, on first install, to generate a CLAUDE.md summarizing your vault's structure and tags, which Claude Code loads automatically every session; regenerate anytime from Settings
 - **Theme-adaptive terminal**: terminal colors derived from the active Obsidian theme; updates live when you switch themes
 - **Cross-platform**: macOS, Linux, and Windows (Windows requires `pip install pywinpty`)
-- **Localized UI**: follows Obsidian's configured display language, with machine-translated drafts available for German, Spanish, Dutch, and French (falls back to English for anything untranslated — see [`src/i18n/README.md`](src/i18n/README.md))
+- **Localized UI**: follows Obsidian's configured display language, with machine-translated drafts available for German, Spanish, Dutch, and French (anything untranslated falls back to English; see [`src/i18n/README.md`](src/i18n/README.md))
 
 ## Requirements
 
@@ -63,7 +66,7 @@ pip install pywinpty
 
 `pywinpty` is a Python package that provides Windows PTY support, including terminal resize. The Quick Ask modal works on all platforms without it.
 
-**Agent SDK credits:** The Quick Ask modal runs Claude Code in non-interactive (`-p`) mode. As of June 15, 2026, Anthropic bills this separately from interactive usage — Pro plans include $20/month of Agent SDK credits ([details](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan)). The interactive terminal (available on all platforms) draws from your regular Claude subscription, not this pool.
+**Agent SDK credits:** The Quick Ask modal runs Claude Code in non-interactive (`-p`) mode. As of June 15, 2026, Anthropic bills this separately from interactive usage. Pro plans include $20/month of Agent SDK credits ([details](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan)). The interactive terminal (available on all platforms) draws from your regular Claude subscription, not this pool.
 
 ## Installation
 
@@ -84,7 +87,7 @@ All commands are available via the command palette (Cmd+P):
 | Start new Claude Code session | Kills the current session and starts a clean fresh one |
 | Insert note reference into terminal | Opens a note picker and inserts `@<path>` into the terminal; assign a hotkey in Settings → Hotkeys |
 
-A ribbon icon (bot) also opens the terminal panel directly. The terminal toolbar has a **New session** button that starts a completely fresh session, a **Clear** button that wipes the terminal output without ending the session, an **@** button that opens a fuzzy note picker and writes the selected path as a `@filename` reference into the terminal (Claude Code reads the file directly — no content dump), a **settings** button (⚙) that opens Glass settings, and status dots for the session and MCP server (green = active, grey = inactive).
+A ribbon icon (bot) also opens the terminal panel directly. The terminal toolbar has a **New session** button that starts a completely fresh session, a **Clear** button that wipes the terminal output without ending the session, an **@** button that opens a fuzzy note picker and writes the selected path as a `@filename` reference into the terminal (Claude Code reads the file itself, so the note's content isn't pasted in), a **settings** button (⚙) that opens Glass settings, and status dots for the session and MCP server (green = active, grey = inactive).
 
 Right-clicking any `.md` file in the file explorer shows an **Ask Claude about this** option, which opens the quick ask modal prefilled with that note's content.
 
@@ -146,11 +149,11 @@ Claude Code gains the following vault tools:
 
 `search_note_content` accepts an optional `directory` argument to limit the search to a subtree, and an optional `max_results` argument (default 10, max 50). Each result includes up to 3 matching lines with surrounding context so Claude can decide which notes to read in full.
 
-`open_note` accepts an optional `pane_id` (from `list_panes`) to target a specific existing pane instead of just the active pane or a new tab — handy for multi-pane layouts where "put this in the top pane" needs to resolve to an actual pane. `pane_id` always replaces that pane's current tab; it can't be combined with `new_leaf`, since Obsidian's plugin API has no way to open a new tab inside a specific *other* pane, only to open a new tab in the active one.
+`open_note` accepts an optional `pane_id` (from `list_panes`) to target a specific existing pane instead of just the active pane or a new tab. This is handy for multi-pane layouts where "put this in the top pane" needs to resolve to an actual pane. `pane_id` always replaces that pane's current tab; it can't be combined with `new_leaf`, since Obsidian's plugin API has no way to open a new tab inside a specific *other* pane, only to open a new tab in the active one.
 
 `create_canvas` and `update_canvas` take a `nodes` array and an optional `edges` array following [Obsidian's JSON Canvas format](https://jsoncanvas.org/spec/1.0/): each node is a card with a unique `id`, a `type` (`text`, `file`, `link`, or `group`), position (`x`/`y`), and size (`width`/`height`), plus a type-specific field (`text`, `file`, or `url`); each edge connects two node ids with `fromNode`/`toNode`. Both validate their input and fail with a specific error (missing field, unknown type, duplicate id, an edge pointing at a node that doesn't exist) rather than writing a malformed canvas.
 
-To disable the MCP server, toggle it off in Settings - Glass - "Enable vault MCP server". To use a different port, change the "MCP server port" setting (valid range: 1024-65535). To hide the vault-writing MCP tools (`create_note`, `update_note`, `create_canvas`, `update_canvas`) from Claude, enable "Read-only vault access" — see [Security](#security) for why this doesn't actually prevent Claude from writing to your vault if it's asked to.
+To disable the MCP server, toggle it off in Settings - Glass - "Enable vault MCP server". To use a different port, change the "MCP server port" setting (valid range: 1024-65535). To hide the vault-writing MCP tools (`create_note`, `update_note`, `create_canvas`, `update_canvas`) from Claude, enable "Read-only vault access". See [Security](#security) for why this doesn't actually prevent Claude from writing to your vault if it's asked to.
 
 **Note:** `.mcp.json` in the vault root is managed by Glass. If you already have a `.mcp.json` with other servers, Glass will merge its `mcpServers.obsidian` entry rather than overwriting the whole file.
 
@@ -158,13 +161,13 @@ To disable the MCP server, toggle it off in Settings - Glass - "Enable vault MCP
 
 Claude Code automatically loads a `CLAUDE.md` file from its working directory at the start of every session. Glass can generate one for you, summarizing your vault's top-level folder structure, tag usage, and a sample of note paths.
 
-On first install, Glass offers once to generate this file (skipped automatically if a `CLAUDE.md` already exists at your vault root, or if you dismiss the offer). You can generate or regenerate it anytime from Settings → Glass → "Generate CLAUDE.md" — if one already exists, you'll be asked to confirm, and the current file is saved as `CLAUDE.bak.md` before being replaced. This is a single rolling backup: regenerating again overwrites `CLAUDE.bak.md` with whatever was just replaced, rather than accumulating timestamped copies.
+On first install, Glass offers once to generate this file (skipped automatically if a `CLAUDE.md` already exists at your vault root, or if you dismiss the offer). You can generate or regenerate it anytime from Settings → Glass → "Generate CLAUDE.md". If one already exists, you'll be asked to confirm, and the current file is saved as `CLAUDE.bak.md` before being replaced. This is a single rolling backup: regenerating again overwrites `CLAUDE.bak.md` with whatever was just replaced, rather than accumulating timestamped copies.
 
-The generated file lives at your vault root as a normal note, so you can open and edit it directly in Obsidian. It's a starting point, not something Glass keeps in sync automatically — edit it freely as your vault evolves.
+The generated file lives at your vault root as a normal note, so you can open and edit it directly in Obsidian. It's a starting point, not something Glass keeps in sync automatically, so edit it freely as your vault evolves.
 
 ## Remote access
 
-Claude Code's built-in `/remote-control` command lets you access your running Glass session from any device where you're signed into Claude — a phone, tablet, or another computer — with no extra install required.
+Claude Code's built-in `/remote-control` command lets you access your running Glass session from any device where you're signed into Claude (a phone, tablet, or another computer) with no extra install required.
 
 While Glass is open on your desktop:
 
@@ -172,7 +175,7 @@ While Glass is open on your desktop:
 2. Claude Code displays a URL for the remote session
 3. Open that URL on any device (any browser, no install)
 
-The vault MCP server keeps running on your desktop, so Claude can still read, search, and write notes from the remote session. You can ask questions about your vault, kick off long tasks, and get results — all from your phone.
+The vault MCP server keeps running on your desktop, so Claude can still read, search, and write notes from the remote session. You can ask questions about your vault, kick off long tasks, and get results, all from your phone.
 
 **Limitation:** this requires Obsidian to remain open on your desktop machine. Closing the app or putting it to sleep shuts down the MCP server, and vault access from the remote session is lost.
 
@@ -227,7 +230,7 @@ Bumps the version in `manifest.json` and `package.json`, builds, commits, tags, 
 ### Development loop
 
 ```bash
-npm run dev   # Watch mode — recompiles on every save
+npm run dev   # Watch mode: recompiles on every save
 ```
 
 ### Testing
@@ -238,7 +241,7 @@ npm test            # Run tests once
 npm run test:watch  # Re-run on file changes
 ```
 
-Integration tests cover the vault MCP server: auth, all eighteen tools, read-only mode, port fallback, and HTTP edge cases. Tests spin up a real HTTP server against a mock vault — no Obsidian instance required.
+Integration tests cover the vault MCP server: auth, all eighteen tools, read-only mode, port fallback, and HTTP edge cases. Tests spin up a real HTTP server against a mock vault, so no Obsidian instance is required.
 
 The PTY terminal, xterm.js rendering, and Obsidian plugin lifecycle are not covered by automated tests; verify those manually in the test vault.
 
