@@ -23,6 +23,14 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 - **Persistent tmux sessions**: A new opt-in setting keeps your Claude Code terminal running in tmux, so the session survives when Obsidian closes or the view reloads.
 - **Haiku 5.5 in quick-ask**: The quick-ask model list now offers Haiku 5.5 in place of Haiku 4.5.
 - **Windows PATH fix**: On Windows systems where the environment variable is spelled "Path", the terminal now keeps your PATH instead of losing it.
+
+## 1.16.1
+
+- **Claude no longer left running after quit**: Quitting Obsidian now properly shuts down the Claude process instead of leaving it orphaned in the background.
+- **Tilde paths for the Claude binary**: A custom Claude binary path that starts with `~` now expands to your home directory, so it resolves correctly.
+- **Version-manager support**: Claude installed through mise, asdf or Volta is now found automatically, because their shim directories are added to the PATH.
+- **Retired quick-ask models**: Quick-ask settings that still point to a retired model ID are now switched to its replacement automatically, so requests don't fail.
+- **GLASS_MODE environment variable**: Claude sessions launched by Blackglass, including those inside tmux, now set `GLASS_MODE`, so your scripts and status lines can tell when they're running inside the plugin.
 <!-- WHATS-NEW-END -->
 
 ## Features
