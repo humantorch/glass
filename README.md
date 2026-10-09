@@ -1,4 +1,5 @@
 <a name="glass"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/glass-hero-dark.png">
   <img alt="Glass: Claude Code, inside Obsidian" src="assets/readme/glass-hero-light.png" width="100%">
@@ -33,6 +34,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 <!-- WHATS-NEW-END -->
 
 <a name="features"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-features-dark.png">
   <img alt="Features" src="assets/readme/h-features-light.png" width="100%">
@@ -61,6 +63,7 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 - **Localized UI**: follows Obsidian's configured display language, with machine-translated drafts available for German, Spanish, Dutch, and French (anything untranslated falls back to English; see [`src/i18n/README.md`](src/i18n/README.md))
 
 <a name="requirements"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-requirements-dark.png">
   <img alt="Requirements" src="assets/readme/h-requirements-light.png" width="100%">
@@ -81,6 +84,7 @@ pip install pywinpty
 **Agent SDK credits:** The Quick Ask modal runs Claude Code in non-interactive (`-p`) mode. As of June 15, 2026, Anthropic bills this separately from interactive usage. Pro plans include $20/month of Agent SDK credits ([details](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan)). The interactive terminal (available on all platforms) draws from your regular Claude subscription, not this pool.
 
 <a name="installation"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-installation-dark.png">
   <img alt="Installation" src="assets/readme/h-installation-light.png" width="100%">
@@ -91,6 +95,7 @@ Search for **Glass** in Settings → Community Plugins → Browse, then install 
 **Manual install:** Download `main.js`, `styles.css`, and `manifest.json` from the [latest release](https://github.com/humantorch/glass/releases/latest) and copy them into `<your-vault>/.obsidian/plugins/blackglass/`.
 
 <a name="commands"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-commands-dark.png">
   <img alt="Commands" src="assets/readme/h-commands-light.png" width="100%">
@@ -112,6 +117,7 @@ A ribbon icon (bot) also opens the terminal panel directly. The terminal toolbar
 Right-clicking any `.md` file in the file explorer shows an **Ask Claude about this** option, which opens the quick ask modal prefilled with that note's content.
 
 <a name="settings"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-settings-dark.png">
   <img alt="Settings" src="assets/readme/h-settings-light.png" width="100%">
@@ -139,6 +145,7 @@ Settings → Glass:
 | Skip permission prompts | off | Passes `--dangerously-skip-permissions` to Claude Code. Claude will execute tool calls without asking for confirmation. Only enable for trusted tasks. |
 
 <a name="vault-mcp-server"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-mcp-dark.png">
   <img alt="Vault MCP server" src="assets/readme/h-mcp-light.png" width="100%">
@@ -186,6 +193,7 @@ To disable the MCP server, toggle it off in Settings - Glass - "Enable vault MCP
 **Note:** `.mcp.json` in the vault root is managed by Glass. If you already have a `.mcp.json` with other servers, Glass will merge its `mcpServers.obsidian` entry rather than overwriting the whole file.
 
 <a name="vault-context-claudemd"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-context-dark.png">
   <img alt="Vault context (CLAUDE.md)" src="assets/readme/h-context-light.png" width="100%">
@@ -198,6 +206,7 @@ On first install, Glass offers once to generate this file (skipped automatically
 The generated file lives at your vault root as a normal note, so you can open and edit it directly in Obsidian. It's a starting point, not something Glass keeps in sync automatically, so edit it freely as your vault evolves.
 
 <a name="remote-access"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-remote-dark.png">
   <img alt="Remote access" src="assets/readme/h-remote-light.png" width="100%">
@@ -216,6 +225,7 @@ The vault MCP server keeps running on your desktop, so Claude can still read, se
 **Limitation:** this requires Obsidian to remain open on your desktop machine. Closing the app or putting it to sleep shuts down the MCP server, and vault access from the remote session is lost.
 
 <a name="network-usage"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-network-dark.png">
   <img alt="Network usage" src="assets/readme/h-network-light.png" width="100%">
@@ -226,6 +236,7 @@ Glass itself communicates only over localhost: the vault MCP server binds to `12
 The Claude Code CLI that Glass runs is a separate process that sends your prompts and conversation history to [Anthropic's API](https://www.anthropic.com) over HTTPS. This is the same network activity that occurs when you use Claude Code in a terminal. Glass does not transmit any data to Anthropic directly; all API communication is handled by the Claude Code CLI using your own account and API credentials.
 
 <a name="security"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-security-dark.png">
   <img alt="Security" src="assets/readme/h-security-light.png" width="100%">
@@ -243,6 +254,7 @@ Glass gives Claude Code full shell access in the context of your vault's working
 - The terminal panel is interactive; you see Claude's responses before anything executes, which is a meaningful check on unexpected behaviour
 
 <a name="building-from-source"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-build-dark.png">
   <img alt="Building from source" src="assets/readme/h-build-light.png" width="100%">
@@ -317,6 +329,7 @@ The symlink folder name should match the plugin ID (`blackglass`) so Obsidian ca
 **MCP servers not available inside the plugin**: Electron's process environment does not inherit your full shell profile, so environment variables like `GITHUB_PERSONAL_ACCESS_TOKEN` are absent by default. The plugin works around this by capturing the full login shell environment at startup (via `zsh -l -c "env"`), which should make any MCP servers that rely on shell-profile variables work automatically. If an MCP tool is still missing, check that the relevant environment variable is exported in your shell profile (`.zshrc`, `.zprofile`, etc.) rather than set only in a terminal session.
 
 <a name="architecture"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-architecture-dark.png">
   <img alt="Architecture" src="assets/readme/h-architecture-light.png" width="100%">
@@ -343,6 +356,7 @@ src/
 **Dual-mode design:** The terminal view runs a persistent PTY session (full interactive Claude Code). The quick modal uses `claude --print --output-format json` for one-shot queries without needing an open terminal session.
 
 <a name="license"></a>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/humantorch/glass/main/assets/readme/h-license-dark.png">
   <img alt="License" src="assets/readme/h-license-light.png" width="100%">
