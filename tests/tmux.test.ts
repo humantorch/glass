@@ -48,6 +48,13 @@ describe("buildTmuxArgs", () => {
 			";", "set-option", "-t", "=glass-Notes:", "status", "off",
 		]);
 	});
+
+	it("passes environment variables to the new session explicitly", () => {
+		const args = buildTmuxArgs("glass-Notes", "/vault", ["claude"], { GLASS_MODE: "terminal" });
+		expect(args.slice(0, 9)).toEqual([
+			"-u", "new-session", "-A", "-s", "glass-Notes", "-c", "/vault", "-e", "GLASS_MODE=terminal",
+		]);
+	});
 });
 
 describe("tmuxTarget", () => {

@@ -6,6 +6,7 @@ import {
 	CLAUDE_ICON,
 	CLAUDE_TERMINAL_VIEW_TYPE,
 	DEFAULT_SETTINGS,
+	RETIRED_QUICK_ASK_MODELS,
 } from "./types";
 import { SettingsTab } from "./SettingsTab";
 import { ContextBuilder } from "./ContextBuilder";
@@ -323,6 +324,8 @@ export default class ClaudeCodePlugin extends Plugin {
 		const raw = (await this.loadData()) as Record<string, unknown> | null;
 		this.isPreExistingInstall = raw !== null && raw !== undefined;
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, raw);
+		const replacement = RETIRED_QUICK_ASK_MODELS[this.settings.quickAskModel];
+		if (replacement) this.settings.quickAskModel = replacement;
 	}
 
 	private async maybeOfferClaudeMdGeneration(): Promise<void> {

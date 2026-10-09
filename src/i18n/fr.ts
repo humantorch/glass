@@ -64,7 +64,7 @@ export const fr = {
 		persistentTmuxSession: {
 			name: "Garder la session active dans tmux",
 			desc: (sessionName: string) =>
-				`Exécute Claude dans la session tmux '${sessionName}' pour qu'elle continue de tourner lorsque vous fermez le panneau ou quittez Obsidian, et s'y reconnecte à la réouverture. Connectez-vous depuis n'importe quel terminal avec : tmux attach -t ${sessionName}. Nouvelle session la termine. Nécessite tmux (macOS et Linux). Après un redémarrage d'Obsidian, cliquez sur Nouvelle session pour reconnecter les outils MCP du coffre. Prend effet au prochain démarrage de session.`,
+				`Exécute Claude dans la session tmux '${sessionName}' pour qu'elle continue de tourner lorsque vous fermez le panneau ou quittez Obsidian, et s'y reconnecte à la réouverture. Connectez-vous depuis n'importe quel terminal avec : tmux attach -t ${sessionName}. Nouvelle session la termine. Nécessite tmux (macOS et Linux). Après un redémarrage d'Obsidian, exécutez /mcp dans Claude et reconnectez obsidian pour rétablir les outils du vault sans perdre la conversation. Prend effet au prochain démarrage de session.`,
 		},
 		skipPermissions: {
 			name: "Ignorer les demandes d'autorisation",

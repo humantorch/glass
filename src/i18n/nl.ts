@@ -64,7 +64,7 @@ export const nl = {
 		persistentTmuxSession: {
 			name: "Sessie actief houden in tmux",
 			desc: (sessionName: string) =>
-				`Draait Claude in de tmux-sessie '${sessionName}', zodat deze blijft draaien als u het paneel sluit of Obsidian afsluit, en opnieuw wordt gekoppeld als u het weer opent. Koppel vanuit elke terminal met: tmux attach -t ${sessionName}. Nieuwe sessie beëindigt deze. Vereist tmux (macOS en Linux). Klik na het herstarten van Obsidian op Nieuwe sessie om de MCP-tools van de kluis opnieuw te verbinden. Wordt van kracht bij de volgende sessiestart.`,
+				`Draait Claude in de tmux-sessie '${sessionName}', zodat deze blijft draaien als u het paneel sluit of Obsidian afsluit, en opnieuw wordt gekoppeld als u het weer opent. Koppel vanuit elke terminal met: tmux attach -t ${sessionName}. Nieuwe sessie beëindigt deze. Vereist tmux (macOS en Linux). Voer na het herstarten van Obsidian /mcp uit in Claude en verbind obsidian opnieuw om de vault-tools te herstellen zonder het gesprek te verliezen. Wordt van kracht bij de volgende sessiestart.`,
 		},
 		skipPermissions: {
 			name: "Toestemmingsvragen overslaan",

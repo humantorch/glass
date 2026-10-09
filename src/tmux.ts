@@ -29,7 +29,7 @@ export function shellQuote(arg: string): string {
  * as one string with every word quoted. That keeps paths with spaces working
  * and prevents a crafted binary path from being interpreted by the shell.
  */
-export function buildTmuxArgs(sessionName: string, cwd: string, command: string[]): string[] {
+export function buildTmuxArgs(sessionName: string, cwd: string, command: string[], env: Record<string, string> = {}): string[] {
 	return [
 		// Force UTF-8: Obsidian launched from the Dock often has no LANG set, and
 		// tmux would otherwise replace non-ASCII output with underscores.
@@ -38,6 +38,9 @@ export function buildTmuxArgs(sessionName: string, cwd: string, command: string[
 		"-A",
 		"-s", sessionName,
 		"-c", cwd,
+		// A new session inherits the tmux server's environment, not this client's,
+		// so variables the command needs must be passed explicitly.
+		...Object.entries(env).flatMap(([key, value]) => ["-e", `${key}=${value}`]),
 		`exec ${command.map(shellQuote).join(" ")}`,
 		// Glass has its own status UI; hide tmux's bar for this session only.
 		";", "set-option", "-t", `${tmuxTarget(sessionName)}:`, "status", "off",

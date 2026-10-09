@@ -5,6 +5,7 @@ import pseudoterminalScript from "./pseudoterminal.py";
 import winBridgeScript from "./pty_bridge_win.py";
 import { PtySessionOptions, PrintModeOptions, PrintModeResult, TmuxSessionTarget } from "./types";
 import { buildTmuxArgs, tmuxTarget } from "./tmux";
+import { expandHome } from "./paths";
 import { strings } from "./i18n";
 
 /**
@@ -90,6 +91,9 @@ function buildEnv(): Record<string, string> {
 		`${home}/.local/bin`,
 		`${home}/.npm-global/bin`,
 		`${home}/.yarn/bin`,
+		`${home}/.local/share/mise/shims`,
+		`${home}/.asdf/shims`,
+		`${home}/.volta/bin`,
 		"/opt/homebrew/bin",
 		"/opt/homebrew/sbin",
 		"/usr/local/bin",
@@ -120,15 +124,15 @@ export class ProcessManager {
 
 		const python = this.resolvePython();
 
-		const args = [options.claudePath];
+		const args = [expandHome(options.claudePath)];
 		if (options.resumeLastSession) args.push("--continue");
 		if (options.skipPermissions) args.push("--dangerously-skip-permissions");
 
 		const cwd = options.workingDirectory || this.resolvedEnv["HOME"] || "/";
-		const env: Record<string, string> = { ...this.resolvedEnv, TERM: "xterm-color", COLORTERM: "truecolor" };
+		const env: Record<string, string> = { ...this.resolvedEnv, TERM: "xterm-color", COLORTERM: "truecolor", GLASS_MODE: "terminal" };
 		let command = args;
 		if (options.tmux) {
-			command = [options.tmux.tmuxPath, ...buildTmuxArgs(options.tmux.sessionName, cwd, args)];
+			command = [options.tmux.tmuxPath, ...buildTmuxArgs(options.tmux.sessionName, cwd, args, { GLASS_MODE: "terminal" })];
 			// tmux degrades to 8 colours under xterm-color; xterm.js handles 256.
 			env.TERM = "xterm-256color";
 			// If Obsidian itself was launched from inside tmux, tmux refuses to nest.
@@ -153,13 +157,13 @@ export class ProcessManager {
 	private startWindowsSession(options: PtySessionOptions): ChildProcess {
 		const python = this.resolvePython();
 
-		const args = [options.claudePath];
+		const args = [expandHome(options.claudePath)];
 		if (options.resumeLastSession) args.push("--continue");
 		if (options.skipPermissions) args.push("--dangerously-skip-permissions");
 
 		const proc = spawn(python, ["-c", winBridgeScript, ...args], {
 			cwd: options.workingDirectory || this.resolvedEnv["USERPROFILE"] || "C:\\",
-			env: { ...this.resolvedEnv, TERM: "xterm-color", COLORTERM: "truecolor" },
+			env: { ...this.resolvedEnv, TERM: "xterm-color", COLORTERM: "truecolor", GLASS_MODE: "terminal" },
 			stdio: ["pipe", "pipe", "pipe", "pipe"],
 		});
 
@@ -326,9 +330,9 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 		const args = ["--print", "--output-format", "text"];
 		if (options.model) args.push("--model", options.model);
 
-		const proc = spawn(options.claudePath, args, {
+		const proc = spawn(expandHome(options.claudePath), args, {
 			cwd: options.workingDirectory || undefined,
-			env: { ...this.resolvedEnv },
+			env: { ...this.resolvedEnv, GLASS_MODE: "print" },
 			stdio: ["pipe", "pipe", "pipe"],
 		});
 
@@ -406,9 +410,9 @@ resizePty(proc: ChildProcess, cols: number, rows: number): void {
 				args.push("--disallowedTools", options.disallowedTools.join(","));
 			}
 
-			const proc = spawn(options.claudePath, args, {
+			const proc = spawn(expandHome(options.claudePath), args, {
 				cwd: options.workingDirectory || undefined,
-				env: { ...this.resolvedEnv },
+				env: { ...this.resolvedEnv, GLASS_MODE: "print" },
 				stdio: ["pipe", "pipe", "pipe"],
 			});
 

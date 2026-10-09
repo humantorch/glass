@@ -51,6 +51,14 @@ export const QUICK_ASK_MODELS: [string, string][] = [
 	["claude-fable-5-1", "Fable 5.1"],
 ];
 
+// Saved model IDs that have left the dropdown, mapped to their current equivalent.
+export const RETIRED_QUICK_ASK_MODELS: Record<string, string> = {
+	"claude-haiku-4-5-20251001": "claude-haiku-5-5",
+	"claude-sonnet-5": "claude-sonnet-5-5",
+	"claude-opus-5": "claude-opus-5-5",
+	"claude-fable-5": "claude-fable-5-1",
+};
+
 export interface PtySessionOptions {
 	claudePath: string;
 	workingDirectory: string;

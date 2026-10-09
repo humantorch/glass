@@ -64,7 +64,7 @@ export const de = {
 		persistentTmuxSession: {
 			name: "Sitzung in tmux weiterlaufen lassen",
 			desc: (sessionName: string) =>
-				`Führt Claude in der tmux-Sitzung '${sessionName}' aus, sodass sie weiterläuft, wenn Sie das Panel schließen oder Obsidian beenden, und beim erneuten Öffnen wieder verbunden wird. Von jedem Terminal aus verbinden mit: tmux attach -t ${sessionName}. Neue Sitzung beendet sie. Erfordert tmux (macOS und Linux). Klicken Sie nach einem Neustart von Obsidian auf Neue Sitzung, um die MCP-Werkzeuge des Vaults wieder zu verbinden. Wird beim nächsten Sitzungsstart wirksam.`,
+				`Führt Claude in der tmux-Sitzung '${sessionName}' aus, sodass sie weiterläuft, wenn Sie das Panel schließen oder Obsidian beenden, und beim erneuten Öffnen wieder verbunden wird. Von jedem Terminal aus verbinden mit: tmux attach -t ${sessionName}. Neue Sitzung beendet sie. Erfordert tmux (macOS und Linux). Führen Sie nach einem Neustart von Obsidian in Claude /mcp aus und verbinden Sie obsidian erneut, um die Vault-Werkzeuge wiederherzustellen, ohne die Unterhaltung zu verlieren. Wird beim nächsten Sitzungsstart wirksam.`,
 		},
 		skipPermissions: {
 			name: "Berechtigungsabfragen überspringen",

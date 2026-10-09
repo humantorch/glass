@@ -61,6 +61,8 @@ Installing the [hot-reload](https://github.com/pjeby/hot-reload) community plugi
 | `main.ts` | Plugin entry point: commands, ribbon icon, settings load, update checks |
 | `ClaudeTerminalView.ts` | The sidebar terminal view (xterm.js + PTY session) |
 | `ProcessManager.ts` | Spawns and manages the Claude Code / PTY child process |
+| `tmux.ts` | Pure helpers for the persistent tmux session (session name, quoted arguments) |
+| `paths.ts` | Expands a leading `~` in the Claude binary path |
 | `VaultMcpServer.ts` | Built-in HTTP MCP server exposing vault read/write tools |
 | `ClaudeQuickModal.ts` | The one-shot "quick ask" modal (print mode) |
 | `ContextBuilder.ts` | Builds note/selection context passed into quick-ask |

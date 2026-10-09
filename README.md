@@ -86,7 +86,7 @@ Settings → Glass:
 
 | Setting | Default | Description |
 |---|---|---|
-| Claude binary path | `claude` | Path to the `claude` CLI. Use full path if not on PATH. |
+| Claude binary path | `claude` | Path to the `claude` CLI. Use full path if not on PATH; a leading `~` is expanded. If this points at a wrapper script, Glass sets `GLASS_MODE=terminal` for the interactive terminal and `GLASS_MODE=print` for quick-ask and CLAUDE.md generation. |
 | Working directory | *(vault root)* | Directory Claude starts in. Defaults to vault root. |
 | Quick ask model | Default | Model used by the quick ask modal. Can be overridden per-query in the modal itself. |
 | Terminal font size | `14` | Font size in pixels. Updates the running terminal immediately. |
@@ -97,7 +97,7 @@ Settings → Glass:
 | Terminal scrollback | `5000` | Number of lines kept in scroll history. Takes effect on next terminal open. Valid range: 100–100,000. |
 | Open panel on startup | off | Auto-open the terminal when Obsidian launches. |
 | Resume last session | on | Passes `--continue` to resume the previous conversation. |
-| Keep session running in tmux | off | macOS/Linux only; requires `tmux`. Runs Claude in a per-vault tmux session (`glass-<vault name>`) that survives closing the panel or quitting Obsidian. Reopening the panel reattaches, and `tmux attach -t glass-<vault name>` works from any terminal. **New session** ends the tmux session and starts fresh. After restarting Obsidian, start a new session to reconnect the vault MCP tools. |
+| Keep session running in tmux | off | macOS/Linux only; requires `tmux`. Runs Claude in a per-vault tmux session (`glass-<vault name>`) that survives closing the panel or quitting Obsidian. Reopening the panel reattaches, and `tmux attach -t glass-<vault name>` works from any terminal. **New session** ends the tmux session and starts fresh. After restarting Obsidian, run `/mcp` in Claude and reconnect **obsidian** to restore the vault tools without losing the conversation. |
 | Enable vault MCP server | on | Starts the built-in MCP server. Disable to run without vault tool access. |
 | MCP server port | `27123` | Port the MCP server binds to. Increments automatically if the port is in use. Valid range: 1024-65535. |
 | Read-only vault access | off | Hides `create_note`, `update_note`, `create_canvas`, and `update_canvas` from Claude. Claude can still read and search notes and canvases. |
@@ -251,7 +251,7 @@ The symlink folder name should match the plugin ID (`blackglass`) so Obsidian ca
 
 **"Python 3 not found"**: install Python 3 from [python.org](https://www.python.org/downloads/) or via Homebrew (`brew install python3`). Python 3 ships with macOS 12.3+; if you're on an older version this may be missing.
 
-**"Session ended with exit code 1" immediately**: Claude is either not on PATH or not found. Obsidian's Electron process does not inherit your full shell PATH. The plugin attempts to supplement PATH with common install locations (`~/.local/bin`, `/opt/homebrew/bin`, `/usr/local/bin`, etc.), but if Claude is installed elsewhere the most reliable fix is to set the full path explicitly in Settings → Glass → "Claude binary path" (use `which claude` in your terminal to find it).
+**"Session ended with exit code 1" immediately**: Claude is either not on PATH or not found. Obsidian's Electron process does not inherit your full shell PATH. The plugin attempts to supplement PATH with common install locations (`~/.local/bin`, mise/asdf/Volta shims, `/opt/homebrew/bin`, `/usr/local/bin`, etc.), but if Claude is installed elsewhere the most reliable fix is to set the full path explicitly in Settings → Glass → "Claude binary path" (use `which claude` in your terminal to find it).
 
 **"No previous session found, starting fresh"**: expected on first launch or in a new working directory. The plugin retries automatically without `--continue` and this message can be ignored.
 
@@ -266,6 +266,8 @@ src/
 ├── SettingsTab.ts             # Obsidian settings UI
 ├── ContextBuilder.ts          # Vault context extraction (file content, selection, paths)
 ├── ProcessManager.ts          # Claude subprocess management (PTY + print mode)
+├── tmux.ts                    # tmux session naming and argument building
+├── paths.ts                   # Home-directory (~) expansion for the binary path
 ├── ClaudeTerminalView.ts      # xterm.js interactive terminal view
 ├── ClaudeQuickModal.ts        # One-shot query modal using --print mode
 ├── VaultMcpServer.ts          # Built-in MCP server exposing vault tools to Claude

@@ -63,7 +63,7 @@ export const en = {
 		persistentTmuxSession: {
 			name: "Keep session running in tmux",
 			desc: (sessionName: string) =>
-				`Runs Claude inside the tmux session '${sessionName}' so it keeps running when you close the panel or quit Obsidian, and reattaches when you reopen it. Attach from any terminal with: tmux attach -t ${sessionName}. New session ends it. Requires tmux (macOS and Linux). After restarting Obsidian, click New session to reconnect the vault MCP tools. Takes effect the next time a session starts.`,
+				`Runs Claude inside the tmux session '${sessionName}' so it keeps running when you close the panel or quit Obsidian, and reattaches when you reopen it. Attach from any terminal with: tmux attach -t ${sessionName}. New session ends it. Requires tmux (macOS and Linux). After restarting Obsidian, run /mcp in Claude and reconnect obsidian to restore the vault tools without losing the conversation. Takes effect the next time a session starts.`,
 		},
 		skipPermissions: {
 			name: "Skip permission prompts",
