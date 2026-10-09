@@ -53,13 +53,19 @@ def main():
                     break
             elif key.data == "resize":
                 line = cmdio.readline()
-                if line:
+                if not line:
+                    # Resize pipe closed; stop watching it or select() spins on EOF.
+                    sel.unregister(cmdio)
+                else:
                     try:
                         cols, rows = (int(x) for x in line.decode().strip().split("x"))
                         set_size(master_fd, cols, rows)
                     except ValueError:
                         pass
 
+    # Hang up the child's terminal before waiting: otherwise, if Obsidian goes
+    # away first, the child never sees EOF and both processes wait forever.
+    os.close(master_fd)
     _, status = os.waitpid(pid, 0)
     if os.WIFEXITED(status):
         sys.exit(os.WEXITSTATUS(status))
