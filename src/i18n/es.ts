@@ -1,4 +1,4 @@
-// Spanish (es). Machine-translated draft — see src/i18n/README.md.
+// Spanish (es). Machine-translated draft. See src/i18n/README.md.
 export const es = {
 	settings: {
 		claudeBinaryPath: {
@@ -64,7 +64,7 @@ export const es = {
 		persistentTmuxSession: {
 			name: "Mantener la sesión en ejecución en tmux",
 			desc: (sessionName: string) =>
-				`Ejecuta Claude dentro de la sesión de tmux '${sessionName}' para que siga funcionando al cerrar el panel o salir de Obsidian, y se vuelve a conectar al abrirlo de nuevo. Conéctese desde cualquier terminal con: tmux attach -t ${sessionName}. Nueva sesión la termina. Requiere tmux (macOS y Linux). Tras reiniciar Obsidian, ejecute /mcp en Claude y vuelva a conectar obsidian para recuperar las herramientas del vault sin perder la conversación. Se aplica la próxima vez que se inicie una sesión.`,
+				`Ejecuta Claude dentro de la sesión de tmux '${sessionName}' para que siga funcionando al cerrar el panel o salir de Obsidian, y se vuelve a conectar al abrirlo de nuevo. Conéctese desde cualquier terminal con: tmux attach -t ${sessionName}. Nueva sesión la termina. Requiere tmux (macOS y Linux). Las herramientas del vault se reconectan solas tras reiniciar Obsidian. Si dejan de responder, ejecute /mcp en Claude y vuelva a conectar obsidian; la conversación se conserva. Se aplica la próxima vez que se inicie una sesión.`,
 		},
 		skipPermissions: {
 			name: "Omitir solicitudes de permiso",
@@ -96,7 +96,7 @@ export const es = {
 		generateClaudeMd: {
 			name: "Generar CLAUDE.md",
 			desc:
-				"Crea un archivo CLAUDE.md en la raíz del Vault que resume su estructura y etiquetas — Claude Code lo " +
+				"Crea un archivo CLAUDE.md en la raíz del Vault que resume su estructura y etiquetas. Claude Code lo " +
 				"carga automáticamente al inicio de cada sesión. Se puede volver a ejecutar en cualquier momento; si ya " +
 				"existe un CLAUDE.md, se le pedirá confirmación, y el archivo actual se guardará como CLAUDE.bak.md " +
 				"antes de sustituirlo.",
@@ -162,7 +162,7 @@ export const es = {
 				"Ajustes → Glass.",
 			generateButton: "Generar CLAUDE.md",
 			notNowButton: "Ahora no",
-			generating: "Generando CLAUDE.md — esto puede tardar un momento...",
+			generating: "Generando CLAUDE.md. Esto puede tardar un momento...",
 			done: "Listo. CLAUDE.md creado en la raíz del Vault.",
 			doneNotice: "CLAUDE.md creado. Claude lo usará a partir de la próxima sesión.",
 			failed: (error: string | undefined) => `Error: ${error}`,
@@ -202,7 +202,7 @@ export const es = {
 			sessionActive: "Sesión activa",
 			sessionEnded: "Sesión finalizada",
 			sessionStatus: (title: string) => `Estado de la sesión: ${title.toLowerCase()}`,
-			updateAvailable: (version: string) => `Glass ${version} está disponible — haga clic para actualizar`,
+			updateAvailable: (version: string) => `Glass ${version} está disponible. Haga clic para actualizar`,
 			mcpRunning: (port: number) => `Servidor MCP del Vault activo en el puerto ${port}`,
 			mcpFailed: "No se pudo iniciar el servidor MCP del Vault",
 			mcpDisabled: "Servidor MCP del Vault desactivado",
@@ -221,7 +221,7 @@ export const es = {
 				`\r\n\x1b[33mCompruebe que '${claudePath}' está en su PATH.${hint}\x1b[0m`,
 			setupHintWindows: " Se requieren Python 3 y pywinpty (pip install pywinpty).",
 			setupHintUnix: " Compruebe que Python 3 esté instalado.",
-			noPreviousSession: `\r\n\x1b[33m[No se encontró ninguna sesión anterior — iniciando una nueva]\x1b[0m\r\n`,
+			noPreviousSession: `\r\n\x1b[33m[No se encontró ninguna sesión anterior. Iniciando una nueva]\x1b[0m\r\n`,
 			sessionEndedWithCode: (exitCode: number) =>
 				`\r\n\x1b[90m[La sesión de Claude Code finalizó con el código de salida ${exitCode}]\x1b[0m`,
 			tmuxNotFound: `\r\n\x1b[33m[No se encontró tmux, iniciando sin sesión persistente. Instale tmux (por ejemplo: brew install tmux) o desactive "Mantener la sesión en ejecución en tmux".]\x1b[0m\r\n`,

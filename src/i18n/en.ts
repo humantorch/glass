@@ -63,7 +63,7 @@ export const en = {
 		persistentTmuxSession: {
 			name: "Keep session running in tmux",
 			desc: (sessionName: string) =>
-				`Runs Claude inside the tmux session '${sessionName}' so it keeps running when you close the panel or quit Obsidian, and reattaches when you reopen it. Attach from any terminal with: tmux attach -t ${sessionName}. New session ends it. Requires tmux (macOS and Linux). After restarting Obsidian, run /mcp in Claude and reconnect obsidian to restore the vault tools without losing the conversation. Takes effect the next time a session starts.`,
+				`Runs Claude inside the tmux session '${sessionName}' so it keeps running when you close the panel or quit Obsidian, and reattaches when you reopen it. Attach from any terminal with: tmux attach -t ${sessionName}. New session ends it. Requires tmux (macOS and Linux). The vault tools reconnect on their own after Obsidian restarts. If they ever stop responding, run /mcp in Claude and reconnect obsidian; the conversation is kept. Takes effect the next time a session starts.`,
 		},
 		skipPermissions: {
 			name: "Skip permission prompts",
@@ -95,7 +95,7 @@ export const en = {
 		generateClaudeMd: {
 			name: "Generate CLAUDE.md",
 			desc:
-				"Creates a CLAUDE.md file at your vault root summarizing its structure and tags — Claude Code " +
+				"Creates a CLAUDE.md file at your vault root summarizing its structure and tags. Claude Code " +
 				"loads this automatically at the start of every session. Safe to run again anytime; if a CLAUDE.md " +
 				"already exists, you'll be asked to confirm, and the current one is saved as CLAUDE.bak.md before " +
 				"it's replaced.",
@@ -161,7 +161,7 @@ export const en = {
 				"anytime from Settings → Glass.",
 			generateButton: "Generate CLAUDE.md",
 			notNowButton: "Not now",
-			generating: "Generating CLAUDE.md — this can take a moment...",
+			generating: "Generating CLAUDE.md. This can take a moment...",
 			done: "Done. CLAUDE.md created at your vault root.",
 			doneNotice: "CLAUDE.md created. Claude will use it starting with your next session.",
 			failed: (error: string | undefined) => `Failed: ${error}`,
@@ -201,7 +201,7 @@ export const en = {
 			sessionActive: "Session active",
 			sessionEnded: "Session ended",
 			sessionStatus: (title: string) => `Session status: ${title.toLowerCase()}`,
-			updateAvailable: (version: string) => `Glass ${version} is available — click to update`,
+			updateAvailable: (version: string) => `Glass ${version} is available. Click to update`,
 			mcpRunning: (port: number) => `Vault MCP server running on port ${port}`,
 			mcpFailed: "Vault MCP server failed to start",
 			mcpDisabled: "Vault MCP server disabled",
@@ -220,7 +220,7 @@ export const en = {
 				`\r\n\x1b[33mCheck that '${claudePath}' is on your PATH.${hint}\x1b[0m`,
 			setupHintWindows: " Python 3 and pywinpty are required (pip install pywinpty).",
 			setupHintUnix: " Check that Python 3 is installed.",
-			noPreviousSession: `\r\n\x1b[33m[No previous session found — starting fresh]\x1b[0m\r\n`,
+			noPreviousSession: `\r\n\x1b[33m[No previous session found. Starting fresh]\x1b[0m\r\n`,
 			sessionEndedWithCode: (exitCode: number) =>
 				`\r\n\x1b[90m[Claude Code session ended with exit code ${exitCode}]\x1b[0m`,
 			tmuxNotFound: `\r\n\x1b[33m[tmux not found, starting without a persistent session. Install tmux (for example: brew install tmux) or turn off "Keep session running in tmux".]\x1b[0m\r\n`,

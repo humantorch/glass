@@ -218,7 +218,7 @@ export class SettingsTab extends PluginSettingTab {
 							await this.plugin.startVaultMcpServer();
 							new Notice(strings.notices.mcpServerStarted);
 						} else {
-							this.plugin.stopVaultMcpServer();
+							this.plugin.stopVaultMcpServer(true);
 							new Notice(strings.notices.mcpServerStopped);
 						}
 					})
@@ -474,7 +474,7 @@ export class SettingsTab extends PluginSettingTab {
 					await this.plugin.startVaultMcpServer();
 					new Notice(strings.notices.mcpServerStarted);
 				} else {
-					this.plugin.stopVaultMcpServer();
+					this.plugin.stopVaultMcpServer(true);
 					new Notice(strings.notices.mcpServerStopped);
 				}
 				return;

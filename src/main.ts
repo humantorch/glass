@@ -204,8 +204,8 @@ export default class ClaudeCodePlugin extends Plugin {
 	private async checkForUpdate(): Promise<void> {
 		try {
 			const resp: RequestUrlResponse = await requestUrl({
-				url: "https://api.github.com/repos/humantorch/blackglass/releases/latest",
-				headers: { "User-Agent": "blackglass-obsidian-plugin" },
+				url: "https://api.github.com/repos/humantorch/glass/releases/latest",
+				headers: { "User-Agent": "glass-obsidian-plugin" },
 			});
 			const data = resp.json as GitHubRelease | null;
 			const latest: string = (data?.tag_name ?? "").replace(/^v/, "");
@@ -251,10 +251,19 @@ export default class ClaudeCodePlugin extends Plugin {
 	async startVaultMcpServer(): Promise<void> {
 		const adapter = this.app.vault.adapter;
 		const vaultRoot = adapter instanceof FileSystemAdapter ? adapter.getBasePath() : "";
-		this.vaultMcpServer = new VaultMcpServer(this.app, this.settings.mcpServerPort, this.settings.mcpReadOnly);
+		this.vaultMcpServer = new VaultMcpServer(this.app, this.settings.mcpServerPort, this.settings.mcpReadOnly, {
+			token: this.settings.mcpToken,
+			version: this.manifest.version,
+			preferredPort: this.settings.mcpLastPort || undefined,
+		});
 		try {
 			const port = await this.vaultMcpServer.start();
 			const token = this.vaultMcpServer.getToken();
+			if (token !== this.settings.mcpToken || port !== this.settings.mcpLastPort) {
+				this.settings.mcpToken = token;
+				this.settings.mcpLastPort = port;
+				await this.saveSettings();
+			}
 			this.registerMcpInProjectSettings(vaultRoot, port, token);
 		} catch (err) {
 			console.error("Glass: failed to start vault MCP server:", err);
@@ -263,7 +272,12 @@ export default class ClaudeCodePlugin extends Plugin {
 		this.getClaudeView()?.updateMcpStatus();
 	}
 
-	stopVaultMcpServer(): void {
+	/** Pass forgetToken when the user turns the server off, so turning it back on issues a new token. */
+	stopVaultMcpServer(forgetToken = false): void {
+		if (forgetToken && this.settings.mcpToken) {
+			this.settings.mcpToken = "";
+			void this.saveSettings();
+		}
 		if (!this.vaultMcpServer) return;
 		const adapter = this.app.vault.adapter;
 		const vaultRoot = adapter instanceof FileSystemAdapter ? adapter.getBasePath() : "";

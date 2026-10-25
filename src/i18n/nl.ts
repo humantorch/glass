@@ -1,4 +1,4 @@
-// Dutch (nl). Machine-translated draft — see src/i18n/README.md.
+// Dutch (nl). Machine-translated draft. See src/i18n/README.md.
 export const nl = {
 	settings: {
 		claudeBinaryPath: {
@@ -64,7 +64,7 @@ export const nl = {
 		persistentTmuxSession: {
 			name: "Sessie actief houden in tmux",
 			desc: (sessionName: string) =>
-				`Draait Claude in de tmux-sessie '${sessionName}', zodat deze blijft draaien als u het paneel sluit of Obsidian afsluit, en opnieuw wordt gekoppeld als u het weer opent. Koppel vanuit elke terminal met: tmux attach -t ${sessionName}. Nieuwe sessie beëindigt deze. Vereist tmux (macOS en Linux). Voer na het herstarten van Obsidian /mcp uit in Claude en verbind obsidian opnieuw om de vault-tools te herstellen zonder het gesprek te verliezen. Wordt van kracht bij de volgende sessiestart.`,
+				`Draait Claude in de tmux-sessie '${sessionName}', zodat deze blijft draaien als u het paneel sluit of Obsidian afsluit, en opnieuw wordt gekoppeld als u het weer opent. Koppel vanuit elke terminal met: tmux attach -t ${sessionName}. Nieuwe sessie beëindigt deze. Vereist tmux (macOS en Linux). De vault-tools maken na het herstarten van Obsidian vanzelf opnieuw verbinding. Reageren ze niet meer, voer dan /mcp uit in Claude en verbind obsidian opnieuw; het gesprek blijft behouden. Wordt van kracht bij de volgende sessiestart.`,
 		},
 		skipPermissions: {
 			name: "Toestemmingsvragen overslaan",
@@ -97,7 +97,7 @@ export const nl = {
 			name: "CLAUDE.md genereren",
 			desc:
 				"Maakt een CLAUDE.md-bestand aan in de hoofdmap van de Vault met een samenvatting van de structuur en " +
-				"tags — Claude Code laadt dit automatisch bij het begin van elke sessie. Kan op elk moment opnieuw " +
+				"tags. Claude Code laadt dit automatisch bij het begin van elke sessie. Kan op elk moment opnieuw " +
 				"worden uitgevoerd; als er al een CLAUDE.md bestaat, wordt om bevestiging gevraagd en wordt het " +
 				"huidige bestand opgeslagen als CLAUDE.bak.md voordat het wordt vervangen.",
 			button: "CLAUDE.md genereren",
@@ -162,7 +162,7 @@ export const nl = {
 				"het op elk moment opnieuw genereren via Instellingen → Glass.",
 			generateButton: "CLAUDE.md genereren",
 			notNowButton: "Niet nu",
-			generating: "CLAUDE.md wordt gegenereerd — dit kan even duren...",
+			generating: "CLAUDE.md wordt gegenereerd. Dit kan even duren...",
 			done: "Klaar. CLAUDE.md aangemaakt in de hoofdmap van de Vault.",
 			doneNotice: "CLAUDE.md aangemaakt. Claude gebruikt dit vanaf de volgende sessie.",
 			failed: (error: string | undefined) => `Mislukt: ${error}`,
@@ -202,7 +202,7 @@ export const nl = {
 			sessionActive: "Sessie actief",
 			sessionEnded: "Sessie beëindigd",
 			sessionStatus: (title: string) => `Sessiestatus: ${title.toLowerCase()}`,
-			updateAvailable: (version: string) => `Glass ${version} is beschikbaar — klik om bij te werken`,
+			updateAvailable: (version: string) => `Glass ${version} is beschikbaar. Klik om bij te werken`,
 			mcpRunning: (port: number) => `MCP-server voor de Vault actief op poort ${port}`,
 			mcpFailed: "MCP-server voor de Vault kon niet worden gestart",
 			mcpDisabled: "MCP-server voor de Vault uitgeschakeld",
@@ -221,7 +221,7 @@ export const nl = {
 				`\r\n\x1b[33mControleer of '${claudePath}' zich in uw PATH bevindt.${hint}\x1b[0m`,
 			setupHintWindows: " Python 3 en pywinpty zijn vereist (pip install pywinpty).",
 			setupHintUnix: " Controleer of Python 3 is geïnstalleerd.",
-			noPreviousSession: `\r\n\x1b[33m[Geen eerdere sessie gevonden — nieuwe sessie wordt gestart]\x1b[0m\r\n`,
+			noPreviousSession: `\r\n\x1b[33m[Geen eerdere sessie gevonden. Nieuwe sessie wordt gestart]\x1b[0m\r\n`,
 			sessionEndedWithCode: (exitCode: number) =>
 				`\r\n\x1b[90m[Claude Code-sessie beëindigd met afsluitcode ${exitCode}]\x1b[0m`,
 			tmuxNotFound: `\r\n\x1b[33m[tmux niet gevonden, starten zonder blijvende sessie. Installeer tmux (bijvoorbeeld: brew install tmux) of schakel "Sessie actief houden in tmux" uit.]\x1b[0m\r\n`,

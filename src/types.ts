@@ -15,6 +15,8 @@ export interface ClaudeCodeSettings {
 	mcpServerEnabled: boolean;
 	mcpServerPort: number;
 	mcpReadOnly: boolean;
+	mcpToken: string;
+	mcpLastPort: number;
 	skipPermissions: boolean;
 	scrollback: number;
 	claudeMdOfferShown: boolean;
@@ -35,6 +37,8 @@ export const DEFAULT_SETTINGS: ClaudeCodeSettings = {
 	mcpServerEnabled: true,
 	mcpServerPort: 27123,
 	mcpReadOnly: false,
+	mcpToken: "",
+	mcpLastPort: 0,
 	skipPermissions: false,
 	scrollback: 5000,
 	claudeMdOfferShown: false,

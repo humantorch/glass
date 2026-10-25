@@ -1,4 +1,4 @@
-// German (de). Machine-translated draft — see src/i18n/README.md.
+// German (de). Machine-translated draft. See src/i18n/README.md.
 export const de = {
 	settings: {
 		claudeBinaryPath: {
@@ -64,7 +64,7 @@ export const de = {
 		persistentTmuxSession: {
 			name: "Sitzung in tmux weiterlaufen lassen",
 			desc: (sessionName: string) =>
-				`Führt Claude in der tmux-Sitzung '${sessionName}' aus, sodass sie weiterläuft, wenn Sie das Panel schließen oder Obsidian beenden, und beim erneuten Öffnen wieder verbunden wird. Von jedem Terminal aus verbinden mit: tmux attach -t ${sessionName}. Neue Sitzung beendet sie. Erfordert tmux (macOS und Linux). Führen Sie nach einem Neustart von Obsidian in Claude /mcp aus und verbinden Sie obsidian erneut, um die Vault-Werkzeuge wiederherzustellen, ohne die Unterhaltung zu verlieren. Wird beim nächsten Sitzungsstart wirksam.`,
+				`Führt Claude in der tmux-Sitzung '${sessionName}' aus, sodass sie weiterläuft, wenn Sie das Panel schließen oder Obsidian beenden, und beim erneuten Öffnen wieder verbunden wird. Von jedem Terminal aus verbinden mit: tmux attach -t ${sessionName}. Neue Sitzung beendet sie. Erfordert tmux (macOS und Linux). Die Vault-Werkzeuge verbinden sich nach einem Neustart von Obsidian von selbst wieder. Falls sie nicht mehr reagieren, führen Sie in Claude /mcp aus und verbinden Sie obsidian erneut; die Unterhaltung bleibt erhalten. Wird beim nächsten Sitzungsstart wirksam.`,
 		},
 		skipPermissions: {
 			name: "Berechtigungsabfragen überspringen",
@@ -96,7 +96,7 @@ export const de = {
 		generateClaudeMd: {
 			name: "CLAUDE.md generieren",
 			desc:
-				"Erstellt eine CLAUDE.md-Datei im Vault-Stammverzeichnis, die dessen Struktur und Tags zusammenfasst — Claude Code " +
+				"Erstellt eine CLAUDE.md-Datei im Vault-Stammverzeichnis, die dessen Struktur und Tags zusammenfasst. Claude Code " +
 				"lädt diese automatisch zu Beginn jeder Sitzung. Kann jederzeit erneut ausgeführt werden; falls bereits eine CLAUDE.md " +
 				"existiert, werden Sie um Bestätigung gebeten, und die aktuelle Datei wird vor dem Ersetzen als CLAUDE.bak.md " +
 				"gesichert.",
@@ -162,7 +162,7 @@ export const de = {
 				"Einstellungen → Glass neu generieren.",
 			generateButton: "CLAUDE.md generieren",
 			notNowButton: "Jetzt nicht",
-			generating: "CLAUDE.md wird generiert — das kann einen Moment dauern...",
+			generating: "CLAUDE.md wird generiert. Das kann einen Moment dauern...",
 			done: "Fertig. CLAUDE.md wurde im Vault-Stammverzeichnis erstellt.",
 			doneNotice: "CLAUDE.md erstellt. Claude verwendet sie ab der nächsten Sitzung.",
 			failed: (error: string | undefined) => `Fehlgeschlagen: ${error}`,
@@ -202,7 +202,7 @@ export const de = {
 			sessionActive: "Sitzung aktiv",
 			sessionEnded: "Sitzung beendet",
 			sessionStatus: (title: string) => `Sitzungsstatus: ${title.toLowerCase()}`,
-			updateAvailable: (version: string) => `Glass ${version} ist verfügbar — klicken zum Aktualisieren`,
+			updateAvailable: (version: string) => `Glass ${version} ist verfügbar. Klicken zum Aktualisieren`,
 			mcpRunning: (port: number) => `Vault-MCP-Server läuft auf Port ${port}`,
 			mcpFailed: "Vault-MCP-Server konnte nicht gestartet werden",
 			mcpDisabled: "Vault-MCP-Server deaktiviert",
@@ -221,7 +221,7 @@ export const de = {
 				`\r\n\x1b[33mPrüfen Sie, ob '${claudePath}' in Ihrem PATH liegt.${hint}\x1b[0m`,
 			setupHintWindows: " Python 3 und pywinpty werden benötigt (pip install pywinpty).",
 			setupHintUnix: " Prüfen Sie, ob Python 3 installiert ist.",
-			noPreviousSession: `\r\n\x1b[33m[Keine vorherige Sitzung gefunden — neue Sitzung wird gestartet]\x1b[0m\r\n`,
+			noPreviousSession: `\r\n\x1b[33m[Keine vorherige Sitzung gefunden. Neue Sitzung wird gestartet]\x1b[0m\r\n`,
 			sessionEndedWithCode: (exitCode: number) =>
 				`\r\n\x1b[90m[Claude-Code-Sitzung mit Exit-Code ${exitCode} beendet]\x1b[0m`,
 			tmuxNotFound: `\r\n\x1b[33m[tmux nicht gefunden, Start ohne dauerhafte Sitzung. Installieren Sie tmux (zum Beispiel: brew install tmux) oder deaktivieren Sie "Sitzung in tmux weiterlaufen lassen".]\x1b[0m\r\n`,

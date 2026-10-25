@@ -179,7 +179,7 @@ const TOOL_DEFINITIONS = [
 			properties: {
 				path: {
 					type: "string",
-					description: "Vault-relative path to the note, e.g. 'Projects/blackglass.md'",
+					description: "Vault-relative path to the note, e.g. 'Projects/glass.md'",
 				},
 			},
 			required: ["path"],
@@ -195,7 +195,7 @@ const TOOL_DEFINITIONS = [
 			properties: {
 				path: {
 					type: "string",
-					description: "Vault-relative path to the note, e.g. 'Projects/blackglass.md'",
+					description: "Vault-relative path to the note, e.g. 'Projects/glass.md'",
 				},
 			},
 			required: ["path"],
@@ -387,6 +387,21 @@ const TOOL_DEFINITIONS = [
 
 const WRITE_TOOLS = new Set(["create_note", "update_note", "create_canvas", "update_canvas"]);
 
+// Sent in the initialize result; Claude Code adds it to the system prompt. Without it, Claude
+// reaches for its own file tools first even when only Obsidian has the answer.
+const SERVER_INSTRUCTIONS =
+	"These tools talk to the running Obsidian app for this vault. Plain file reads are fine for " +
+	"reading or grepping note text, but use these tools first when Obsidian knows something the " +
+	"files don't:\n" +
+	"- Links: get_backlinks and get_outlinks use Obsidian's link index, which resolves aliases, " +
+	"display text and short links that a text search misses.\n" +
+	"- What the user is looking at: get_active_note and list_panes know which notes are open " +
+	"and focused, so use them for \"this note\" or \"what I have open\".\n" +
+	"- Tags: list_tags includes frontmatter and inline tags.\n" +
+	"- Acting in Obsidian: open_note, split_pane, navigate_to_heading and show_notice change " +
+	"what the user sees.\n" +
+	"- Canvases: use the canvas tools rather than editing .canvas JSON by hand.";
+
 /**
  * Wraps vault note content in explicit delimiters and a data-boundary instruction.
  * This is a prompt injection defence: it makes the data/instruction boundary
@@ -419,13 +434,24 @@ export class VaultMcpServer {
 	private port: number;
 	private readOnly: boolean;
 	private actualPort: number | null = null;
-	private token: string = "";
+	private token: string;
+	private version: string;
 	private paneRegistry = new Map<string, WorkspaceLeaf>();
 
-	constructor(app: App, port: number, readOnly = false) {
+	private preferredPort: number | null;
+
+	constructor(
+		app: App,
+		port: number,
+		readOnly = false,
+		options: { token?: string; version?: string; preferredPort?: number } = {}
+	) {
 		this.app = app;
 		this.port = port;
 		this.readOnly = readOnly;
+		this.token = options.token ?? "";
+		this.version = options.version ?? "0.0.0";
+		this.preferredPort = options.preferredPort ?? null;
 	}
 
 	getActualPort(): number | null {
@@ -437,16 +463,25 @@ export class VaultMcpServer {
 	}
 
 	start(): Promise<number> {
-		this.token = crypto.randomBytes(32).toString("hex");
+		// Reuse a saved token so a reattached tmux session's .mcp.json stays valid
+		if (!this.token) this.token = crypto.randomBytes(32).toString("hex");
+		// The configured port plus up to 4 fallbacks. Several vaults starting at once race
+		// for these, so a vault tries the port it last bound first to keep its .mcp.json URL.
+		const candidates = [0, 1, 2, 3, 4].map((offset) => this.port + offset);
+		if (this.preferredPort !== null && candidates.includes(this.preferredPort)) {
+			candidates.splice(candidates.indexOf(this.preferredPort), 1);
+			candidates.unshift(this.preferredPort);
+		}
 		return new Promise((resolve, reject) => {
-			const tryPort = (port: number, attemptsLeft: number) => {
+			const tryPort = (index: number) => {
+				const port = candidates[index];
 				const server = http.createServer((req, res) => {
 					this.handleRequest(req, res);
 				});
 
 				server.on("error", (err: NodeJS.ErrnoException) => {
-					if (err.code === "EADDRINUSE" && attemptsLeft > 0) {
-						tryPort(port + 1, attemptsLeft - 1);
+					if (err.code === "EADDRINUSE" && index + 1 < candidates.length) {
+						tryPort(index + 1);
 					} else {
 						reject(new Error(`Could not bind MCP server: ${err.message}`));
 					}
@@ -459,7 +494,7 @@ export class VaultMcpServer {
 				});
 			};
 
-			tryPort(this.port, 4);
+			tryPort(0);
 		});
 	}
 
@@ -549,7 +584,8 @@ export class VaultMcpServer {
 					result: {
 						protocolVersion: "2024-11-05",
 						capabilities: { tools: {} },
-						serverInfo: { name: "obsidian-blackglass", version: "0.1.0" },
+						serverInfo: { name: "obsidian-glass", version: this.version },
+						instructions: SERVER_INSTRUCTIONS,
 					},
 				};
 

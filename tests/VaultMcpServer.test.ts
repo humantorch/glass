@@ -395,7 +395,8 @@ describe("VaultMcpServer", () => {
 			const { body } = await rpc(port, token, "initialize");
 			expect(body.result.protocolVersion).toBe("2024-11-05");
 			expect(body.result.capabilities).toHaveProperty("tools");
-			expect(body.result.serverInfo.name).toBe("obsidian-blackglass");
+			expect(body.result.serverInfo.name).toBe("obsidian-glass");
+			expect(body.result.instructions).toContain("get_backlinks");
 		});
 	});
 
@@ -1388,6 +1389,33 @@ describe("VaultMcpServer", () => {
 	});
 
 	// -------------------------------------------------------------------------
+	// Token reuse
+	// -------------------------------------------------------------------------
+
+	describe("token", () => {
+		it("reuses a saved token instead of generating a new one", async () => {
+			const server2 = new VaultMcpServer(mock.app as any, TEST_PORT + 2, false, { token: "saved-token" });
+			const port2 = await server2.start();
+			expect(server2.getToken()).toBe("saved-token");
+			const { status } = await rpc(port2, "saved-token", "initialize");
+			expect(status).toBe(200);
+			await server2.stop();
+		});
+
+		it("generates a token when none is saved", () => {
+			expect(token).toMatch(/^[0-9a-f]{64}$/);
+		});
+
+		it("reports the plugin version it was given", async () => {
+			const server2 = new VaultMcpServer(mock.app as any, TEST_PORT + 2, false, { version: "9.9.9" });
+			const port2 = await server2.start();
+			const { body } = await rpc(port2, server2.getToken(), "initialize");
+			expect(body.result.serverInfo.version).toBe("9.9.9");
+			await server2.stop();
+		});
+	});
+
+	// -------------------------------------------------------------------------
 	// Port fallback
 	// -------------------------------------------------------------------------
 
@@ -1397,6 +1425,18 @@ describe("VaultMcpServer", () => {
 			const server2 = new VaultMcpServer(mock.app as any, TEST_PORT);
 			const port2 = await server2.start();
 			expect(port2).toBe(TEST_PORT + 1);
+			await server2.stop();
+		});
+
+		it("tries the preferred port before the configured one", async () => {
+			const server2 = new VaultMcpServer(mock.app as any, TEST_PORT, false, { preferredPort: TEST_PORT + 3 });
+			expect(await server2.start()).toBe(TEST_PORT + 3);
+			await server2.stop();
+		});
+
+		it("ignores a preferred port outside the fallback range", async () => {
+			const server2 = new VaultMcpServer(mock.app as any, TEST_PORT, false, { preferredPort: TEST_PORT + 50 });
+			expect(await server2.start()).toBe(TEST_PORT + 1);
 			await server2.stop();
 		});
 	});

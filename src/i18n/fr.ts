@@ -1,4 +1,4 @@
-// French (fr). Machine-translated draft — see src/i18n/README.md.
+// French (fr). Machine-translated draft. See src/i18n/README.md.
 export const fr = {
 	settings: {
 		claudeBinaryPath: {
@@ -64,7 +64,7 @@ export const fr = {
 		persistentTmuxSession: {
 			name: "Garder la session active dans tmux",
 			desc: (sessionName: string) =>
-				`Exécute Claude dans la session tmux '${sessionName}' pour qu'elle continue de tourner lorsque vous fermez le panneau ou quittez Obsidian, et s'y reconnecte à la réouverture. Connectez-vous depuis n'importe quel terminal avec : tmux attach -t ${sessionName}. Nouvelle session la termine. Nécessite tmux (macOS et Linux). Après un redémarrage d'Obsidian, exécutez /mcp dans Claude et reconnectez obsidian pour rétablir les outils du vault sans perdre la conversation. Prend effet au prochain démarrage de session.`,
+				`Exécute Claude dans la session tmux '${sessionName}' pour qu'elle continue de tourner lorsque vous fermez le panneau ou quittez Obsidian, et s'y reconnecte à la réouverture. Connectez-vous depuis n'importe quel terminal avec : tmux attach -t ${sessionName}. Nouvelle session la termine. Nécessite tmux (macOS et Linux). Les outils du vault se reconnectent d'eux-mêmes après un redémarrage d'Obsidian. S'ils ne répondent plus, exécutez /mcp dans Claude et reconnectez obsidian ; la conversation est conservée. Prend effet au prochain démarrage de session.`,
 		},
 		skipPermissions: {
 			name: "Ignorer les demandes d'autorisation",
@@ -96,7 +96,7 @@ export const fr = {
 		generateClaudeMd: {
 			name: "Générer CLAUDE.md",
 			desc:
-				"Crée un fichier CLAUDE.md à la racine du Vault résumant sa structure et ses tags — Claude Code le " +
+				"Crée un fichier CLAUDE.md à la racine du Vault résumant sa structure et ses tags. Claude Code le " +
 				"charge automatiquement au début de chaque session. Peut être relancé à tout moment ; si un fichier " +
 				"CLAUDE.md existe déjà, une confirmation vous sera demandée, et le fichier actuel sera enregistré " +
 				"sous CLAUDE.bak.md avant d'être remplacé.",
@@ -162,7 +162,7 @@ export const fr = {
 				"régénérer à tout moment depuis Paramètres → Glass.",
 			generateButton: "Générer CLAUDE.md",
 			notNowButton: "Pas maintenant",
-			generating: "Génération de CLAUDE.md en cours — cela peut prendre un moment...",
+			generating: "Génération de CLAUDE.md en cours. Cela peut prendre un moment...",
 			done: "Terminé. CLAUDE.md créé à la racine du Vault.",
 			doneNotice: "CLAUDE.md créé. Claude l'utilisera dès la prochaine session.",
 			failed: (error: string | undefined) => `Échec : ${error}`,
@@ -202,7 +202,7 @@ export const fr = {
 			sessionActive: "Session active",
 			sessionEnded: "Session terminée",
 			sessionStatus: (title: string) => `État de la session : ${title.toLowerCase()}`,
-			updateAvailable: (version: string) => `Glass ${version} est disponible — cliquez pour mettre à jour`,
+			updateAvailable: (version: string) => `Glass ${version} est disponible. Cliquez pour mettre à jour`,
 			mcpRunning: (port: number) => `Serveur MCP du Vault actif sur le port ${port}`,
 			mcpFailed: "Échec du démarrage du serveur MCP du Vault",
 			mcpDisabled: "Serveur MCP du Vault désactivé",
@@ -221,7 +221,7 @@ export const fr = {
 				`\r\n\x1b[33mVérifiez que '${claudePath}' se trouve dans votre PATH.${hint}\x1b[0m`,
 			setupHintWindows: " Python 3 et pywinpty sont requis (pip install pywinpty).",
 			setupHintUnix: " Vérifiez que Python 3 est installé.",
-			noPreviousSession: `\r\n\x1b[33m[Aucune session précédente trouvée — démarrage d'une nouvelle session]\x1b[0m\r\n`,
+			noPreviousSession: `\r\n\x1b[33m[Aucune session précédente trouvée. Démarrage d'une nouvelle session]\x1b[0m\r\n`,
 			sessionEndedWithCode: (exitCode: number) =>
 				`\r\n\x1b[90m[Session Claude Code terminée avec le code de sortie ${exitCode}]\x1b[0m`,
 			tmuxNotFound: `\r\n\x1b[33m[tmux introuvable, démarrage sans session persistante. Installez tmux (par exemple : brew install tmux) ou désactivez « Garder la session active dans tmux ».]\x1b[0m\r\n`,

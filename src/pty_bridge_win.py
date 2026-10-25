@@ -60,7 +60,7 @@ def main():
         try:
             data = pty.read()
         except Exception as e:
-            sys.stderr.write(f"[blackglass pty read error: {e}]\n")
+            sys.stderr.write(f"[glass pty read error: {e}]\n")
             sys.stderr.flush()
             break
         if data:
