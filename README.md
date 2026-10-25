@@ -31,6 +31,13 @@ Every slash command, every MCP tool, every session you'd have in a standalone te
 - **Version-manager support**: Claude installed through mise, asdf or Volta is now found automatically, because their shim directories are added to the PATH.
 - **Retired quick-ask models**: Quick-ask settings that still point to a retired model ID are now switched to its replacement automatically, instead of showing a blank model dropdown.
 - **GLASS_MODE environment variable**: Claude sessions launched by Glass, including those inside tmux, now set `GLASS_MODE`, so your scripts and status lines can tell when they're running inside the plugin.
+
+## 1.16.2
+
+- **Vault tools stay connected**: Claude keeps access to your vault tools when you reattach to a tmux session, and vaults that start at the same time no longer take each other's ports.
+- **Smarter vault tool use**: Claude now gets guidance on when the vault tools work better than plain file reads, such as for links, open notes, tags, canvases, and actions in Obsidian.
+- **Accurate update checks**: Update checks now look in the correct Glass repository, and the vault server shows up as obsidian-glass with the real plugin version.
+- **Cleaner wording**: The old plugin name is gone from all on-screen text, and the /mcp reconnect tip now reads as a fallback in every supported language.
 <!-- WHATS-NEW-END -->
 
 <a name="features"></a>
